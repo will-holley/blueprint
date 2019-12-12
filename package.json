@@ -1,0 +1,19 @@
+{
+  "name": "blueprint",
+  "version": "0.0.1",
+  "description": "inspire yourself",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/will-holley/blueprint.git"
+  },
+  "author": "will holley",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/will-holley/blueprint/issues"
+  },
+  "homepage": "https://github.com/will-holley/blueprint#readme"
+}
