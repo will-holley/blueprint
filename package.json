@@ -3,9 +3,6 @@
   "version": "0.0.1",
   "description": "inspire yourself",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/will-holley/blueprint.git"
@@ -15,5 +12,47 @@
   "bugs": {
     "url": "https://github.com/will-holley/blueprint/issues"
   },
-  "homepage": "https://github.com/will-holley/blueprint#readme"
+  "homepage": "https://github.com/will-holley/blueprint#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "echo \"Error: no lint specified\" && exit 1",
+    "build": "rimraf dist && babel src --out-dir dist && webpack --mode production --config src/webpack.config.js",
+    "server-dev": "nodemon --exec babel-node src/server/index.js",
+    "server-prod": "node dist/server/index.js",
+    "client": "webpack-dev-server --mode development --config src/webpack.config.js"
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.4.4",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^7.0.0",
+    "express": "^4.16.4",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/node": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-transform-async-to-generator": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/preset-react": "^7.0.0",
+    "@rebass/grid": "^6.0.0",
+    "babel-loader": "^8.0.5",
+    "babel-plugin-styled-components": "^1.10.0",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
+    "immutable": "^4.0.0-rc.12",
+    "nodemon": "^1.18.11",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-helmet": "^5.2.0",
+    "react-router-dom": "^5.0.0",
+    "slate": "^0.46.1",
+    "slate-react": "^0.21.24",
+    "styled-components": "^4.2.0",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1",
+    "webpack-dev-server": "^3.3.1"
+  }
 }
