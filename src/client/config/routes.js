@@ -1,21 +1,13 @@
-import Dashboard from '../views/Dashboard';
-import Editor from '../views/Editor/Editor';
+import Dashboard from "../views/Dashboard";
 
 const routes = {
-	'/': {
-		exact: true,
-		component: Dashboard,
-		authenticated: false,
-		label: 'Dashboard',
-		nav: true
-	},
-	'/editor': {
-		exact: true,
-		component: Editor,
-		authenticated: false,
-		label: 'Editor',
-		nav: true
-	}
+  "/": {
+    exact: true,
+    component: Dashboard,
+    authenticated: false,
+    label: "Dashboard",
+    nav: false
+  }
 };
 
 export default routes;
