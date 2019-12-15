@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
   html {
@@ -23,8 +23,8 @@ const GlobalStyle = createGlobalStyle`
 		// Layout
 		padding: 50px;
 		// Colors
-		background: linear-gradient(45deg,#003bc6 0%,#00319b 100%);
-		color: white;
+		background: ${({ theme }) => theme.background};
+		color: ${({ theme }) => theme.text.color};
 	}
 `;
 
