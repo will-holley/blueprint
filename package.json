@@ -27,7 +27,9 @@
     "cors": "^2.8.5",
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
-    "uuid": "^3.3.2"
+    "immutability-helper": "^3.0.1",
+    "react-sweet-state": "^1.1.1",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
@@ -48,11 +50,9 @@
     "react-dom": "^16.8.6",
     "react-helmet": "^5.2.0",
     "react-router-dom": "^5.0.0",
-    "slate": "^0.46.1",
-    "slate-react": "^0.21.24",
     "styled-components": "^4.2.0",
-    "webpack": "^4.30.0",
+    "webpack": "^4.41.2",
     "webpack-cli": "^3.3.1",
-    "webpack-dev-server": "^3.3.1"
+    "webpack-dev-server": "^3.9.0"
   }
 }
