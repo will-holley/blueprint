@@ -1,7 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import React from "react";
+import PropTypes from "prop-types";
+import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 const H1 = styled.h1``;
 
@@ -12,19 +12,29 @@ const H3 = styled.h3``;
 const P = styled.p``;
 
 const A = styled(Link)`
-	font-size: 16px;
-	font-weight: 400;
-	text-decoration: none;
-	${props =>
-		props.current &&
-		`
+  font-size: 16px;
+  font-weight: 400;
+  text-decoration: none;
+  ${props =>
+    props.current &&
+    `
 		cursor:pointer;
 		border-bottom: 1px solid;
 	`}
 `;
 
 A.propTypes = {
-	current: PropTypes.bool.isRequired
+  current: PropTypes.bool.isRequired
 };
 
-export { H1, H2, H3, P, A };
+const Input = styled.input`
+  font-size: 2rem;
+  width: 100%;
+  display: block;
+`;
+
+const Button = styled.button`
+  font-size: 2rem;
+`;
+
+export { H1, H2, H3, P, A, Input, Button };
