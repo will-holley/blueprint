@@ -40,6 +40,14 @@ module.exports = {
         test: /\.ts$/,
         use: "ts-loader",
         exclude: /node_modules/
+      },
+      {
+        test: /\.(woff|woff2)$/,
+        use: [
+          {
+            loader: "url-loader"
+          }
+        ]
       }
     ]
   },
