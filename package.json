@@ -16,18 +16,21 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "echo \"Error: no lint specified\" && exit 1",
-    "build": "rimraf dist && babel src --out-dir dist && webpack --mode production --config src/webpack.config.js",
+    "build": "rimraf dist && babel src --out-dir dist && webpack --mode production --config webpack.config.js",
     "server-dev": "nodemon --exec babel-node src/server/index.js",
     "server-prod": "node dist/server/index.js",
-    "client": "webpack-dev-server --mode development --config src/webpack.config.js"
+    "client": "webpack-dev-server --mode development --config webpack.config.js"
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
+    "d3-flextree": "^2.1.1",
+    "d3-hierarchy": "^1.1.9",
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
     "immutability-helper": "^3.0.1",
+    "react-hotkeys-hook": "^1.5.4",
     "react-sweet-state": "^1.1.1",
     "uuid": "^3.3.3"
   },
@@ -51,6 +54,8 @@
     "react-helmet": "^5.2.0",
     "react-router-dom": "^5.0.0",
     "styled-components": "^4.2.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.3",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.1",
     "webpack-dev-server": "^3.9.0"
