@@ -20,7 +20,7 @@ const actions = {
       };
     });
     // Update all nodes
-    let newState = update(state, {
+    const newState = update(state, {
       documents: {
         [document.id]: {
           nodes: { $set: nodes }
@@ -69,6 +69,16 @@ const actions = {
         }
       });
     }
+    setState(newState);
+  },
+  setAsFocused: nodeId => ({ setState, getState }) => {
+    console.log(nodeId);
+    const state = getState();
+    const newState = update(state, {
+      currentDoc: {
+        activeNode: { $set: nodeId }
+      }
+    });
     setState(newState);
   }
 };

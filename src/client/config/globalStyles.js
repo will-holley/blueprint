@@ -25,18 +25,6 @@ const GlobalStyle = createGlobalStyle`
 		background: ${({ theme }) => theme.background};
 		color: ${({ theme }) => theme.text.color};
 	}
-
-	[contenteditable] {
-		text-align: center;
-		&:empty:before {
-			content: attr(placeholder);
-			display: block;
-			font-size: 26px;
-		}
-		&:focus {
-			outline: none;
-		}
-	}
 `;
 
 export default GlobalStyle;

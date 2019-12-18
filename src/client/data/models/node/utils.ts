@@ -6,6 +6,7 @@ import { flextree } from "d3-flextree";
 import { NodeType } from "./interfaces";
 
 const DEFAULT_WIDTH = 200;
+const DEFAULT_HEIGHT = 100;
 
 const createNode = (parentId: string): NodeType => ({
   id: uuidv4(),
@@ -15,10 +16,7 @@ const createNode = (parentId: string): NodeType => ({
     y: null
   },
   dimensions: {
-    //* Placeholder for Node layout.  This property is used to track height for position calculations.
-    //* and is *not* passed into the CSS positioning (height is set to `auto`).
-    height: 50,
-    // Default width.  Used for both setting node CSS and tracking position.
+    height: DEFAULT_HEIGHT,
     width: DEFAULT_WIDTH
   },
   content: {
@@ -36,7 +34,8 @@ const computeNodePositions = (nodes: Array<NodeType>): Array<object> => {
 
   //* Use the flextree for now...
   const tree = flextree({
-    spacing: (nodeA: object, nodeB: object): number => DEFAULT_WIDTH * 1.5,
+    spacing: (nodeA: object | any, nodeB: object | any): number =>
+      DEFAULT_WIDTH,
     nodeSize: ({ data: { dimensions } }: object | any): [number, number] => {
       return [dimensions.height, dimensions.width];
     }

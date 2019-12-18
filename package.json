@@ -31,7 +31,9 @@
     "express": "^4.16.4",
     "immutability-helper": "^3.0.1",
     "react-hotkeys-hook": "^1.5.4",
+    "react-svg-pan-zoom": "^3.7.0",
     "react-sweet-state": "^1.1.1",
+    "react-virtualized": "^9.21.2",
     "uuid": "^3.3.3"
   },
   "devDependencies": {

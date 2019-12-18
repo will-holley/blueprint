@@ -7,6 +7,7 @@ import { useWindowSize } from "../utils/hooks";
 import useStore from "../data/store";
 // Components
 import { Container, Text, NewChildButton } from "./style/Node.style";
+import { Edge } from "./../components/style/Edge.style";
 
 const Node = ({
   id,
@@ -37,13 +38,10 @@ const Node = ({
   //! == LIFECYCLE ==
   //! ===============
 
-  /**
-   * Run on mount (b/c of empty dependency array)
-   */
   useEffect(() => {
     // isActive should always be `true`
-    textInput.current.focus();
-  }, []);
+    if (isActive) textInput.current.focus();
+  });
 
   //! ====================
   //! == EVENT HANDLERS ==
@@ -71,11 +69,15 @@ const Node = ({
     // as well as the visible text.
     const nodeHeight = el.current.clientHeight;
     let shouldUpdateHeight = false;
-    if (nodeHeight !== lastHeight) {
-      lastHeight = nodeHeight;
-      shouldUpdateHeight = true;
-    }
+    // if (nodeHeight !== lastHeight) {
+    //   lastHeight = nodeHeight;
+    //   shouldUpdateHeight = true;
+    // }
     actions.updateNodeText(id, value, shouldUpdateHeight ? nodeHeight : null);
+  };
+
+  const handleClick = event => {
+    actions.setAsFocused(id);
   };
 
   //! ============
@@ -84,32 +86,54 @@ const Node = ({
 
   // Render relative to window innerHeight and innerWidth
   const { height: windowHeight, width: windowWidth } = useWindowSize();
-  const quarterHeight = windowHeight / 4; // start here for vertical tree
-  const midWidth = windowWidth / 2;
-  const adjustedY = quarterHeight + y;
-  const adjustedX = midWidth + x;
+  const calibrateX = n => windowWidth / 2 + n - width;
+  const calibrateY = n => windowHeight / 3 + n;
+  const calibratedY = calibrateY(y);
+  const calibratedX = calibrateX(x);
+
+  let d;
+  if (parentId) {
+    const {
+      position: { y: parentY, x: parentX },
+      dimensions: { width: parentWidth, height: parentHeight }
+    } = state.documents[state.currentDoc.id].nodes[parentId];
+
+    console.log(parentX, calibrateX(parentX));
+
+    d = [
+      "M",
+      calibrateX(parentX) + parentWidth / 2,
+      calibrateY(parentY) + parentHeight,
+      "L",
+      calibratedX + width / 2,
+      calibratedY
+    ];
+  }
+
   return (
-    <Container
-      ref={el}
-      width={width}
-      top={adjustedY - height / 2}
-      left={adjustedX - width / 2}
-    >
-      <Text
-        ref={textInput}
+    <>
+      {parentId && <Edge key={`${parentId}-${id}`} d={d.join(" ")} />}
+      <Container
+        ref={el}
         width={width}
-        contentEditable={true}
-        suppressContentEditableWarning={true}
-        onInput={handleTextInput}
-        placeholder={"💭"}
+        height={height}
+        y={calibratedY}
+        x={calibratedX}
       >
-        {text}
-      </Text>
-      <p>
-        {x},{y}
-      </p>
-      <NewChildButton onClick={addChild}>➕</NewChildButton>
-    </Container>
+        <Text
+          ref={textInput}
+          onClick={handleClick}
+          width={width}
+          contentEditable={true}
+          suppressContentEditableWarning={true}
+          onInput={handleTextInput}
+          placeholder={"💭"}
+        >
+          {text}
+        </Text>
+        <NewChildButton onClick={addChild}>➕</NewChildButton>
+      </Container>
+    </>
   );
 };
 

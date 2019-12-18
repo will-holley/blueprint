@@ -8,16 +8,14 @@ const Container = styled.div`
   // padding: 5vh 5vw 5vh 5vw;
   // height: ${({ height }) => height}px;
   // width: ${({ width }) => width}px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 5%;
-  overflow: scroll;
   //background:linear-gradient(to right, red, red 50%, blue 50%);
+  height: 100vh;
+  width: 100vw;
 `;
 
-const Actions = styled.div``;
+const Actions = styled.div`
+  position: fixed;
+  z-index: 99999;
+`;
 
 export { Container, Actions };

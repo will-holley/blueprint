@@ -7,6 +7,8 @@ import useStore from "../data/store";
 // Components
 import { Container, Actions } from "./../components/style/Document.style";
 import Node from "./../components/Node";
+import { AutoSizer } from "react-virtualized";
+import { UncontrolledReactSVGPanZoom } from "react-svg-pan-zoom";
 
 const Document = () => {
   //! ============
@@ -25,10 +27,6 @@ const Document = () => {
   ] = useStore();
   const { nodes, edges } = documents[id];
 
-  // Create a reference to the document plane DOM element. Nodes
-  // will use this for computing their positions.
-  const el = useRef(null);
-
   //! ====================
   //! == EVENT HANDLERS ==
   //! ====================
@@ -45,33 +43,59 @@ const Document = () => {
   // TODO: `useHotkeys` binds to this element and not the document!
   useHotkeys("cmd+enter", addBaseNode);
 
+  // // Hijack zoom
+  // let viewer;
+  // useHotkeys("cmd+3", () => {
+  //   console.log(viewer);
+  //   viewer.zoomOnViewerCenter(2);
+  //   return false;
+  // });
+
   //! ============
   //! == RENDER ==
   //! ============
   return (
-    <Container ref={el} height={docHeight} width={docWidth}>
+    <Container>
       <Actions>
         <p>Document: {id}</p>
         <button onClick={addBaseNode}>New Base</button>
       </Actions>
-      {Object.keys(nodes).map(nodeId => {
-        const { parentId, dimensions, position, content } = nodes[nodeId];
-
-        return (
-          <Node
-            key={nodeId}
-            id={nodeId}
-            parentId={parentId}
-            position={position}
-            dimensions={dimensions}
-            content={content}
-          />
-        );
-      })}
-      {/* {edges.map(edge => {
-        console.log(edge);
-        return <div />;
-      })} */}
+      <AutoSizer>
+        {({ width, height }) =>
+          width === 0 || height === 0 ? null : (
+            <UncontrolledReactSVGPanZoom
+              tool="auto"
+              toolbarProps={{ position: "none" }}
+              miniatureProps={{ position: "none" }}
+              width={width}
+              height={height}
+              detectAutoPan={false}
+              background="transparent"
+              scaleFactor={1}
+              scaleFactorMin={0.5}
+              scaleFactorMax={1}
+            >
+              <svg viewBox="0 0 0 0" style={{ height: "auto" }}>
+                {Object.keys(nodes).map(nodeId => {
+                  const { parentId, dimensions, position, content } = nodes[
+                    nodeId
+                  ];
+                  return (
+                    <Node
+                      key={nodeId}
+                      id={nodeId}
+                      parentId={parentId}
+                      position={position}
+                      dimensions={dimensions}
+                      content={content}
+                    />
+                  );
+                })}
+              </svg>
+            </UncontrolledReactSVGPanZoom>
+          )
+        }
+      </AutoSizer>
     </Container>
   );
 };

@@ -2,8 +2,8 @@ interface NodeType {
   id: string;
   parentId: string;
   position: {
-    x: number | null;
-    y: number | null;
+    x: number;
+    y: number;
   };
   dimensions: {
     height: number;
