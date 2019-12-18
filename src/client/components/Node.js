@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 // Hooks
-import { useHotkeys } from "react-hotkeys-hook";
-import { useWindowSize } from "../utils/hooks";
+import { useWindowSize, useOnClickOutside, useHotkeys } from "../utils/hooks";
 // Data
 import useStore from "../data/store";
 // Components
 import { Container, Text, NewChildButton } from "./style/Node.style";
 import { Edge } from "./../components/style/Edge.style";
+import { P } from "./tags";
 
 const Node = ({
   id,
@@ -23,25 +23,63 @@ const Node = ({
   const [state, actions] = useStore();
 
   //* Determine if this node is active
-  const isActive = state.currentDoc.activeNode === id;
+  const isActive = state.currentDoc.activeNodeId === id;
 
   //* Ref used for tracking container height.
   const el = useRef(null);
   const textInput = useRef(null);
 
-  // TODO: may need to set this in an `useEffect` onMount tracker to handle weird
-  // TODO: behaviors associated with nodes that have no text content (and as such no height)
-  // TODO: within the state having their position re-computed when another node is added.
-  let lastHeight = null;
+  //! ===============
+  //! == UTILITIES ==
+  //! ===============
+
+  /**
+   * Calculates the height of container based on the height
+   * of all child elements.
+   */
+  const calculateHeight = () => {
+    return Array.from(el.current.children)
+      .map(({ offsetHeight }) => offsetHeight)
+      .reduce((acc, height) => (acc += height), 0);
+  };
 
   //! ===============
   //! == LIFECYCLE ==
   //! ===============
 
+  /**
+   * When `isActive` changes, check if this node should
+   * be focused.
+   */
   useEffect(() => {
-    // isActive should always be `true`
-    if (isActive) textInput.current.focus();
-  });
+    const _el = textInput.current;
+    if (isActive) {
+      // focus
+      _el.focus();
+      // ensure that cursor is always at the end.  otherwise, if text is present,
+      // cursor will go back to the beginning.  first check that _el has a value;
+      // this not an issue if no text has been entered.
+      const value = _el.innerHTML;
+      if (value.length) {
+        setTimeout(() => {
+          _el.selectionStart = _el.selectionEnd = 10000;
+        }, 0);
+        //_el.selectionStart = _el.selectionEnd = value.length;
+      }
+    } else if (window.document.activeElement === _el) {
+      // Programmatically de-focus if this element is not active
+      // but was.  This occurs when `escape` key is pressed.
+      _el.blur();
+    }
+  }, [isActive]);
+
+  /**
+   * When node renders, set height property in the store.
+   */
+  useEffect(() => {
+    // on mount
+    actions.updateNodeHeight(id, calculateHeight());
+  }, []);
 
   //! ====================
   //! == EVENT HANDLERS ==
@@ -67,18 +105,34 @@ const Node = ({
     // Compute the current height of the node and determine whether or not it has
     // changed since the last text change. If it has changed, update the height
     // as well as the visible text.
-    const nodeHeight = el.current.clientHeight;
-    let shouldUpdateHeight = false;
-    // if (nodeHeight !== lastHeight) {
-    //   lastHeight = nodeHeight;
-    //   shouldUpdateHeight = true;
-    // }
-    actions.updateNodeText(id, value, shouldUpdateHeight ? nodeHeight : null);
+    const nodeHeight = calculateHeight();
+    //* Track text area size.
+    actions.updateNodeText(
+      id,
+      value,
+      nodeHeight !== height ? nodeHeight : null
+    );
   };
 
   const handleClick = event => {
-    actions.setAsFocused(id);
+    actions.setActiveNodeId(id);
   };
+
+  /**
+   * If this node is current active, set it as inactive
+   */
+  useOnClickOutside(el, () => {
+    if (isActive) actions.setActiveNodeId(null);
+  });
+
+  //! =============
+  //! == HOTKEYS ==
+  //! =============
+
+  // Prevent the enter key from expanding the text area
+  useHotkeys("enter", () => {
+    return false;
+  });
 
   //! ============
   //! == RENDER ==
@@ -91,14 +145,13 @@ const Node = ({
   const calibratedY = calibrateY(y);
   const calibratedX = calibrateX(x);
 
+  // Create Edge to parent
   let d;
   if (parentId) {
     const {
       position: { y: parentY, x: parentX },
       dimensions: { width: parentWidth, height: parentHeight }
     } = state.documents[state.currentDoc.id].nodes[parentId];
-
-    console.log(parentX, calibrateX(parentX));
 
     d = [
       "M",
@@ -120,10 +173,10 @@ const Node = ({
         y={calibratedY}
         x={calibratedX}
       >
+        <small>{id}</small>
         <Text
           ref={textInput}
           onClick={handleClick}
-          width={width}
           contentEditable={true}
           suppressContentEditableWarning={true}
           onInput={handleTextInput}

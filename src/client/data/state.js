@@ -10,7 +10,7 @@ const initialState = {
       width: window.innerWidth
     },
     // Hotkeys, etc.
-    activeNode: null
+    activeNodeId: null
   }
 };
 

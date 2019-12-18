@@ -1,4 +1,7 @@
+// react hooks
 import { useState, useCallback, useEffect } from "react";
+// 3rd party hooks
+import hotkeys, { HotkeysEvent } from "hotkeys-js";
 
 /**
  * Taken from https://wattenberger.com/blog/react-hooks
@@ -76,4 +79,53 @@ const useWindowSize = () => {
   return windowSize;
 };
 
-export { useOnKeyPress, useWindowSize };
+/**
+ * https://usehooks.com/useOnClickOutside/
+ * @param {*} ref
+ * @param {*} handler
+ */
+const useOnClickOutside = (ref, handler) => {
+  useEffect(
+    () => {
+      const listener = event => {
+        // Do nothing if clicking ref's element or descendent elements
+        if (!ref.current || ref.current.contains(event.target)) {
+          return;
+        }
+
+        handler(event);
+      };
+
+      document.addEventListener("mousedown", listener);
+      document.addEventListener("touchstart", listener);
+
+      return () => {
+        document.removeEventListener("mousedown", listener);
+        document.removeEventListener("touchstart", listener);
+      };
+    },
+    // Add ref and handler to effect dependencies
+    // It's worth noting that because passed in handler is a new ...
+    // ... function on every render that will cause this effect ...
+    // ... callback/cleanup to run every render. It's not a big deal ...
+    // ... but to optimize you can wrap handler in useCallback before ...
+    // ... passing it into this hook.
+    [ref, handler]
+  );
+};
+
+const useHotkeys = (keys, callback, deps = []) => {
+  const memoisedCallback = useCallback(callback, deps);
+
+  useEffect(() => {
+    hotkeys.filter = event => {
+      // Allow hotkeys on input, select, textarea, and isContentEditable
+      return true;
+    };
+    hotkeys(keys, memoisedCallback);
+
+    return () => hotkeys.unbind(keys);
+  }, [memoisedCallback]);
+};
+
+export { useOnKeyPress, useWindowSize, useOnClickOutside, useHotkeys };

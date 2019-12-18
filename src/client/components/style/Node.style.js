@@ -4,6 +4,7 @@ import styled from "styled-components";
 const Container = styled.foreignObject`
   height: ${({ height }) => height}px;
   width: ${({ width }) => width}px;
+  cursor: default;
   //border: 1px solid black;
 `;
 
@@ -15,12 +16,15 @@ Container.propTypes = {
 };
 
 const Text = styled.p`
+  padding: 2rem 0.75rem;
   height: auto;
-  width: ${({ width }) => width}px;
+  width: 100%;
   // * Constrain padding to text to make the entire container clickable.
   font-size: 26px;
-  line-height: 26px;
+  font-weight: bold;
+  line-height: 1.25;
   text-align: center;
+  cursor: text;
   &:empty:before {
     content: attr(placeholder);
     display: block;
@@ -29,12 +33,15 @@ const Text = styled.p`
   &:focus {
     outline: none;
   }
+  border: 1pt solid #e2e2e2;
+  border-radius: 4pt;
 `;
 
-Text.propTypes = {
-  width: PropTypes.number.isRequired
-};
+Text.propTypes = {};
 
-const NewChildButton = styled.a``;
+const NewChildButton = styled.a`
+  display: block;
+  cursor: pointer;
+`;
 
 export { Container, Text, NewChildButton };

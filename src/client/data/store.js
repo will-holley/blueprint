@@ -23,3 +23,4 @@ const store = createStore({
 const useStore = createHook(store);
 
 export default useStore;
+export { store };

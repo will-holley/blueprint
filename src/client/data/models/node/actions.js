@@ -1,5 +1,5 @@
 import update from "immutability-helper";
-import { createNode, computeNodePositions } from "./utils";
+import { createNode, repositionNodes } from "./utils";
 
 const actions = {
   /**
@@ -8,26 +8,21 @@ const actions = {
   addNode: parentNodeId => ({ setState, getState }) => {
     const state = getState();
     const document = state.documents[state.currentDoc.id];
-    // Create default node
+    // Create default node and add it to nodes before update
+    // nodes positions
     const node = createNode(parentNodeId);
-    const nodes = document.nodes;
-    nodes[node.id] = node;
-    // Update positions and set back onto dict
-    computeNodePositions(Object.values(nodes)).forEach(node => {
-      nodes[node.id].position = {
-        x: node.x,
-        y: node.y
-      };
+    const nodes = update(document.nodes, {
+      [node.id]: { $set: node }
     });
     // Update all nodes
     const newState = update(state, {
       documents: {
         [document.id]: {
-          nodes: { $set: nodes }
+          nodes: { $set: repositionNodes(nodes) }
         }
       },
       currentDoc: {
-        activeNode: {
+        activeNodeId: {
           $set: node.id
         }
       }
@@ -51,32 +46,53 @@ const actions = {
         }
       }
     });
-    // If height has changed, update height
     if (nodeHeight) {
+      // Update height then re-compute all positions.
+      const nodes = update(state.documents[state.currentDoc.id].nodes, {
+        [nodeId]: {
+          dimensions: {
+            height: {
+              $set: nodeHeight
+            }
+          }
+        }
+      });
+      const repositioned = repositionNodes(nodes);
       newState = update(newState, {
         documents: {
           [state.currentDoc.id]: {
-            nodes: {
-              [nodeId]: {
-                dimensions: {
-                  height: {
-                    $set: nodeHeight
-                  }
-                }
-              }
-            }
+            nodes: { $set: repositioned }
           }
         }
       });
     }
     setState(newState);
   },
-  setAsFocused: nodeId => ({ setState, getState }) => {
-    console.log(nodeId);
+  /**
+   * Called immediately after a node is mounted
+   */
+  updateNodeHeight: (nodeId, nodeHeight) => ({ setState, getState }) => {
+    const state = getState();
+    const newState = update(state, {
+      documents: {
+        [state.currentDoc.id]: {
+          nodes: {
+            [nodeId]: {
+              dimensions: {
+                height: { $set: nodeHeight }
+              }
+            }
+          }
+        }
+      }
+    });
+    setState(newState);
+  },
+  setActiveNodeId: nodeId => ({ setState, getState }) => {
     const state = getState();
     const newState = update(state, {
       currentDoc: {
-        activeNode: { $set: nodeId }
+        activeNodeId: { $set: nodeId }
       }
     });
     setState(newState);
