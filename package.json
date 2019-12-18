@@ -29,8 +29,9 @@
     "d3-hierarchy": "^1.1.9",
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
+    "hotkeys-js": "^3.7.3",
+    "human-readable-ids": "^1.0.4",
     "immutability-helper": "^3.0.1",
-    "react-hotkeys-hook": "^1.5.4",
     "react-svg-pan-zoom": "^3.7.0",
     "react-sweet-state": "^1.1.1",
     "react-virtualized": "^9.21.2",
@@ -58,6 +59,7 @@
     "styled-components": "^4.2.0",
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.3",
+    "url-loader": "^3.0.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.1",
     "webpack-dev-server": "^3.9.0"
