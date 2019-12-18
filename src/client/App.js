@@ -8,50 +8,51 @@ import Head from "./config/Head";
 import { dark, light } from "./config/styledThemes";
 import GlobalStyle from "./config/globalStyles";
 // Our Components
-import ViewContainer from "./components/containers/ViewContainer";
 import Nav from "./components/Nav";
 import ContentContainer from "./components/containers/ContentContainer";
 
-class App extends React.Component {
-  get isAuthenticated() {
-    // Until authentication is set up, return true by default.
+const App = () => {
+  // TODO: make a hook (https://usehooks.com/useRequireAuth/)
+  const isAuthenticated = () => {
     return true;
-  }
+  };
 
-  render() {
-    return (
-      <>
-        <Head />
-        <ThemeProvider theme={light}>
-          <GlobalStyle />
-          <BrowserRouter basename="/">
-            <ViewContainer>
-              <Nav />
-              <ContentContainer>
-                <Switch>
-                  {Object.keys(routes).map(path => {
-                    const { component, exact, authenticated } = routes[path];
-                    // Handle authenticated Routes
-                    return authenticated && !this.isAuthenticated ? (
-                      <Redirect to="/" />
-                    ) : (
-                      <Route
-                        key={`route-${path}`}
-                        path={path}
-                        exact={exact}
-                        component={component}
-                      />
-                    );
-                  })}
-                  <Route render={() => <h1>Not Found</h1>} status={404} />
-                </Switch>
-              </ContentContainer>
-            </ViewContainer>
-          </BrowserRouter>
-        </ThemeProvider>
-      </>
-    );
-  }
-}
+  //! ====================
+  //! == EVENT HANDLERS ==
+  //! ====================
+
+  //! ============
+  //! == RENDER ==
+  //! ============
+  return (
+    <>
+      <Head />
+      <ThemeProvider theme={light}>
+        <GlobalStyle />
+        <BrowserRouter basename="/">
+          <ContentContainer>
+            <Switch>
+              {Object.keys(routes).map(path => {
+                const { component, exact, authenticated } = routes[path];
+                // Handle authenticated Routes
+                return authenticated && !this.isAuthenticated ? (
+                  <Redirect to="/" />
+                ) : (
+                  <Route
+                    key={`route-${path}`}
+                    path={path}
+                    exact={exact}
+                    component={component}
+                  />
+                );
+              })}
+              <Route render={() => <h1>Not Found</h1>} status={404} />
+            </Switch>
+          </ContentContainer>
+        </BrowserRouter>
+      </ThemeProvider>
+    </>
+  );
+};
 
 export default App;

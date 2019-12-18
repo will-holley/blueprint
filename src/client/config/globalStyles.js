@@ -21,10 +21,21 @@ const GlobalStyle = createGlobalStyle`
 		// Project Defaults ^
 		// Typography
 		// Layout
-		padding: 50px;
 		// Colors
 		background: ${({ theme }) => theme.background};
 		color: ${({ theme }) => theme.text.color};
+	}
+
+	[contenteditable] {
+		text-align: center;
+		&:empty:before {
+			content: attr(placeholder);
+			display: block;
+			font-size: 26px;
+		}
+		&:focus {
+			outline: none;
+		}
 	}
 `;
 
