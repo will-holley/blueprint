@@ -8,6 +8,8 @@ import InterMediumWoffTwo from "./../static/fonts/inter/Inter-Medium.woff2";
 import InterMediumWoff from "./../static/fonts/inter/Inter-Medium.woff";
 import InterBoldWoffTwo from "./../static/fonts/inter/Inter-Bold.woff2";
 import InterBoldWoff from "./../static/fonts/inter/Inter-Bold.woff";
+import InterLightWoffTwo from "./../static/fonts/inter/Inter-Light-BETA.woff2";
+import InterLightWoff from "./../static/fonts/inter/Inter-Light-BETA.woff";
 
 const GlobalStyle = createGlobalStyle`
 
@@ -15,7 +17,15 @@ const GlobalStyle = createGlobalStyle`
 	@font-face {
     font-family: 'Inter';
     font-style: normal;
-    font-weight: normal;
+    font-weight: 300;
+    src:
+      url('${InterLightWoffTwo}') format('woff2'),
+      url('${InterLightWoff}') format('woff');
+	}
+	@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
     src:
       url('${InterRegularWoffTwo}') format('woff2'),
       url('${InterRegularWoff}') format('woff');
@@ -31,7 +41,7 @@ const GlobalStyle = createGlobalStyle`
 	@font-face {
     font-family: 'Inter';
     font-style: normal;
-    font-weight: bold;
+    font-weight: 700;
     src:
       url('${InterBoldWoffTwo}') format('woff2'),
       url('${InterBoldWoff}') format('woff');
@@ -46,13 +56,12 @@ const GlobalStyle = createGlobalStyle`
   	box-sizing: inherit;
   	padding: 0;
   	margin: 0;
-  	font-family: inherit;
+  	font-family: 'Inter', sans-serif;
   	color: inherit;
   	-webkit-font-smoothing: antialiased;
   	-moz-osx-font-smoothing: grayscale;
 	}
 	body {
-		font-family: 'Inter', sans-serif;
 		font-size: 1.6rem;
 		min-height: 100vh;
 		// Project Defaults ^
