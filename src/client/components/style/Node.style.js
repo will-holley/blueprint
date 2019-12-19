@@ -33,8 +33,6 @@ const Text = styled.p`
   &:focus {
     outline: none;
   }
-  border: 1pt solid #e2e2e2;
-  border-radius: 4pt;
 `;
 
 Text.propTypes = {};
