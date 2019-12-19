@@ -118,14 +118,14 @@ const Node = ({
   };
 
   const handleClick = event => {
-    actions.setActiveNodeId(id);
+    actions.setActiveNode(id);
   };
 
   /**
    * If this node is current active, set it as inactive
    */
   useOnClickOutside(el, () => {
-    if (isActive) actions.setActiveNodeId(null);
+    if (isActive) actions.setActiveNode(null);
   });
 
   //! =============
@@ -141,8 +141,8 @@ const Node = ({
   //! == RENDER ==
   //! ============
 
-  // How much space should be between nodes
-  const yBottomPadding = 150;
+  // How many pixels should be between nodes
+  const yBottomPadding = 75;
 
   // Render relative to window innerHeight and innerWidth
   const { height: windowHeight, width: windowWidth } = useWindowSize();

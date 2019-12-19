@@ -88,7 +88,7 @@ const actions = {
     });
     setState(newState);
   },
-  setActiveNodeId: nodeId => ({ setState, getState }) => {
+  setActiveNode: nodeId => ({ setState, getState }) => {
     const state = getState();
     const newState = update(state, {
       currentDoc: {
@@ -96,6 +96,9 @@ const actions = {
       }
     });
     setState(newState);
+  },
+  deleteNode: nodeId => ({ setState, getState }) => {
+    // TODO: think about this. Write and delete edges?
   }
 };
 
