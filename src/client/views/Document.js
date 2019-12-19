@@ -82,7 +82,8 @@ const Document = () => {
   });
 
   const [activeNode] = useGetActiveNode();
-  // arrow key navigation
+
+  //$ Arrow key navigation
   useHotkeys(
     "up",
     event => {
@@ -94,6 +95,7 @@ const Document = () => {
     // but when they can, append `node`.
     [activeNode]
   );
+
   useHotkeys(
     "down",
     event => {
@@ -116,13 +118,17 @@ const Document = () => {
   useHotkeys(
     "cmd+left",
     event => {
-      if (!activeNode || nodes[activeNode.parentId].children.length === 1)
-        return;
-      // Find id of left most child
-      const levelIds = nodes[activeNode.parentId].children;
-      const index = levelIds.indexOf(activeNode.id);
-      const nextIndex = index - 1 >= 0 ? index - 1 : levelIds.length - 1;
-      actions.setActiveNodeId(levelIds[nextIndex]);
+      if (!activeNode) return;
+      else if (nodes[activeNode.parentId].children.length === 1) {
+        // create new sibling
+        actions.addNode(activeNode.parentId);
+      } else {
+        // Find id of left most child
+        const levelIds = nodes[activeNode.parentId].children;
+        const index = levelIds.indexOf(activeNode.id);
+        const nextIndex = index - 1 >= 0 ? index - 1 : levelIds.length - 1;
+        actions.setActiveNodeId(levelIds[nextIndex]);
+      }
     },
     [activeNode, nodes]
   );
@@ -134,15 +140,24 @@ const Document = () => {
   useHotkeys(
     "cmd+right",
     event => {
-      if (!activeNode || nodes[activeNode.parentId].children.length === 1)
-        return;
-      const levelIds = nodes[activeNode.parentId].children;
-      const index = levelIds.indexOf(activeNode.id);
-      const nextIndex = index + 1 <= levelIds.length - 1 ? index + 1 : 0;
-      actions.setActiveNodeId(levelIds[nextIndex]);
+      if (!activeNode) return;
+      else if (nodes[activeNode.parentId].children.length === 1) {
+        // create new sibling
+        actions.addNode(activeNode.parentId);
+      } else {
+        const levelIds = nodes[activeNode.parentId].children;
+        const index = levelIds.indexOf(activeNode.id);
+        const nextIndex = index + 1 <= levelIds.length - 1 ? index + 1 : 0;
+        actions.setActiveNodeId(levelIds[nextIndex]);
+      }
     },
     [activeNode, nodes]
   );
+
+  /**
+   * Delete a node.  Deletes all nodes underneath it.
+   */
+  useHotkeys("cmd+delete", event => console.info("delete"));
 
   //? DEV: Audit hotkeys
   //useHotkeys("*", event => console.info(event));
