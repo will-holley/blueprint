@@ -51,27 +51,29 @@ const Node = ({
    * When `isActive` changes, check if this node should
    * be focused.
    */
-  useEffect(() => {
-    const _el = textInput.current;
-    if (isActive) {
-      // focus
-      _el.focus();
-      // ensure that cursor is always at the end.  otherwise, if text is present,
-      // cursor will go back to the beginning.  first check that _el has a value;
-      // this not an issue if no text has been entered.
-      const value = _el.innerHTML;
-      if (value.length) {
-        setTimeout(() => {
-          _el.selectionStart = _el.selectionEnd = 10000;
-        }, 0);
-        //_el.selectionStart = _el.selectionEnd = value.length;
+  useEffect(
+    () => {
+      const _el = textInput.current;
+      if (isActive) {
+        // focus
+        _el.focus();
+        // Set cursor to end of content
+        if (_el.innerHTML.length) {
+          const range = document.createRange();
+          const sel = window.getSelection();
+          range.setStart(_el, 1);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      } else if (window.document.activeElement === _el) {
+        // Programmatically de-focus if this element is not active
+        // but was.  This occurs when `escape` key is pressed.
+        _el.blur();
       }
-    } else if (window.document.activeElement === _el) {
-      // Programmatically de-focus if this element is not active
-      // but was.  This occurs when `escape` key is pressed.
-      _el.blur();
-    }
-  }, [isActive]);
+    },
+    [isActive]
+  );
 
   /**
    * When node renders, set height property in the store.
