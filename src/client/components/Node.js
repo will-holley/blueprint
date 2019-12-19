@@ -14,7 +14,8 @@ const Node = ({
   parentId,
   position: { x, y, draggable },
   dimensions: { height, width },
-  content: { type, text }
+  content: { type, text },
+  depth
 }) => {
   //! ============
   //! == CONFIG ==
@@ -140,25 +141,29 @@ const Node = ({
   //! == RENDER ==
   //! ============
 
+  // How much space should be between nodes
+  const yBottomPadding = 150;
+
   // Render relative to window innerHeight and innerWidth
   const { height: windowHeight, width: windowWidth } = useWindowSize();
   const calibrateX = n => windowWidth / 2 + n - width;
   const calibrateY = n => windowHeight / 3 + n;
-  const calibratedY = calibrateY(y);
+  const calibratedY = calibrateY(y) + yBottomPadding * depth;
   const calibratedX = calibrateX(x);
 
   // Create Edge to parent
-  let d;
+  let d = [];
   if (parentId) {
     const {
       position: { y: parentY, x: parentX },
       dimensions: { width: parentWidth, height: parentHeight }
     } = state.documents[state.currentDoc.id].nodes[parentId];
 
+    // Calculate Edge position
     d = [
       "M",
       calibrateX(parentX) + parentWidth / 2,
-      calibrateY(parentY) + parentHeight,
+      calibrateY(parentY) + parentHeight + yBottomPadding * (depth - 1),
       "L",
       calibratedX + width / 2,
       calibratedY
@@ -175,7 +180,9 @@ const Node = ({
         y={calibratedY}
         x={calibratedX}
       >
-        <small>{id}</small>
+        <small>
+          {id} - {depth}
+        </small>
         <Text
           ref={textInput}
           onClick={handleClick}
@@ -206,7 +213,8 @@ Node.propTypes = {
   content: PropTypes.shape({
     type: PropTypes.string,
     text: PropTypes.string
-  }).isRequired
+  }).isRequired,
+  depth: PropTypes.number
 };
 Node.defaultProps = {};
 

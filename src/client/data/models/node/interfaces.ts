@@ -18,6 +18,7 @@ interface NodeType {
   };
   draggable: boolean;
   children: Array<string>;
+  depth: number | undefined;
 }
 
 interface NodesType {

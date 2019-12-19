@@ -28,7 +28,8 @@ const createNode = (parentId: string): NodeType => ({
     text: null
   },
   draggable: true,
-  children: []
+  children: [],
+  depth: undefined
 });
 
 /**
@@ -38,24 +39,19 @@ const computeNodePositions = (nodes: Array<NodeType>): Array<object> => {
   const baseNode: object = stratify()(nodes);
 
   //* Use the flextree for now...
-  // TODO: calculate height
-  const tree: any = flextree({
-    // Calculates how much space should be in between peer nodes.
+  const layout: any = flextree({
+    // Determines how far adjacent nodes in that diagram should appear
     spacing: DEFAULT_WIDTH,
-    nodeSize: ({ data: { dimensions } }: object | any): [number, number] => {
-      return [dimensions.height, dimensions.width];
-    }
+    nodeSize: ({
+      data: { id, dimensions }
+    }: object | any): [number, number] => [dimensions.width, dimensions.height]
   });
 
   // Get positions
-  const data = tree(baseNode);
-  const descendants = data.descendants();
+  const data = layout(baseNode);
 
-  // return {
-  //   data,
-  //   nodes: descendants
-  // };
-  return descendants;
+  // Return all nodes
+  return data.descendants();
 };
 
 /**
@@ -72,12 +68,13 @@ const repositionNodes = (nodes: NodesType): NodesType => {
         (c: object | any) => c.id
       );
     }
-
     // Add position to this node
     _nodes[node.id].position = {
       x: node.x,
       y: node.y
     };
+    // Add depth to this node
+    _nodes[node.id].depth = node.depth;
   });
   return _nodes;
 };
