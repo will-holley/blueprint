@@ -52,7 +52,10 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: [".ts", ".js", ".html"]
+    extensions: [".ts", ".js", ".html"],
+    alias: {
+      client: path.resolve(__dirname, "src/client")
+    }
   },
   plugins: [
     new HtmlWebPackPlugin({
