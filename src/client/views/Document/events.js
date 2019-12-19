@@ -64,7 +64,7 @@ const useKeyboardHotkeys = (nodes, activeNode) => {
   //$ ================
   //$ == NAVIGATION ==
   //$ ================
-  //$ Shift + Arrow Key
+  //$ Cmd + Arrow Key
 
   /**
    * Navigate up
