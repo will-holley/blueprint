@@ -2,6 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useWindowSize } from "client/utils/hooks";
 
+/**
+ * https://css-tricks.com/creating-a-panning-effect-for-svg/
+ * @param {object} props
+ */
 const InteractiveSVG = ({ children, displayCorners }) => {
   //! Get the window size.  It is used to set <svg> dimensions.
   const { height, width } = useWindowSize();
