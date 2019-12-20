@@ -16,10 +16,7 @@ const Zoomer = styled.div`
   font-size: 24px;
 
   a {
-    padding: 1rem;
-  }
-
-  span {
+    padding: 1rem 0.75rem;
   }
 `;
 
@@ -52,7 +49,8 @@ const InteractiveSVG = ({ children }) => {
   const [point, setPoint] = useState(null);
 
   //! Set up zoom variables
-  const [zoom, setZoom] = useState(1);
+  const defaultZoom = 1;
+  const [zoom, setZoom] = useState(defaultZoom);
 
   //! On Mount
   useEffect(() => {
@@ -74,6 +72,11 @@ const InteractiveSVG = ({ children }) => {
   const handleZoomOut = event => {
     const newZoom = zoom - 0.1;
     setZoom(newZoom);
+    return false;
+  };
+
+  const resetZoom = event => {
+    setZoom(defaultZoom);
     return false;
   };
 
@@ -128,7 +131,7 @@ const InteractiveSVG = ({ children }) => {
     <>
       <Zoomer>
         <a onClick={handleZoomIn}>➕</a>
-        <span>🔍</span>
+        <a onClick={resetZoom}>🔍</a>
         <a onClick={handleZoomOut}>➖</a>
       </Zoomer>
       <svg
