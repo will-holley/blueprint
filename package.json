@@ -32,7 +32,6 @@
     "hotkeys-js": "^3.7.3",
     "human-readable-ids": "^1.0.4",
     "immutability-helper": "^3.0.1",
-    "react-svg-pan-zoom": "^3.7.0",
     "react-sweet-state": "^1.1.1",
     "react-virtualized": "^9.21.2",
     "uuid": "^3.3.3"
