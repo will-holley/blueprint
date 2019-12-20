@@ -6,8 +6,8 @@ import useStore from "client/data/store";
 import { Container, Actions } from "client/components/style/Document.style";
 import Node from "client/components/Node";
 import InteractiveSVG from "client/components/InteractiveSVG";
+import { EmojiButton } from "client/components/style/Buttons";
 // Events
-
 import { useKeyboardHotkeys } from "./events";
 
 const Document = () => {
@@ -30,8 +30,10 @@ const Document = () => {
   return (
     <Container>
       <Actions>
-        <p>Document: {id}</p>
-        <button onClick={event => actions.addNode(null)}>New Base</button>
+        <EmojiButton onClick={event => actions.addNode(null)}>🌀</EmojiButton>
+        {/* <span>
+          <h1>{id}</h1>
+        </span> */}
       </Actions>
       <InteractiveSVG>
         {Object.values(nodes).map(

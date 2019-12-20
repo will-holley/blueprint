@@ -10,7 +10,15 @@ const Container = styled.div`
 
 const Actions = styled.div`
   position: fixed;
+  top: 0;
+  left: 0;
   z-index: 99999;
+  padding: 1rem;
+
+  h1 {
+    font-weight: 800;
+    font-size: 18px;
+  }
 `;
 
 export { Container, Actions };

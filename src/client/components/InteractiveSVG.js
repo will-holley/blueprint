@@ -2,22 +2,14 @@ import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useWindowSize, useHotkeys } from "client/utils/hooks";
+import { EmojiButton } from "./style/Buttons";
 
 const Zoomer = styled.div`
   position: fixed;
   top: 0;
   right: 0;
   z-index: 99999;
-
   padding: 1rem;
-  cursor: pointer;
-
-  user-select: none;
-  font-size: 24px;
-
-  a {
-    padding: 1rem 0.75rem;
-  }
 `;
 
 const Group = styled.g.attrs(({ zoom }) => ({
@@ -130,9 +122,9 @@ const InteractiveSVG = ({ children }) => {
   return (
     <>
       <Zoomer>
-        <a onClick={handleZoomIn}>➕</a>
-        <a onClick={resetZoom}>🔍</a>
-        <a onClick={handleZoomOut}>➖</a>
+        <EmojiButton onClick={handleZoomIn}>➕</EmojiButton>
+        <EmojiButton onClick={resetZoom}>🔍</EmojiButton>
+        <EmojiButton onClick={handleZoomOut}>➖</EmojiButton>
       </Zoomer>
       <svg
         ref={svg}
