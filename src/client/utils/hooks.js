@@ -3,54 +3,6 @@ import { useState, useCallback, useEffect } from "react";
 // 3rd party hooks
 import hotkeys, { HotkeysEvent } from "hotkeys-js";
 
-/**
- * Taken from https://wattenberger.com/blog/react-hooks
- * @param {string} targetKey
- * @param {function} onKeyDown
- * @param {function} onKeyUp
- * @param {boolean} isDebugging
- */
-const useOnKeyPress = (targetKey, onKeyDown, onKeyUp, isDebugging = false) => {
-  const [isKeyDown, setIsKeyDown] = useState(false);
-
-  const onKeyDownLocal = useCallback(e => {
-    if (isDebugging)
-      console.log(
-        "key down",
-        e.key,
-        e.key != targetKey ? "- isn't triggered" : "- is triggered"
-      );
-    if (e.key != targetKey) return;
-    setIsKeyDown(true);
-    if (typeof onKeyDown != "function") return;
-    onKeyDown(e);
-  });
-
-  const onKeyUpLocal = useCallback(e => {
-    if (isDebugging)
-      console.log(
-        "key up",
-        e.key,
-        e.key != targetKey ? "- isn't triggered" : "- is triggered"
-      );
-    if (e.key != targetKey) return;
-    setIsKeyDown(false);
-    if (typeof onKeyUp != "function") return;
-    onKeyUp(e);
-  });
-
-  //* Binding
-  useEffect(() => {
-    addEventListener("keydown", onKeyDownLocal);
-    addEventListener("keyup", onKeyUpLocal);
-    return () => {
-      removeEventListener("keydown", onKeyDownLocal);
-      removeEventListener("keyup", onKeyUpLocal);
-    };
-  }, []);
-  return isKeyDown;
-};
-
 const useWindowSize = () => {
   const isClient = typeof window === "object";
 
@@ -128,4 +80,4 @@ const useHotkeys = (keys, callback, deps = []) => {
   }, [memoisedCallback]);
 };
 
-export { useOnKeyPress, useWindowSize, useOnClickOutside, useHotkeys };
+export { useWindowSize, useOnClickOutside, useHotkeys };
