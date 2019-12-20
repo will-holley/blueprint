@@ -5,12 +5,10 @@ import useStore from "client/data/store";
 // Components
 import { Container, Actions } from "client/components/style/Document.style";
 import Node from "client/components/Node";
-import { AutoSizer } from "react-virtualized";
-import { UncontrolledReactSVGPanZoom } from "react-svg-pan-zoom";
+import InteractiveSVG from "client/components/InteractiveSVG";
 // Events
-import { useKeyboardHotkeys } from "./events";
 
-const DEBUGGING = false;
+import { useKeyboardHotkeys } from "./events";
 
 const Document = () => {
   const [
@@ -35,50 +33,21 @@ const Document = () => {
         <p>Document: {id}</p>
         <button onClick={event => actions.addNode(null)}>New Base</button>
       </Actions>
-      <AutoSizer>
-        {({ width, height }) =>
-          width === 0 || height === 0 ? null : (
-            <UncontrolledReactSVGPanZoom
-              tool="auto"
-              toolbarProps={{ position: "none" }}
-              miniatureProps={{ position: "none" }}
-              width={width}
-              height={height}
-              detectAutoPan={false}
-              background={DEBUGGING ? "red" : "transparent"}
-              scaleFactor={1}
-              // Shrink
-              scaleFactorMin={0.4}
-              // Enlarge -- by setting value equal to
-              // `scaleFactor`, enlarging is disabled.
-              scaleFactorMax={1}
-            >
-              <svg viewBox="0 0 0 0" style={{ height: "auto" }}>
-                {Object.keys(nodes).map(nodeId => {
-                  const {
-                    parentId,
-                    dimensions,
-                    position,
-                    content,
-                    depth
-                  } = nodes[nodeId];
-                  return (
-                    <Node
-                      key={nodeId}
-                      id={nodeId}
-                      parentId={parentId}
-                      position={position}
-                      dimensions={dimensions}
-                      content={content}
-                      depth={depth}
-                    />
-                  );
-                })}
-              </svg>
-            </UncontrolledReactSVGPanZoom>
+      <InteractiveSVG>
+        {Object.values(nodes).map(
+          ({ id: nodeId, parentId, dimensions, position, content, depth }) => (
+            <Node
+              key={nodeId}
+              id={nodeId}
+              parentId={parentId}
+              position={position}
+              dimensions={dimensions}
+              content={content}
+              depth={depth}
+            />
           )
-        }
-      </AutoSizer>
+        )}
+      </InteractiveSVG>
     </Container>
   );
 };
