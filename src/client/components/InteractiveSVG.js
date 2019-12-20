@@ -2,21 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useWindowSize } from "client/utils/hooks";
 
-// This function returns an object with X & Y values from the pointer event
-function getPointFromEvent(event) {
-  var point = { x: 0, y: 0 };
-  // If even is triggered by a touch event, we get the position of the first finger
-  if (event.targetTouches) {
-    point.x = event.targetTouches[0].clientX;
-    point.y = event.targetTouches[0].clientY;
-  } else {
-    point.x = event.clientX;
-    point.y = event.clientY;
-  }
-
-  return point;
-}
-
 const InteractiveSVG = ({ children, displayCorners }) => {
   //! Get the window size.  It is used to set <svg> dimensions.
   const { height, width } = useWindowSize();
@@ -32,21 +17,30 @@ const InteractiveSVG = ({ children, displayCorners }) => {
   // We save the original values from the viewBox
   const [viewBoxX, setViewBoxX] = useState(0);
   const [viewBoxY, setViewBoxY] = useState(0);
-  // The distances calculated from the pointer will be stored here
-  const [newViewBoxX, setNewViewBoxX] = useState(0);
-  const [newViewBoxY, setNewViewBoxY] = useState(0);
-  // Calculate the ratio based on the viewBox width and the SVG width
-  const [ratio, setRatio] = useState(0);
+  // Create an SVG point that contains x & y values
+  const [point, setPoint] = useState(null);
 
   //! On Mount
   useEffect(() => {
-    // Set
-    setRatio(width / el.current.getBoundingClientRect().width);
-    // Reset when window resizes
-    window.addEventListener("resize", function() {
-      setRatio(width / el.current.getBoundingClientRect().width);
-    });
+    // Set up svg point
+    setPoint(el.current.createSVGPoint());
+    // Set up viewbox
+    const { x, y } = el.current.viewBox.baseVal;
+    setViewBoxX(x);
+    setViewBoxY(y);
   }, []);
+
+  //! This function returns an object with X & Y values from the pointer event
+  const getPointFromEvent = ({ targetTouches, clientX, clientY }) => {
+    let _point = point;
+    _point.x = targetTouches ? targetTouches[0].clientX : clientX;
+    _point.y = targetTouches ? targetTouches[0].clientY : clientY;
+
+    // We get the current transformation matrix of the SVG and we inverse it
+    var invertedSVGMatrix = el.current.getScreenCTM().inverse();
+
+    return _point.matrixTransform(invertedSVGMatrix);
+  };
 
   //! Event Handlers
   const onPointerDown = event => {
@@ -60,9 +54,6 @@ const InteractiveSVG = ({ children, displayCorners }) => {
 
   const onPointerUp = event => {
     setIsPointerDown(false);
-    // We save the viewBox coordinates based on the last pointer offsets
-    setViewBoxX(newViewBoxX);
-    setViewBoxY(newViewBoxY);
   };
 
   const onPointerMove = event => {
@@ -77,11 +68,11 @@ const InteractiveSVG = ({ children, displayCorners }) => {
 
     // We calculate the distance between the pointer origin and the current position
     // The viewBox x & y values must be calculated from the original values and the distances
-    setNewViewBoxX(viewBoxX - (x - pointerOriginX) * ratio);
-    setNewViewBoxY(viewBoxY - (y - pointerOriginY) * ratio);
+    setViewBoxX(viewBoxX - (x - pointerOriginX));
+    setViewBoxY(viewBoxY - (y - pointerOriginY));
   };
 
-  const viewBoxString = `${newViewBoxX} ${newViewBoxY} ${width} ${height}`;
+  const viewBoxString = `${viewBoxX} ${viewBoxY} ${width} ${height}`;
   //? DEV:
   //console.log(`Viewbox: ${viewBoxString}`);
 
