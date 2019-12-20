@@ -1,7 +1,5 @@
 import React, { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-// Hooks
-import { useHotkeys } from "client/utils/hooks";
 // Data
 import useStore from "client/data/store";
 // Components
@@ -12,11 +10,9 @@ import { UncontrolledReactSVGPanZoom } from "react-svg-pan-zoom";
 // Events
 import { useKeyboardHotkeys } from "./events";
 
-const Document = () => {
-  //! ===========
-  //! == HOOKS ==
-  //! ===========
+const DEBUGGING = false;
 
+const Document = () => {
   const [
     {
       currentDoc: {
@@ -30,15 +26,9 @@ const Document = () => {
   ] = useStore();
   const { nodes, edges } = documents[id];
 
-  //! ============
-  //! == EVENTS ==
-  //! ============
-
+  //! Attach keyboard shortcuts
   useKeyboardHotkeys(nodes, activeNodeId && nodes[activeNodeId]);
 
-  //! ============
-  //! == RENDER ==
-  //! ============
   return (
     <Container>
       <Actions>
@@ -55,7 +45,7 @@ const Document = () => {
               width={width}
               height={height}
               detectAutoPan={false}
-              background="transparent"
+              background={DEBUGGING ? "red" : "transparent"}
               scaleFactor={1}
               // Shrink
               scaleFactorMin={0.4}
