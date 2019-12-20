@@ -1,19 +1,46 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useWindowSize } from "client/utils/hooks";
+import styled from "styled-components";
+import { useWindowSize, useHotkeys } from "client/utils/hooks";
+
+const Zoomer = styled.div`
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 99999;
+
+  padding: 1rem;
+  cursor: pointer;
+
+  user-select: none;
+  font-size: 24px;
+
+  a {
+    padding: 1rem;
+  }
+
+  span {
+  }
+`;
+
+const Group = styled.g.attrs(({ zoom }) => ({
+  transform: `scale(${zoom})`
+}))``;
 
 /**
  * https://css-tricks.com/creating-a-panning-effect-for-svg/
  * @param {object} props
  */
-const InteractiveSVG = ({ children, displayCorners }) => {
+const InteractiveSVG = ({ children }) => {
   //! Get the window size.  It is used to set <svg> dimensions.
   const { height, width } = useWindowSize();
 
   //! Create a ref for tracking the <svg> DOM element.
-  const el = useRef(null);
+  const svg = useRef(null);
+  //! Create a ref for tracking the <g> dimensions.
+  const group = useRef(null);
 
-  //! Set up state variables.
+  //! Set up pan variables.
   const [isPointerDown, setIsPointerDown] = useState(false);
   // This variable will contain the original coordinates when the user start pressing the mouse or touching the screen
   const [pointerOriginX, setPointerOriginX] = useState(0);
@@ -24,15 +51,34 @@ const InteractiveSVG = ({ children, displayCorners }) => {
   // Create an SVG point that contains x & y values
   const [point, setPoint] = useState(null);
 
+  //! Set up zoom variables
+  const [zoom, setZoom] = useState(1);
+
   //! On Mount
   useEffect(() => {
     // Set up svg point
-    setPoint(el.current.createSVGPoint());
+    setPoint(svg.current.createSVGPoint());
     // Set up viewbox
-    const { x, y } = el.current.viewBox.baseVal;
+    const { x, y } = svg.current.viewBox.baseVal;
     setViewBoxX(x);
     setViewBoxY(y);
   }, []);
+
+  //! Zoom
+  const handleZoomIn = event => {
+    const newZoom = zoom + 0.1;
+    setZoom(newZoom);
+    return false;
+  };
+
+  const handleZoomOut = event => {
+    const newZoom = zoom - 0.1;
+    setZoom(newZoom);
+    return false;
+  };
+
+  useHotkeys("cmd+=", handleZoomIn, [zoom]);
+  useHotkeys("cmd+-", handleZoomOut, [zoom]);
 
   //! This function returns an object with X & Y values from the pointer event
   const getPointFromEvent = ({ targetTouches, clientX, clientY }) => {
@@ -41,13 +87,13 @@ const InteractiveSVG = ({ children, displayCorners }) => {
     _point.y = targetTouches ? targetTouches[0].clientY : clientY;
 
     // We get the current transformation matrix of the SVG and we inverse it
-    var invertedSVGMatrix = el.current.getScreenCTM().inverse();
+    var invertedSVGMatrix = svg.current.getScreenCTM().inverse();
 
     return _point.matrixTransform(invertedSVGMatrix);
   };
 
-  //! Event Handlers
-  const onPointerDown = event => {
+  //! Pan Event Handlers
+  const handlePointerDown = event => {
     setIsPointerDown(true);
     // We get the pointer position on click/touchdown so we can get the value
     // once the user starts to drag
@@ -56,11 +102,9 @@ const InteractiveSVG = ({ children, displayCorners }) => {
     setPointerOriginY(y);
   };
 
-  const onPointerUp = event => {
-    setIsPointerDown(false);
-  };
+  const handlePointerUp = event => setIsPointerDown(false);
 
-  const onPointerMove = event => {
+  const handlePointerMove = event => {
     // Only run this function if the pointer is down
     if (!isPointerDown) return;
 
@@ -81,46 +125,38 @@ const InteractiveSVG = ({ children, displayCorners }) => {
   //console.log(`Viewbox: ${viewBoxString}`);
 
   return (
-    <svg
-      ref={el}
-      viewBox={viewBoxString}
-      style={{ width }}
-      onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
-      onPointerLeave={onPointerUp}
-      onPointerMove={onPointerMove}
-      onMouseDown={onPointerDown}
-      onMouseUp={onPointerUp}
-      onMouseLeave={onPointerUp}
-      onMouseMove={onPointerMove}
-      onTouchStart={onPointerDown}
-      onTouchEnd={onPointerUp}
-      onTouchMove={onPointerMove}
-    >
-      <g>
-        {displayCorners && (
-          <>
-            <rect x="0" y="0" width="20" height="20" />
-            <rect x="280" y="0" width="20" height="20" />
-            <rect x="0" y="280" width="20" height="20" />
-            <rect x="280" y="280" width="20" height="20" />
-          </>
-        )}
-
-        {children}
-      </g>
-    </svg>
+    <>
+      <Zoomer>
+        <a onClick={handleZoomIn}>➕</a>
+        <span>🔍</span>
+        <a onClick={handleZoomOut}>➖</a>
+      </Zoomer>
+      <svg
+        ref={svg}
+        viewBox={viewBoxString}
+        style={{ width }}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
+        onPointerMove={handlePointerMove}
+        onMouseDown={handlePointerDown}
+        onMouseUp={handlePointerUp}
+        onMouseLeave={handlePointerUp}
+        onMouseMove={handlePointerMove}
+        onTouchStart={handlePointerDown}
+        onTouchEnd={handlePointerUp}
+        onTouchMove={handlePointerMove}
+      >
+        <Group zoom={zoom} ref={group}>
+          {children}
+        </Group>
+      </svg>
+    </>
   );
 };
 
 InteractiveSVG.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.element).isRequired,
-  displayCorners: PropTypes.bool.isRequired
-};
-
-//? DEV
-InteractiveSVG.defaultProps = {
-  displayCorners: true
+  children: PropTypes.arrayOf(PropTypes.element).isRequired
 };
 
 export default InteractiveSVG;
