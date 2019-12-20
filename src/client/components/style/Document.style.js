@@ -2,13 +2,8 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 
 const Container = styled.div`
-  // position: relative;
-  // min-height: 100vh;
-  // min-width: 100vw;
-  // padding: 5vh 5vw 5vh 5vw;
-  // height: ${({ height }) => height}px;
-  // width: ${({ width }) => width}px;
-  //background:linear-gradient(to right, red, red 50%, blue 50%);
+  position: relative;
+  //background: conic-gradient(#fff 90deg, #000 2turn);
   height: 100vh;
   width: 100vw;
 `;
