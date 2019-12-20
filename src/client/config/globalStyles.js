@@ -10,10 +10,30 @@ import InterBoldWoffTwo from "./../static/fonts/inter/Inter-Bold.woff2";
 import InterBoldWoff from "./../static/fonts/inter/Inter-Bold.woff";
 import InterLightWoffTwo from "./../static/fonts/inter/Inter-Light-BETA.woff2";
 import InterLightWoff from "./../static/fonts/inter/Inter-Light-BETA.woff";
+import InterThinWoffTwo from "./../static/fonts/inter/Inter-Thin-BETA.woff2";
+import InterThinWoff from "./../static/fonts/inter/Inter-Thin-BETA.woff";
+import InterExtraLightWoffTwo from "./../static/fonts/inter/Inter-ExtraLight-BETA.woff2";
+import InterExtraLightWoff from "./../static/fonts/inter/Inter-ExtraLight-BETA.woff";
 
 const GlobalStyle = createGlobalStyle`
 
 	// Setup font faces
+	@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 100;
+    src:
+      url('${InterThinWoffTwo}') format('woff2'),
+      url('${InterThinWoff}') format('woff');
+	}
+	@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 200;
+    src:
+      url('${InterExtraLightWoffTwo}') format('woff2'),
+      url('${InterExtraLightWoff}') format('woff');
+	}
 	@font-face {
     font-family: 'Inter';
     font-style: normal;
@@ -70,6 +90,10 @@ const GlobalStyle = createGlobalStyle`
 		// Colors
 		background: ${({ theme }) => theme.background};
 		color: ${({ theme }) => theme.text.color};
+	}
+
+	span {
+		display: inline-block;
 	}
 `;
 
