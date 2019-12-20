@@ -15,7 +15,9 @@ const Node = ({
   position: { x, y, draggable },
   dimensions: { height, width },
   content: { type, text },
-  depth
+  depth,
+  showId,
+  showButtons
 }) => {
   //! ============
   //! == CONFIG ==
@@ -52,29 +54,26 @@ const Node = ({
    * When `isActive` changes, check if this node should
    * be focused.
    */
-  useEffect(
-    () => {
-      const _el = textInput.current;
-      if (isActive) {
-        // focus
-        _el.focus();
-        // Set cursor to end of content
-        if (_el.innerHTML.length) {
-          const range = document.createRange();
-          const sel = window.getSelection();
-          range.setStart(_el, 1);
-          range.collapse(true);
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
-      } else if (window.document.activeElement === _el) {
-        // Programmatically de-focus if this element is not active
-        // but was.  This occurs when `escape` key is pressed.
-        _el.blur();
+  useEffect(() => {
+    const _el = textInput.current;
+    if (isActive) {
+      // focus
+      _el.focus();
+      // Set cursor to end of content
+      if (_el.innerHTML.length) {
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.setStart(_el, 1);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
       }
-    },
-    [isActive]
-  );
+    } else if (window.document.activeElement === _el) {
+      // Programmatically de-focus if this element is not active
+      // but was.  This occurs when `escape` key is pressed.
+      _el.blur();
+    }
+  }, [isActive]);
 
   /**
    * When node renders, set height property in the store.
@@ -94,11 +93,6 @@ const Node = ({
    */
   const addChild = event => actions.addNode(id);
 
-  // TODO: this needs to be attached to text because it's the element
-  // TODO: being focused!
-  // TODO: See https://github.com/JohannesKlauss/react-hotkeys-hook/issues/127
-  ////useHotkeys("cmd+enter", () => console.log("child hotkey"));
-
   /**
    * Controlled input logic that updates the Node's text as the user changes it.
    * Also updates node height in state if number of text lines has changed.
@@ -117,9 +111,7 @@ const Node = ({
     );
   };
 
-  const handleClick = event => {
-    actions.setActiveNode(id);
-  };
+  const handleClick = event => actions.setActiveNode(id);
 
   /**
    * If this node is current active, set it as inactive
@@ -141,13 +133,14 @@ const Node = ({
   //! == RENDER ==
   //! ============
 
+  //$ Position Calibration
   // How many pixels should be between nodes
   const yBottomPadding = 75;
 
   // Render relative to window innerHeight and innerWidth
   const { height: windowHeight, width: windowWidth } = useWindowSize();
-  const calibrateX = n => windowWidth / 2 + n - width;
-  const calibrateY = n => windowHeight / 3 + n;
+  const calibrateX = n => windowWidth / 2 + n - width / 2;
+  const calibrateY = n => windowHeight / 2 + n - height / 2;
   const calibratedY = calibrateY(y) + yBottomPadding * depth;
   const calibratedX = calibrateX(x);
 
@@ -180,9 +173,11 @@ const Node = ({
         y={calibratedY}
         x={calibratedX}
       >
-        <small>
-          {id} - {depth}
-        </small>
+        {showId && (
+          <small>
+            {id} - {depth}
+          </small>
+        )}
         <Text
           ref={textInput}
           onClick={handleClick}
@@ -193,7 +188,7 @@ const Node = ({
         >
           {text}
         </Text>
-        <NewChildButton onClick={addChild}>➕</NewChildButton>
+        {showButtons && <NewChildButton onClick={addChild}>➕</NewChildButton>}
       </Container>
     </>
   );
@@ -214,8 +209,14 @@ Node.propTypes = {
     type: PropTypes.string,
     text: PropTypes.string
   }).isRequired,
-  depth: PropTypes.number
+  depth: PropTypes.number,
+  showId: PropTypes.bool.isRequired,
+  showButtons: PropTypes.bool.isRequired
 };
-Node.defaultProps = {};
+
+Node.defaultProps = {
+  showId: false,
+  showButtons: false
+};
 
 export default Node;
