@@ -4,7 +4,7 @@ import { hri } from "human-readable-ids";
 import { stratify } from "d3-hierarchy";
 // https://github.com/Klortho/d3-flextree
 import { flextree } from "d3-flextree";
-import { NodeType, NodesType } from "./interfaces";
+import { NodeType, NodesType, EdgeType } from "./interfaces";
 
 const DEFAULT_WIDTH = 300;
 const NODE_SPACING = DEFAULT_WIDTH;
@@ -28,8 +28,17 @@ const createNode = (parentId: string): NodeType => ({
     text: null
   },
   draggable: true,
-  children: [],
+  edges: {},
   depth: undefined
+});
+
+const createEdge = (nodes: Array<string>): EdgeType => ({
+  _id: uuidv4(),
+  id: hri.random(),
+  nodes: nodes.reduce((acc: { [key: string]: boolean }, id: string) => {
+    acc[id] = true;
+    return acc;
+  }, {})
 });
 
 /**
@@ -62,12 +71,6 @@ const repositionNodes = (nodes: NodesType): NodesType => {
   const _nodes: NodesType = nodes;
   const asArray: Array<NodeType> = Object.values(_nodes);
   computeNodePositions(asArray).forEach((node: object | any) => {
-    // add parent->children relationships to store for arrow ui-traversal
-    if (node.parent) {
-      _nodes[node.parent.id].children = node.parent.children.map(
-        (c: object | any) => c.id
-      );
-    }
     // Add position to this node
     _nodes[node.id].position = {
       x: node.x,
@@ -79,4 +82,4 @@ const repositionNodes = (nodes: NodesType): NodesType => {
   return _nodes;
 };
 
-export { createNode, computeNodePositions, repositionNodes };
+export { createNode, computeNodePositions, repositionNodes, createEdge };

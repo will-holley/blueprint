@@ -17,12 +17,27 @@ interface NodeType {
     text: string | null;
   };
   draggable: boolean;
-  children: Array<string>;
   depth: number | undefined;
+  edges: {
+    // nodeId: edgeId
+    [id: string]: string;
+  };
 }
 
 interface NodesType {
-  [key: string]: NodeType;
+  [id: string]: NodeType;
 }
 
-export { NodeType, NodesType };
+interface EdgeType {
+  _id: string;
+  id: string;
+  nodes: {
+    [id: string]: boolean;
+  };
+}
+
+interface EdgesType {
+  [edgeId: string]: EdgeType;
+}
+
+export { NodeType, NodesType, EdgeType, EdgesType };

@@ -1,4 +1,4 @@
-import { createDoc } from "./models/document";
+import { createDoc } from "./models/document/utils";
 
 const initialState = {
   // TODO: It may be necessary to switch to a documents/nodes/edges flat structure.

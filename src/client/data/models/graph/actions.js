@@ -1,5 +1,5 @@
 import update from "immutability-helper";
-import { createNode, repositionNodes } from "./utils";
+import { createNode, repositionNodes, createEdge } from "./utils";
 
 const actions = {
   /**
@@ -11,14 +11,19 @@ const actions = {
     // Create default node and add it to nodes before update
     // nodes positions
     const node = createNode(parentNodeId);
+
     const nodes = update(document.nodes, {
-      [node.id]: { $set: node }
+      [node.id]: {
+        $set: node
+      }
     });
     // Update all nodes
-    const newState = update(state, {
+    let newState = update(state, {
       documents: {
         [document.id]: {
-          nodes: { $set: repositionNodes(nodes) }
+          nodes: {
+            $set: repositionNodes(nodes)
+          }
         }
       },
       currentDoc: {
@@ -27,6 +32,25 @@ const actions = {
         }
       }
     });
+
+    // Create edge if this is not the base node
+    if (parentNodeId) {
+      const edge = createEdge([node.id, parentNodeId]);
+      newState = update(newState, {
+        documents: {
+          [document.id]: {
+            edges: {
+              [edge.id]: { $set: edge }
+            },
+            nodes: {
+              [node.id]: { edges: { [parentNodeId]: { $set: edge.id } } },
+              [parentNodeId]: { edges: { [node.id]: { $set: edge.id } } }
+            }
+          }
+        }
+      });
+    }
+
     setState(newState);
   },
   updateNodeText: (nodeId, text, nodeHeight) => ({ setState, getState }) => {
