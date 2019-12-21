@@ -1,5 +1,7 @@
 import React from "react";
 import { Helmet } from "react-helmet";
+import largeBlueCircle from "client/static/images/large_blue_circle.ico";
+import link from "client/static/images/link.ico";
 
 const Head = () => (
   <Helmet>
@@ -13,6 +15,7 @@ const Head = () => (
     <title>{"Blueprint"}</title>
     <meta name="description" content={"Inspire yourself"} />
     <link rel="canonical" href="index.html" />
+    <link rel="icon" href={largeBlueCircle}></link>
     {/* <>
           <link
             rel="apple-touch-icon"
