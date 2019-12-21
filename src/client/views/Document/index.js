@@ -31,9 +31,9 @@ const Document = () => {
     <Container>
       <Actions>
         <EmojiButton onClick={event => actions.addNode(null)}>🌀</EmojiButton>
-        {/* <span>
+        <span>
           <h1>{id}</h1>
-        </span> */}
+        </span>
       </Actions>
       <InteractiveSVG>
         {Object.values(nodes).map(
