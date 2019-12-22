@@ -74,7 +74,7 @@ const Document = () => {
   useHotkeys("cmd+-", handleZoomOut, [zoom]);
 
   //! Attach Node keyboard shortcuts
-  useKeyboardHotkeys(nodes, activeNodeId && nodes[activeNodeId]);
+  useKeyboardHotkeys();
 
   const toggleHotkeyMenu = event => setShowHotkeyMenu(!showHotkeyMenu);
   useHotkeys("cmd+k", toggleHotkeyMenu, [showHotkeyMenu]);
@@ -104,7 +104,15 @@ const Document = () => {
       )}
       <InteractiveSVG zoom={zoom}>
         {Object.values(nodes).map(
-          ({ id: nodeId, parentId, dimensions, position, content, depth }) => (
+          ({
+            id: nodeId,
+            parentId,
+            dimensions,
+            position,
+            content,
+            depth,
+            edges
+          }) => (
             <Node
               key={nodeId}
               id={nodeId}
@@ -113,6 +121,7 @@ const Document = () => {
               dimensions={dimensions}
               content={content}
               depth={depth}
+              edges={edges}
             />
           )
         )}

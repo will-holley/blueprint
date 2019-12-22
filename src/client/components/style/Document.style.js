@@ -3,9 +3,10 @@ import styled from "styled-components";
 
 const Container = styled.div`
   position: relative;
-  //background: conic-gradient(#fff 90deg, #000 2turn);
   height: 100vh;
   width: 100vw;
+  // DEV:
+  //background: conic-gradient(#fff 90deg, #000 2turn);
 `;
 
 const Actions = styled.div`

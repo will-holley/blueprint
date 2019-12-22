@@ -16,7 +16,6 @@ const actions = {
     // Create default node and add it to nodes before update
     // nodes positions
     const node = createNode(parentNodeId);
-
     const nodes = update(document.nodes, {
       [node.id]: {
         $set: node
@@ -86,11 +85,10 @@ const actions = {
           }
         }
       });
-      const repositioned = repositionNodes(nodes);
       newState = update(newState, {
         documents: {
           [state.currentDoc.id]: {
-            nodes: { $set: repositioned }
+            nodes: { $set: repositionNodes(nodes) }
           }
         }
       });

@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import PropTypes from "prop-types";
 
 const Edge = styled.path`
   fill: transparent;
@@ -7,5 +8,9 @@ const Edge = styled.path`
   stroke-dasharray: 5, 5;
   stroke-linecap: round;
 `;
+
+Edge.propTypes = {
+  id: PropTypes.string.isRequired
+};
 
 export { Edge };

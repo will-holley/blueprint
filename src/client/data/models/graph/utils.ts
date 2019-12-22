@@ -87,10 +87,7 @@ const repositionNodes = (nodes: NodesType): NodesType => {
   const asArray: Array<NodeType> = Object.values(_nodes);
   computeNodePositions(asArray).forEach((node: object | any) => {
     // Add position to this node
-    _nodes[node.id].position = {
-      x: node.x,
-      y: node.y
-    };
+    _nodes[node.id].position = { x: node.x, y: node.y };
     // Add depth to this node
     _nodes[node.id].depth = node.depth;
   });
