@@ -98,13 +98,12 @@ const InteractiveSVG = ({ children, zoom }) => {
     // a base node.
     if (!activeNodeId) return;
     // Get active node position
-    const el = document.getElementById(activeNodeId);
     const {
       height: elHeight,
       width: elWidth,
       x: elLeft,
       y: elTop
-    } = el.getBBox();
+    } = document.getElementById(activeNodeId).getBBox();
     const elX = elLeft + elWidth * 0.5;
     const elY = elTop + elHeight * 0.5;
     // Determine how far from the center of the viewbox the element currently is
