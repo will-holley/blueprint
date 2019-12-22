@@ -31,9 +31,9 @@ interface NodesType {
 interface EdgeType {
   _id: string;
   id: string;
-  nodes: {
-    [id: string]: boolean;
-  };
+  parent: string | null;
+  child: string | null;
+  peers: { [id: string]: boolean } | null;
 }
 
 interface EdgesType {

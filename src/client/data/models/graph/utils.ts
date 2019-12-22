@@ -4,7 +4,7 @@ import { hri } from "human-readable-ids";
 import { stratify } from "d3-hierarchy";
 // https://github.com/Klortho/d3-flextree
 import { flextree } from "d3-flextree";
-import { NodeType, NodesType, EdgeType } from "./interfaces";
+import { NodeType, NodesType, EdgeType, EdgesType } from "./interfaces";
 
 const DEFAULT_WIDTH = 300;
 const NODE_SPACING = DEFAULT_WIDTH;
@@ -32,13 +32,28 @@ const createNode = (parentId: string): NodeType => ({
   depth: undefined
 });
 
-const createEdge = (nodes: Array<string>): EdgeType => ({
+/**
+ * An edge can either be a parent-child relationship or a
+ * peer relationship.
+ * @param parent  parent node id
+ * @param child   child node id
+ * @param peers   array of node ids
+ */
+const createEdge = (
+  parent: string | null,
+  child: string | null,
+  peers: Array<string> | null
+): EdgeType => ({
   _id: uuidv4(),
   id: hri.random(),
-  nodes: nodes.reduce((acc: { [key: string]: boolean }, id: string) => {
-    acc[id] = true;
-    return acc;
-  }, {})
+  parent: parent ? parent : null,
+  child: child ? child : null,
+  peers: peers
+    ? peers.reduce((acc: { [key: string]: boolean }, id: string) => {
+        acc[id] = true;
+        return acc;
+      }, {})
+    : null
 });
 
 /**
@@ -82,4 +97,43 @@ const repositionNodes = (nodes: NodesType): NodesType => {
   return _nodes;
 };
 
-export { createNode, computeNodePositions, repositionNodes, createEdge };
+/**
+ * Given a base node, find the node ids of all nodes underneath it and return
+ * those along with the edge ids linking said nodes.
+ * @param baseNodeId
+ * @param nodes
+ * @param edges
+ */
+const markChildNodesForDeletion = (
+  baseNode: NodeType,
+  nodes: NodesType,
+  edges: EdgesType
+): { [key: string]: string[] } => {
+  // By design the given node is to be deleted.
+  const nodesToDelete: string[] = [baseNode.id];
+  const edgesToDelete: string[] = [];
+
+  const search = (node: NodeType): void => {
+    if (!node || !node.edges) return;
+    Object.values(node.edges).map((edgeId: string) => {
+      const { parent, child } = edges[edgeId];
+      if (parent === node.id) {
+        nodesToDelete.push(child);
+        edgesToDelete.push(edgeId);
+        search(nodes[child]);
+      }
+    });
+  };
+
+  search(baseNode);
+
+  return { nodesToDelete, edgesToDelete };
+};
+
+export {
+  createNode,
+  computeNodePositions,
+  repositionNodes,
+  createEdge,
+  markChildNodesForDeletion
+};

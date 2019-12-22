@@ -61,6 +61,18 @@ const useKeyboardHotkeys = (nodes, activeNode) => {
     [activeNodeId]
   );
 
+  /**
+   * Delete a node.  Deletes all nodes underneath it.
+   */
+  useHotkeys(
+    "cmd+backspace",
+    event => {
+      if (activeNodeId) actions.deleteNode(activeNodeId);
+      return false;
+    },
+    [activeNodeId]
+  );
+
   //$ ================
   //$ == NAVIGATION ==
   //$ ================
@@ -127,11 +139,6 @@ const useKeyboardHotkeys = (nodes, activeNode) => {
     activeNodeId,
     nodes
   ]);
-
-  /**
-   * Delete a node.  Deletes all nodes underneath it.
-   */
-  ////useHotkeys("cmd+delete", event => console.info("delete"));
 };
 
 export { useKeyboardHotkeys };
