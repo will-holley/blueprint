@@ -110,7 +110,7 @@ const useKeyboardHotkeys = (nodes, activeNode) => {
    */
   const handleHorizontalNavigation = computeNextIndex => {
     if (!activeNode || !activeNode.parentId) return;
-    const levelIds = nodes[activeNode.parentId].children;
+    const levelIds = Object.keys(nodes[activeNode.parentId].edges);
     const index = levelIds.indexOf(activeNode.id);
     const nextIndex = computeNextIndex(index, levelIds);
     //console.log(computeNextIndex, levelIds, levelIds[nextIndex]);
