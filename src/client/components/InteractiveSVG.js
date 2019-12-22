@@ -1,16 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { useWindowSize, useHotkeys } from "client/utils/hooks";
-import { EmojiButton } from "./style/Buttons";
-
-const Zoomer = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 99999;
-  padding: 1rem;
-`;
+import { useWindowSize } from "client/utils/hooks";
 
 const Group = styled.g.attrs(({ zoom }) => ({
   transform: `scale(${zoom})`
@@ -20,7 +11,7 @@ const Group = styled.g.attrs(({ zoom }) => ({
  * https://css-tricks.com/creating-a-panning-effect-for-svg/
  * @param {object} props
  */
-const InteractiveSVG = ({ children }) => {
+const InteractiveSVG = ({ children, zoom }) => {
   //! Get the window size.  It is used to set <svg> dimensions.
   const { height, width } = useWindowSize();
 
@@ -40,10 +31,6 @@ const InteractiveSVG = ({ children }) => {
   // Create an SVG point that contains x & y values
   const [point, setPoint] = useState(null);
 
-  //! Set up zoom variables
-  const defaultZoom = 1;
-  const [zoom, setZoom] = useState(defaultZoom);
-
   //! On Mount
   useEffect(() => {
     // Set up svg point
@@ -53,27 +40,6 @@ const InteractiveSVG = ({ children }) => {
     setViewBoxX(x);
     setViewBoxY(y);
   }, []);
-
-  //! Zoom
-  const handleZoomIn = event => {
-    const newZoom = zoom + 0.1;
-    setZoom(newZoom);
-    return false;
-  };
-
-  const handleZoomOut = event => {
-    const newZoom = zoom - 0.1;
-    setZoom(newZoom);
-    return false;
-  };
-
-  const resetZoom = event => {
-    setZoom(defaultZoom);
-    return false;
-  };
-
-  useHotkeys("cmd+=", handleZoomIn, [zoom]);
-  useHotkeys("cmd+-", handleZoomOut, [zoom]);
 
   //! This function returns an object with X & Y values from the pointer event
   const getPointFromEvent = ({ targetTouches, clientX, clientY }) => {
@@ -121,11 +87,6 @@ const InteractiveSVG = ({ children }) => {
 
   return (
     <>
-      <Zoomer>
-        <EmojiButton onClick={handleZoomIn}>➕</EmojiButton>
-        <EmojiButton onClick={resetZoom}>🔍</EmojiButton>
-        <EmojiButton onClick={handleZoomOut}>➖</EmojiButton>
-      </Zoomer>
       <svg
         ref={svg}
         viewBox={viewBoxString}
@@ -151,7 +112,12 @@ const InteractiveSVG = ({ children }) => {
 };
 
 InteractiveSVG.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.element).isRequired
+  children: PropTypes.arrayOf(PropTypes.element).isRequired,
+  zoom: PropTypes.number.isRequired
+};
+
+InteractiveSVG.defaultProps = {
+  zoom: 1
 };
 
 export default InteractiveSVG;

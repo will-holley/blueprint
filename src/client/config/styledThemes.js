@@ -9,6 +9,6 @@ const dark = makeTheme({
   textColor: "white",
   background: "linear-gradient(45deg,#040404 0%,#020202 100%)"
 });
-const light = makeTheme({ textColor: "black", background: "white" });
+const light = makeTheme({ textColor: "#222", background: "white" });
 
 export { dark, light };
