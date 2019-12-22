@@ -5,11 +5,17 @@ import { useHotkeys } from "client/utils/hooks";
 
 /**
  * Hooks all of the keyboard shortcuts in
- * TODO: memoize this b.
  */
-const useKeyboardHotkeys = (nodes, activeNode) => {
-  const [state, actions] = useStore();
-  const activeNodeId = activeNode && activeNode.id;
+const useKeyboardHotkeys = () => {
+  const [
+    {
+      documents,
+      currentDoc: { activeNodeId, id: docId }
+    },
+    actions
+  ] = useStore();
+  const { nodes, edges } = documents[docId];
+  const activeNode = activeNodeId && nodes[activeNodeId];
 
   //! ==============
   //! == DOCUMENT ==
@@ -107,9 +113,12 @@ const useKeyboardHotkeys = (nodes, activeNode) => {
     "cmd+down",
     event => {
       if (!activeNode) return;
-      const childIds = Object.keys(activeNode.edges);
-      if (!childIds.length) actions.addNode(activeNodeId);
-      else actions.setActiveNode(childIds[0]);
+      const edgeIds = Object.values(activeNode.edges).filter(id => {
+        const { parent, child } = edges[id];
+        return parent === activeNodeId;
+      });
+      if (!edgeIds.length) actions.addNode(activeNodeId);
+      else actions.setActiveNode(edges[edgeIds[0]].child);
     },
     [activeNodeId]
   );
