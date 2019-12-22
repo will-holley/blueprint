@@ -138,8 +138,7 @@ const actions = {
       document.edges
     );
 
-    // Delete nodes & edges
-    const edges = update(document.edges, { $unset: edgesToDelete });
+    // Delete nodes
     const nodes = update(document.nodes, { $unset: nodesToDelete });
 
     // Recompute node positions
@@ -150,8 +149,10 @@ const actions = {
       },
       documents: {
         [state.currentDoc.id]: {
-          nodes: { $set: nodes.length ? repositionNodes(nodes) : [] },
-          edges: { $set: edges }
+          nodes: {
+            $set: Object.keys(nodes).length ? repositionNodes(nodes) : {}
+          },
+          edges: { $unset: edgesToDelete }
         }
       }
     });
