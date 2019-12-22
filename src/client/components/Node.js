@@ -16,6 +16,7 @@ const Node = ({
   dimensions: { height, width },
   content: { type, text },
   depth,
+  edges,
   showId,
   showButtons
 }) => {
@@ -165,9 +166,10 @@ const Node = ({
 
   return (
     <>
-      {parentId && <Edge key={`${parentId}-${id}`} d={d.join(" ")} />}
+      {parentId && <Edge id={edges[parentId]} d={d.join(" ")} />}
       <Container
         ref={el}
+        id={id}
         width={width}
         height={height}
         y={calibratedY}
@@ -175,7 +177,7 @@ const Node = ({
       >
         {showId && (
           <small>
-            {id} - {depth}
+            {id} - {depth} - ({calibratedX},{calibratedY})
           </small>
         )}
         <Text
@@ -210,12 +212,13 @@ Node.propTypes = {
     text: PropTypes.string
   }).isRequired,
   depth: PropTypes.number,
+  edges: PropTypes.object.isRequired,
   showId: PropTypes.bool.isRequired,
   showButtons: PropTypes.bool.isRequired
 };
 
 Node.defaultProps = {
-  showId: false,
+  showId: true,
   showButtons: false
 };
 

@@ -64,6 +64,7 @@ module.exports = {
     }),
     new webpack.SourceMapDevToolPlugin({})
   ],
+  devtool: "eval-source-map",
   devServer: {
     open: true,
     contentBase: path.join(__dirname, "dist/client"),

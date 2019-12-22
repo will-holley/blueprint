@@ -1,16 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { useWindowSize, useHotkeys } from "client/utils/hooks";
-import { EmojiButton } from "./style/Buttons";
-
-const Zoomer = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 99999;
-  padding: 1rem;
-`;
+import useStore from "client/data/store";
+import { useWindowSize } from "client/utils/hooks";
 
 const Group = styled.g.attrs(({ zoom }) => ({
   transform: `scale(${zoom})`
@@ -20,7 +12,7 @@ const Group = styled.g.attrs(({ zoom }) => ({
  * https://css-tricks.com/creating-a-panning-effect-for-svg/
  * @param {object} props
  */
-const InteractiveSVG = ({ children }) => {
+const InteractiveSVG = ({ children, zoom }) => {
   //! Get the window size.  It is used to set <svg> dimensions.
   const { height, width } = useWindowSize();
 
@@ -40,10 +32,6 @@ const InteractiveSVG = ({ children }) => {
   // Create an SVG point that contains x & y values
   const [point, setPoint] = useState(null);
 
-  //! Set up zoom variables
-  const defaultZoom = 1;
-  const [zoom, setZoom] = useState(defaultZoom);
-
   //! On Mount
   useEffect(() => {
     // Set up svg point
@@ -53,27 +41,6 @@ const InteractiveSVG = ({ children }) => {
     setViewBoxX(x);
     setViewBoxY(y);
   }, []);
-
-  //! Zoom
-  const handleZoomIn = event => {
-    const newZoom = zoom + 0.1;
-    setZoom(newZoom);
-    return false;
-  };
-
-  const handleZoomOut = event => {
-    const newZoom = zoom - 0.1;
-    setZoom(newZoom);
-    return false;
-  };
-
-  const resetZoom = event => {
-    setZoom(defaultZoom);
-    return false;
-  };
-
-  useHotkeys("cmd+=", handleZoomIn, [zoom]);
-  useHotkeys("cmd+-", handleZoomOut, [zoom]);
 
   //! This function returns an object with X & Y values from the pointer event
   const getPointFromEvent = ({ targetTouches, clientX, clientY }) => {
@@ -119,13 +86,36 @@ const InteractiveSVG = ({ children }) => {
   //? DEV:
   //console.log(`Viewbox: ${viewBoxString}`);
 
+  // Activating a node centers it.
+  const [
+    {
+      currentDoc: { activeNodeId }
+    },
+    actions
+  ] = useStore();
+  useEffect(() => {
+    // By default there is no active node until the user creates
+    // a base node.
+    if (!activeNodeId) return;
+    // Get active node position
+    const el = document.getElementById(activeNodeId);
+    const {
+      height: elHeight,
+      width: elWidth,
+      x: elLeft,
+      y: elTop
+    } = el.getBBox();
+    const elX = elLeft + elWidth * 0.5;
+    const elY = elTop + elHeight * 0.5;
+    // Determine how far from the center of the viewbox the element currently is
+    const xOffset = width / 2 - elX;
+    const yOffset = height / 2 - elY;
+    setViewBoxY(-yOffset);
+    setViewBoxX(-xOffset);
+  }, [activeNodeId]);
+
   return (
     <>
-      <Zoomer>
-        <EmojiButton onClick={handleZoomIn}>➕</EmojiButton>
-        <EmojiButton onClick={resetZoom}>🔍</EmojiButton>
-        <EmojiButton onClick={handleZoomOut}>➖</EmojiButton>
-      </Zoomer>
       <svg
         ref={svg}
         viewBox={viewBoxString}
@@ -151,7 +141,13 @@ const InteractiveSVG = ({ children }) => {
 };
 
 InteractiveSVG.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.element).isRequired
+  children: PropTypes.arrayOf(PropTypes.element).isRequired,
+  zoom: PropTypes.number.isRequired
+};
+
+// Zoom is controlled a level up.
+InteractiveSVG.defaultProps = {
+  zoom: 1
 };
 
 export default InteractiveSVG;

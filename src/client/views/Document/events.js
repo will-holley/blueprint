@@ -5,11 +5,17 @@ import { useHotkeys } from "client/utils/hooks";
 
 /**
  * Hooks all of the keyboard shortcuts in
- * TODO: memoize this b.
  */
-const useKeyboardHotkeys = (nodes, activeNode) => {
-  const [_, actions] = useStore();
-  const activeNodeId = activeNode && activeNode.id;
+const useKeyboardHotkeys = () => {
+  const [
+    {
+      documents,
+      currentDoc: { activeNodeId, id: docId }
+    },
+    actions
+  ] = useStore();
+  const { nodes, edges } = documents[docId];
+  const activeNode = activeNodeId && nodes[activeNodeId];
 
   //! ==============
   //! == DOCUMENT ==
@@ -29,6 +35,16 @@ const useKeyboardHotkeys = (nodes, activeNode) => {
     () => {
       if (!activeNodeId) actions.addNode(null);
     }, // Callback is memoized until `activeNodeId` has changed.
+    [activeNodeId]
+  );
+
+  useHotkeys(
+    "cmd+shift+enter",
+    event => {
+      if (activeNodeId && activeNode.parentId)
+        actions.addNode(activeNode.parentId);
+      return false;
+    },
     [activeNodeId]
   );
 
@@ -61,6 +77,18 @@ const useKeyboardHotkeys = (nodes, activeNode) => {
     [activeNodeId]
   );
 
+  /**
+   * Delete a node.  Deletes all nodes underneath it.
+   */
+  useHotkeys(
+    "cmd+backspace",
+    event => {
+      if (activeNodeId) actions.deleteNode(activeNodeId);
+      return false;
+    },
+    [activeNodeId]
+  );
+
   //$ ================
   //$ == NAVIGATION ==
   //$ ================
@@ -85,8 +113,12 @@ const useKeyboardHotkeys = (nodes, activeNode) => {
     "cmd+down",
     event => {
       if (!activeNode) return;
-      else if (activeNode.children.length === 0) actions.addNode(activeNodeId);
-      else actions.setActiveNode(activeNode.children[0]);
+      const edgeIds = Object.values(activeNode.edges).filter(id => {
+        const { parent, child } = edges[id];
+        return parent === activeNodeId;
+      });
+      if (!edgeIds.length) actions.addNode(activeNodeId);
+      else actions.setActiveNode(edges[edgeIds[0]].child);
     },
     [activeNodeId]
   );
@@ -98,7 +130,7 @@ const useKeyboardHotkeys = (nodes, activeNode) => {
    */
   const handleHorizontalNavigation = computeNextIndex => {
     if (!activeNode || !activeNode.parentId) return;
-    const levelIds = nodes[activeNode.parentId].children;
+    const levelIds = Object.keys(nodes[activeNode.parentId].edges);
     const index = levelIds.indexOf(activeNode.id);
     const nextIndex = computeNextIndex(index, levelIds);
     //console.log(computeNextIndex, levelIds, levelIds[nextIndex]);
@@ -127,11 +159,6 @@ const useKeyboardHotkeys = (nodes, activeNode) => {
     activeNodeId,
     nodes
   ]);
-
-  /**
-   * Delete a node.  Deletes all nodes underneath it.
-   */
-  ////useHotkeys("cmd+delete", event => console.info("delete"));
 };
 
 export { useKeyboardHotkeys };

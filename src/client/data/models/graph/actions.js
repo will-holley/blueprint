@@ -1,5 +1,10 @@
 import update from "immutability-helper";
-import { createNode, repositionNodes } from "./utils";
+import {
+  createNode,
+  repositionNodes,
+  createEdge,
+  markChildNodesForDeletion
+} from "./utils";
 
 const actions = {
   /**
@@ -12,13 +17,17 @@ const actions = {
     // nodes positions
     const node = createNode(parentNodeId);
     const nodes = update(document.nodes, {
-      [node.id]: { $set: node }
+      [node.id]: {
+        $set: node
+      }
     });
     // Update all nodes
-    const newState = update(state, {
+    let newState = update(state, {
       documents: {
         [document.id]: {
-          nodes: { $set: repositionNodes(nodes) }
+          nodes: {
+            $set: repositionNodes(nodes)
+          }
         }
       },
       currentDoc: {
@@ -27,6 +36,25 @@ const actions = {
         }
       }
     });
+
+    // Create edge if this is not the base node
+    if (parentNodeId) {
+      const edge = createEdge(parentNodeId, node.id, null);
+      newState = update(newState, {
+        documents: {
+          [document.id]: {
+            edges: {
+              [edge.id]: { $set: edge }
+            },
+            nodes: {
+              [node.id]: { edges: { [parentNodeId]: { $set: edge.id } } },
+              [parentNodeId]: { edges: { [node.id]: { $set: edge.id } } }
+            }
+          }
+        }
+      });
+    }
+
     setState(newState);
   },
   updateNodeText: (nodeId, text, nodeHeight) => ({ setState, getState }) => {
@@ -57,11 +85,10 @@ const actions = {
           }
         }
       });
-      const repositioned = repositionNodes(nodes);
       newState = update(newState, {
         documents: {
           [state.currentDoc.id]: {
-            nodes: { $set: repositioned }
+            nodes: { $set: repositionNodes(nodes) }
           }
         }
       });
@@ -98,7 +125,36 @@ const actions = {
     setState(newState);
   },
   deleteNode: nodeId => ({ setState, getState }) => {
-    // TODO: think about this. Write and delete edges?
+    const state = getState();
+    const document = state.documents[state.currentDoc.id];
+    const node = document.nodes[nodeId];
+
+    // Recursively determine which child nodes, if any, need to be deleted
+    const { nodesToDelete, edgesToDelete } = markChildNodesForDeletion(
+      node,
+      document.nodes,
+      document.edges
+    );
+
+    // Delete nodes
+    const nodes = update(document.nodes, { $unset: nodesToDelete });
+
+    // Recompute node positions
+    const newState = update(state, {
+      currentDoc: {
+        // If the deleted node has a parent node, focus on it
+        activeNodeId: { $set: node.parentId ? node.parentId : null }
+      },
+      documents: {
+        [state.currentDoc.id]: {
+          nodes: {
+            $set: Object.keys(nodes).length ? repositionNodes(nodes) : {}
+          },
+          edges: { $unset: edgesToDelete }
+        }
+      }
+    });
+    setState(newState);
   }
 };
 

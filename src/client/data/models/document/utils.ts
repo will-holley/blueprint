@@ -1,13 +1,12 @@
 import uuidv4 from "uuid/v4";
 import { hri } from "human-readable-ids";
+import { DocumentType } from "./interfaces";
 
-const createDoc = () => ({
+const createDoc = (): DocumentType => ({
   _id: uuidv4(),
   id: hri.random(),
   nodes: {},
-  edges: []
+  edges: {}
 });
 
-const actions = {};
-
-export { createDoc, actions };
+export { createDoc };
