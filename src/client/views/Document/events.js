@@ -8,7 +8,7 @@ import { useHotkeys } from "client/utils/hooks";
  * TODO: memoize this b.
  */
 const useKeyboardHotkeys = (nodes, activeNode) => {
-  const [_, actions] = useStore();
+  const [state, actions] = useStore();
   const activeNodeId = activeNode && activeNode.id;
 
   //! ==============
@@ -29,6 +29,16 @@ const useKeyboardHotkeys = (nodes, activeNode) => {
     () => {
       if (!activeNodeId) actions.addNode(null);
     }, // Callback is memoized until `activeNodeId` has changed.
+    [activeNodeId]
+  );
+
+  useHotkeys(
+    "cmd+shift+enter",
+    event => {
+      if (activeNodeId && activeNode.parentId)
+        actions.addNode(activeNode.parentId);
+      return false;
+    },
     [activeNodeId]
   );
 
@@ -97,8 +107,9 @@ const useKeyboardHotkeys = (nodes, activeNode) => {
     "cmd+down",
     event => {
       if (!activeNode) return;
-      else if (activeNode.children.length === 0) actions.addNode(activeNodeId);
-      else actions.setActiveNode(activeNode.children[0]);
+      const childIds = Object.keys(activeNode.edges);
+      if (!childIds.length) actions.addNode(activeNodeId);
+      else actions.setActiveNode(childIds[0]);
     },
     [activeNodeId]
   );
