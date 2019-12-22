@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
+import useStore from "client/data/store";
 import { useWindowSize } from "client/utils/hooks";
 
 const Group = styled.g.attrs(({ zoom }) => ({
@@ -85,6 +86,34 @@ const InteractiveSVG = ({ children, zoom }) => {
   //? DEV:
   //console.log(`Viewbox: ${viewBoxString}`);
 
+  // Activating a node centers it.
+  const [
+    {
+      currentDoc: { activeNodeId }
+    },
+    actions
+  ] = useStore();
+  useEffect(() => {
+    // By default there is no active node until the user creates
+    // a base node.
+    if (!activeNodeId) return;
+    // Get active node position
+    const el = document.getElementById(activeNodeId);
+    const {
+      height: elHeight,
+      width: elWidth,
+      x: elLeft,
+      y: elTop
+    } = el.getBBox();
+    const elX = elLeft + elWidth * 0.5;
+    const elY = elTop + elHeight * 0.5;
+    // Determine how far from the center of the viewbox the element currently is
+    const xOffset = width / 2 - elX;
+    const yOffset = height / 2 - elY;
+    setViewBoxY(-yOffset);
+    setViewBoxX(-xOffset);
+  }, [activeNodeId]);
+
   return (
     <>
       <svg
@@ -116,6 +145,7 @@ InteractiveSVG.propTypes = {
   zoom: PropTypes.number.isRequired
 };
 
+// Zoom is controlled a level up.
 InteractiveSVG.defaultProps = {
   zoom: 1
 };
