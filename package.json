@@ -23,18 +23,22 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
+    "apollo-server": "^2.9.14",
     "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
     "d3-flextree": "^2.1.1",
     "d3-hierarchy": "^1.1.9",
     "dotenv": "^7.0.0",
-    "express": "^4.16.4",
+    "graphql": "^14.5.8",
     "hotkeys-js": "^3.7.3",
     "human-readable-ids": "^1.0.4",
     "immutability-helper": "^3.0.1",
+    "pg": "^7.15.1",
+    "pg-hstore": "^2.3.3",
     "react-sweet-state": "^1.1.1",
     "react-virtualized": "^9.21.2",
-    "uuid": "^3.3.3"
+    "sequelize": "^5.21.3",
+    "uuid": "^3.3.3",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
@@ -62,5 +66,11 @@
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.1",
     "webpack-dev-server": "^3.9.0"
+  },
+  "nodemonConfig": {
+    "verbose": false,
+    "watch": [
+      "src/server"
+    ]
   }
 }
