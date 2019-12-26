@@ -4,10 +4,15 @@
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "es6",
-    "target": "es5",
+    "target": "es2016",
     "jsx": "react",
     "allowJs": true,
     // Allow default imports from modules
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    //! Experimental Options
+    // Enables experimental support for ES7 decorators.
+    "experimentalDecorators": true,
+    // Enables experimental support for emitting type metadata for decorators.
+    "emitDecoratorMetadata": true
   }
 }
