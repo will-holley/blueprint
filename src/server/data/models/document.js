@@ -9,15 +9,31 @@ class Document extends Model {
     table.string("name").nullable();
   }
 
-  static async create(parent, args, context, info) {
-    const returning = this._getReturnFields(info);
-    const records = await this.db(this.table).insert(
-      {
-        human_id: this._generateHumanId()
-      },
-      returning
-    );
-    return this._resolveSQLResponse(records)[0];
+  static async create(req, res) {
+    try {
+      const rows = await this.db(this.table).insert(
+        {
+          human_id: this._generateHumanId()
+        },
+        ["*"]
+      );
+      res.status(201);
+      res.send(rows[0]);
+    } catch (error) {
+      res.send(error);
+    }
+  }
+
+  static async fetchAll(req, res) {
+    try {
+      const rows = await this.db(this.table)
+        .select("*")
+        .where("deleted_at", null);
+      res.status(200);
+      res.send(rows);
+    } catch (error) {
+      res.send(error);
+    }
   }
 }
 

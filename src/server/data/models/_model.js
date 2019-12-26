@@ -22,17 +22,45 @@ class Model {
   static fetchAll(req, res) {
     res.sendStatus(501);
   }
-  static fetchById(req, res) {
-    res.sendStatus(501);
+
+  static async fetchById({ params: { id } }, res) {
+    try {
+      const rows = await this.db(this.table)
+        .select("*")
+        .where("id", id);
+      res.status(200);
+      res.send(rows[0]);
+    } catch (error) {
+      res.send(error);
+    }
   }
+
   static create(req, res) {
     res.sendStatus(501);
   }
-  static update(req, res) {
-    res.sendStatus(501);
+
+  static async update({ params: { id }, body }, res) {
+    try {
+      const updatedCount = await this.db(this.table)
+        .where("id", id)
+        .update(body);
+      res.sendStatus(updatedCount !== 0 ? 200 : 400);
+    } catch (error) {
+      res.send(error);
+    }
   }
-  static delete(req, res) {
-    res.sendStatus(501);
+
+  static async delete({ params: { id } }, res) {
+    try {
+      const updatedCount = await this.db(this.table)
+        .where("id", id)
+        .update({ deleted_at: new Date() });
+      // Response will indicate how many records were updated.
+      const responseStatus = updatedCount !== 0 ? 200 : 400;
+      res.sendStatus(responseStatus);
+    } catch (error) {
+      res.send(error);
+    }
   }
 
   //! =====================

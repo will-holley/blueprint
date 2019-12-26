@@ -1,5 +1,6 @@
 import Model from "./_model";
 import Document from "./document";
+import update from "immutability-helper";
 
 class Node extends Model {
   static get table() {
@@ -18,28 +19,47 @@ class Node extends Model {
     table.foreign("document").references(`${Document.table}.id`);
   }
 
-  static async create(parent, { documentId }, context, info) {
-    const returning = this._getReturnFields(info);
-    // Insert records first
-    const [{ id }] = await this.db(this.table).insert(
-      {
-        human_id: this._generateHumanId(),
-        document: documentId
-      },
-      ["id"]
-    );
-    // Query the record respecting that the query may contained
-    // joined document props.
-    const records = await this.db(this.table)
-      .join(
-        Document.table,
-        `${this.table}.document`,
-        "=",
-        `${Document.table}.id`
-      )
-      .select(returning)
-      .where(`${this.table}.id`, id);
-    return this._resolveSQLResponse(records)[0];
+  static async create({ params: { id }, body: { documentId } }, res) {
+    try {
+      const rows = await this.db(this.table).insert(
+        {
+          human_id: this._generateHumanId(),
+          document: documentId
+        },
+        ["*"]
+      );
+      res.status(201);
+      res.send(rows[0]);
+    } catch (error) {
+      res.status(error);
+    }
+  }
+
+  static async update(req, res) {
+    // The only field which is editable is content
+    const cleanReq = update(req, {
+      body: {
+        $set: {
+          content: req.body.content
+        }
+      }
+    });
+    super.update(cleanReq, res);
+  }
+
+  /**
+   * node/?d=<document_uuid>
+   */
+  static async fetchAll({ query: { d } }, res) {
+    try {
+      const rows = await this.db(this.table)
+        .select("*")
+        .where({ document: d, deleted_at: null });
+      res.status(200);
+      res.send(rows);
+    } catch (error) {
+      res.send(error);
+    }
   }
 }
 

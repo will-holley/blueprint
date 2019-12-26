@@ -19,11 +19,8 @@ class Edge extends Model {
       .notNullable();
   }
 
-  static async create(parent, { nodeA, nodeB, hasParent }, context, info) {
-    const returning = this._getReturnFields(info);
-    // Insert records first
-    const table = this.table;
-    const [{ id }] = await this.db(this.table).insert(
+  static async create({ body: { nodeA, nodeB, hasParent } }, res) {
+    const rows = await this.db(this.table).insert(
       {
         human_id: this._generateHumanId(),
         node_a: nodeA,
@@ -32,43 +29,26 @@ class Edge extends Model {
       },
       ["id"]
     );
-    const records = await this.db(this.table)
-      .innerJoin(Node.table, function() {
-        this.on(`${Node.table}.id`, "=", `${table}.node_a`).orOn(
-          `${Node.table}.id`,
-          "=",
-          `${table}.node_b`
-        );
-      })
-      .select(returning)
-      .where(`${this.table}.id`, id);
-    return this._resolveSQLResponse(records)[0];
+    res.status(201);
+    res.send(rows[0]);
   }
 
-  // static async fetchByDocument(parent, { documentId }, context, info) {
-  //   //? Currently, cross-document linking is not available, so find all
-  //   //? edges where nodeA.document is equal to documentId.
-  //   // return Edge.findAll({
-  //   //   include: [
-  //   //     {
-  //   //       model: Node,
-  //   //       as: "nodeA",
-  //   //       where: {
-  //   //         document: documentId
-  //   //       }
-  //   //     },
-  //   //     {
-  //   //       model: Node,
-  //   //       as: "nodeB"
-  //   //     }
-  //   //   ]
-  //   // });
-  //   return "foo";
-  // }
-
-  // static async fetchById(parent, { id }, context, info) {
-  //   return "foo";
-  // }
+  /**
+   * TODO: merge this with the identical function
+   * from `node.js`.
+   * edge/?d=<document_uuid>
+   */
+  static async fetchAll({ query: { d } }, res) {
+    try {
+      const rows = await this.db(this.table)
+        .select("*")
+        .where({ document: d, deleted_at: null });
+      res.status(200);
+      res.send(rows);
+    } catch (error) {
+      res.send(error);
+    }
+  }
 }
 
 export default Edge;
