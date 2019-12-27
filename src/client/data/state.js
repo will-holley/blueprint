@@ -14,9 +14,4 @@ const initialState = {
   }
 };
 
-//! Create an initial document for now. This suffices until multi-doc trees are added.
-const initialDoc = createDoc();
-initialState.documents[initialDoc.id] = initialDoc;
-initialState.currentDoc.id = initialDoc.id;
-
 export default initialState;
