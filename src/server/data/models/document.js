@@ -28,7 +28,8 @@ class Document extends Model {
     try {
       const rows = await this.db(this.table)
         .select("*")
-        .where("deleted_at", null);
+        .where("deleted_at", null)
+        .orderBy("updated_at", "desc");
       res.status(200);
       res.send(rows);
     } catch (error) {
