@@ -218,7 +218,7 @@ Node.propTypes = {
 };
 
 Node.defaultProps = {
-  showId: true,
+  showId: false,
   showButtons: false
 };
 
