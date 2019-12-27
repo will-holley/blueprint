@@ -58,6 +58,8 @@ module.exports = {
     }
   },
   plugins: [
+    // Add environment variables
+    new webpack.EnvironmentPlugin(["API_ADDRESS"]),
     new HtmlWebPackPlugin({
       template: path.resolve(__dirname, "src/client", ENTRY_FILE),
       filename: `./src/client/${ENTRY_FILE}`
