@@ -21,15 +21,19 @@ const Document = () => {
   const currentDocument = id ? documents[id] : null;
 
   /**
-   * On mount set active document.
+   * On document mount
    */
   useEffect(() => {
-    if (!currentDocument) {
-      actions.setLoading(true);
-      actions.setActiveDocument(params.humanId);
-      actions.setLoading(false);
+    //! Set the humanId from the url param
+    actions.setLoading(true);
+    actions.setActiveDocument(params.humanId);
+    actions.setLoading(false);
+    //! If this is a new document and there are no nodes, create one
+    if (id && !currentDocument.nodes.length) {
+      const nodeId = actions.addNode();
+      actions.setActiveNode(nodeId);
     }
-  }, [currentDocument]);
+  }, [id]);
 
   return currentDocument ? (
     <>
