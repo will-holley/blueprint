@@ -3,10 +3,10 @@ import PropTypes from "prop-types";
 // Components
 import { H1 } from "client/components/tags";
 // Styles
-import { randomGradient } from "../styles/gradients";
+import { getRandomGradient } from "../styles/gradients";
 
 const ColoredH1 = styled(H1)`
-  background: ${randomGradient};
+  background: ${({ gradient }) => (gradient ? gradient : getRandomGradient())};
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 
@@ -22,11 +22,13 @@ const ColoredH1 = styled(H1)`
 `;
 
 ColoredH1.propTypes = {
-  interactive: PropTypes.bool.isRequired
+  interactive: PropTypes.bool.isRequired,
+  gradient: PropTypes.string
 };
 
 ColoredH1.defaultProps = {
-  interactive: false
+  interactive: false,
+  gradient: null
 };
 
 export default ColoredH1;

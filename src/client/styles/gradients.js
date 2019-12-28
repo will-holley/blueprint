@@ -22,15 +22,16 @@ const gradients = [
   ["#45145A", "#FF5300"],
   ["#333333", "#5A5454"],
   ["#4F00BC", "#29ABE2"],
-  ["#00B7FF", "#FFFFC7"],
-  ["#93278F", "#00A99D"]
+  ["#00B7FF", "#FFFFC7"]
 ];
 
 // Get a random gradient for page style
-const [colorA, colorB] = gradients[
-  Math.floor(Math.random() * gradients.length)
-];
-const randomGradient = `linear-gradient(90deg, ${colorA}, ${colorB});`;
+function getRandomGradient() {
+  const [colorA, colorB] = gradients[
+    Math.floor(Math.random() * gradients.length)
+  ];
+  return `linear-gradient(90deg, ${colorA}, ${colorB});`;
+}
 
 export default gradients;
-export { randomGradient };
+export { getRandomGradient };
