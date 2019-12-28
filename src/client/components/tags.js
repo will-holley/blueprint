@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 
 const H1 = styled.h1`
-  font-size: 48px;
+  font-size: 72px;
   font-weight: 700;
 `;
 
