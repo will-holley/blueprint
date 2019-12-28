@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 // Components
 import { H1 } from "client/components/tags";
 // Styles
-import { randomGradient } from "client/config/gradients";
+import { randomGradient } from "../styles/gradients";
 
 const ColoredH1 = styled(H1)`
   background: ${randomGradient};

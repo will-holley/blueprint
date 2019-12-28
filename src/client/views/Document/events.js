@@ -14,6 +14,7 @@ const useKeyboardHotkeys = () => {
     },
     actions
   ] = useStore();
+
   const { nodes, edges } = documents[docId];
   const activeNode = activeNodeId && nodes[activeNodeId];
 

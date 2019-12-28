@@ -34,6 +34,7 @@
     "immutability-helper": "^3.0.1",
     "knex": "^0.20.4",
     "lodash": "^4.17.15",
+    "moment": "^2.24.0",
     "pg": "^7.15.1",
     "pg-hstore": "^2.3.3",
     "react-router-dom": "^5.1.2",

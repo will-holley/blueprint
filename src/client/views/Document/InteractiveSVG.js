@@ -12,7 +12,7 @@ const Group = styled.g.attrs(({ zoom }) => ({
  * https://css-tricks.com/creating-a-panning-effect-for-svg/
  * @param {object} props
  */
-const InteractiveSVG = ({ children, zoom }) => {
+const InteractiveSVG = ({ children }) => {
   //! Get the window size.  It is used to set <svg> dimensions.
   const { height, width } = useWindowSize();
 
@@ -89,7 +89,7 @@ const InteractiveSVG = ({ children, zoom }) => {
   // Activating a node centers it.
   const [
     {
-      currentDoc: { activeNodeId }
+      currentDoc: { activeNodeId, zoom }
     },
     actions
   ] = useStore();
@@ -140,13 +140,7 @@ const InteractiveSVG = ({ children, zoom }) => {
 };
 
 InteractiveSVG.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.element).isRequired,
-  zoom: PropTypes.number.isRequired
-};
-
-// Zoom is controlled a level up.
-InteractiveSVG.defaultProps = {
-  zoom: 1
+  children: PropTypes.arrayOf(PropTypes.element).isRequired
 };
 
 export default InteractiveSVG;

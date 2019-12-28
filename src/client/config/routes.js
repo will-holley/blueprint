@@ -1,12 +1,21 @@
-import Dashboard from "../views/Dashboard";
+import Documents from "client/views/Documents";
+import Document from "client/views/Document";
 
 const routes = {
+  //$ Documents
   "/": {
     exact: true,
-    component: Dashboard,
+    Component: Documents,
     authenticated: false,
-    label: "Dashboard",
-    nav: false
+    label: "Dashboard"
+    //nav: false
+  },
+  //$ Document
+  "/d/:humanId": {
+    exact: true,
+    Component: Document,
+    authenticated: false,
+    label: "Document"
   }
 };
 

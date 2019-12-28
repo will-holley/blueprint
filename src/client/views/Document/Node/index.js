@@ -1,13 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 // Hooks
-import { useWindowSize, useOnClickOutside, useHotkeys } from "../utils/hooks";
+import {
+  useWindowSize,
+  useOnClickOutside,
+  useHotkeys
+} from "client/utils/hooks";
 // Data
-import useStore from "../data/store";
+import useStore from "client/data/store";
 // Components
-import { Container, Text, NewChildButton } from "./style/Node.style";
-import { Edge } from "./../components/style/Edge.style";
-import { P } from "./tags";
+import { Container, Text, NewChildButton } from "./ui";
+import { Edge } from "./Edge";
+import { P } from "client/components/tags";
 
 const Node = ({
   id,

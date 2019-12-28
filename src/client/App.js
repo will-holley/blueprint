@@ -1,15 +1,20 @@
 // 3rd Party Libs
 import React from "react";
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect
+} from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 // Config
 import routes from "./config/routes";
 import Head from "./config/Head";
-import { dark, light } from "./config/styledThemes";
-import GlobalStyle from "./config/globalStyles";
+import { dark, light } from "./styles/styledThemes";
+import GlobalStyle from "./styles/globalStyles";
 // Our Components
 import Nav from "./components/Nav";
-import ContentContainer from "./components/containers/ContentContainer";
+import ContentContainer from "./containers/Content/Container";
 
 const App = () => {
   // TODO: make a hook (https://usehooks.com/useRequireAuth/)
@@ -17,39 +22,32 @@ const App = () => {
     return true;
   };
 
-  //! ====================
-  //! == EVENT HANDLERS ==
-  //! ====================
-
-  //! ============
-  //! == RENDER ==
-  //! ============
   return (
     <>
       <Head />
       <ThemeProvider theme={light}>
         <GlobalStyle />
-        <BrowserRouter basename="/">
+        <Router basename="/">
           <ContentContainer>
             <Switch>
-              {Object.keys(routes).map(path => {
-                const { component, exact, authenticated } = routes[path];
-                // Handle authenticated Routes
-                return authenticated && !this.isAuthenticated ? (
-                  <Redirect to="/" />
-                ) : (
-                  <Route
-                    key={`route-${path}`}
-                    path={path}
-                    exact={exact}
-                    component={component}
-                  />
-                );
-              })}
+              {Object.entries(routes).map(
+                ([path, { Component, beforeMount, exact, authenticated }]) =>
+                  // Handle authenticated Routes
+                  authenticated && !isAuthenticated ? (
+                    <Redirect to="/" />
+                  ) : (
+                    <Route
+                      key={`route-${path}`}
+                      path={path}
+                      exact={exact}
+                      component={Component}
+                    />
+                  )
+              )}
               <Route render={() => <h1>Not Found</h1>} status={404} />
             </Switch>
           </ContentContainer>
-        </BrowserRouter>
+        </Router>
       </ThemeProvider>
     </>
   );

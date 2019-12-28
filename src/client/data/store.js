@@ -7,15 +7,18 @@ import {
 // State
 import initialState from "./state";
 // Actions
-import { default as docActions } from "./models/document/actions";
-import { default as graphActions } from "./models/graph/actions";
+import { default as docActions } from "./services/document/actions";
+import { default as graphActions } from "./services/graph/actions";
+import { default as uiActions } from "./services/ui/actions";
 
 // Config
 defaults.devtools = process.env.NODE_ENV == "development";
 
+const actions = [docActions, graphActions, uiActions];
+
 const store = createStore({
   initialState,
-  actions: Object.assign({}, ...[docActions, graphActions]),
+  actions: Object.assign({}, ...actions),
   name: "globalStore"
 });
 

@@ -1,27 +1,6 @@
 import PropTypes from "prop-types";
 import styled from "styled-components";
-
-const Container = styled.div`
-  position: relative;
-  height: 100vh;
-  width: 100vw;
-  // DEV:
-  //background: conic-gradient(#fff 90deg, #000 2turn);
-`;
-
-const Actions = styled.div`
-  position: fixed;
-  top: 0;
-  z-index: 99999;
-  padding: 1rem;
-`;
-
-const LeftActions = styled(Actions)`
-  left: 0;
-`;
-const RightActions = styled(Actions)`
-  right: 0;
-`;
+import { Actions } from "client/containers/Content/Actions";
 
 const Title = styled.h1`
   display: inline-block;
@@ -57,10 +36,4 @@ const HotkeyShortcutsContainer = styled(ActionInfo)`
   }
 `;
 
-export {
-  Container,
-  LeftActions,
-  RightActions,
-  Title,
-  HotkeyShortcutsContainer
-};
+export { Title, HotkeyShortcutsContainer };
