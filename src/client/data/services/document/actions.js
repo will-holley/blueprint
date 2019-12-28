@@ -14,7 +14,7 @@ const actions = {
     const response = await request("document", "GET");
     // Map to a dict with the empty nodes and edges arrays.
     const documentMap = response.reduce(
-      (obj, doc) => ({ ...obj, [doc.id]: { ...doc, nodes: [], edges: [] } }),
+      (obj, doc) => ({ ...obj, [doc.id]: { ...doc } }),
       {}
     );
     setState({
@@ -66,6 +66,17 @@ const actions = {
       }
     });
     setState(newState);
+  },
+  createDocument: () => async ({ setState, getState }) => {
+    const state = getState();
+    const document = await request("document", "POST");
+    const newState = update(state, {
+      documents: {
+        [document.id]: { $set: document }
+      }
+    });
+    setState(newState);
+    return document.humanId;
   }
 };
 
