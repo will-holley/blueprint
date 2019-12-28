@@ -9,6 +9,18 @@ class Document extends Model {
     table.string("name").nullable();
   }
 
+  /**
+   * Adds empty nodes + edges arrays
+   * @param {*} rows
+   */
+  static _serialize(rows) {
+    return rows.map(row => {
+      row.nodes = [];
+      row.edges = [];
+      return row;
+    });
+  }
+
   static async create(req, res) {
     try {
       const rows = await this.db(this.table).insert(
@@ -17,8 +29,9 @@ class Document extends Model {
         },
         ["*"]
       );
+      const ready = this._serialize(rows);
       res.status(201);
-      res.send(rows[0]);
+      res.send(ready[0]);
     } catch (error) {
       res.send(error);
     }
@@ -30,8 +43,9 @@ class Document extends Model {
         .select("*")
         .where("deleted_at", null)
         .orderBy("updated_at", "desc");
+      const ready = this._serialize(rows);
       res.status(200);
-      res.send(rows);
+      res.send(ready);
     } catch (error) {
       res.send(error);
     }
