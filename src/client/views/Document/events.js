@@ -128,7 +128,7 @@ const useKeyboardHotkeys = () => {
 
   /**
    * If base node, do nothing.
-   * If multiple nodes on layer, traverse horizontally.
+   * TODO: Restore cousin traversal: If multiple nodes on layer, traverse horizontally.
    * @param {function} computeNextIndex : child index computer
    */
   const handleHorizontalNavigation = computeNextIndex => {

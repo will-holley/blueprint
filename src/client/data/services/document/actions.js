@@ -1,10 +1,5 @@
 import update from "immutability-helper";
 import { request } from "client/utils/api";
-import {
-  repositionNodes,
-  createEdge,
-  markChildNodesForDeletion
-} from "./utils";
 
 //TODO: go through actions and use `dispatch` to decompose them,
 //TODO: particularly the actions having to do with node position
@@ -68,7 +63,7 @@ const actions = {
       },
       documents: {
         [id]: {
-          nodes: { $set: repositionNodes(nodes, edges) },
+          nodes: { $set: nodes },
           edges: { $set: edges }
         }
       }
@@ -138,7 +133,7 @@ const actions = {
       documents: {
         [id]: {
           nodes: {
-            $set: repositionNodes(nodes, edges)
+            $set: nodes
           },
           edges: { $set: edges }
         }
@@ -160,6 +155,7 @@ const actions = {
     const state = getState();
     const docId = state.currentDoc.id;
     const doc = state.documents[docId];
+    const node = doc.nodes[nodeId];
 
     //? Sync with the server.
     try {
@@ -169,37 +165,18 @@ const actions = {
     }
 
     //? Update state
-    let newState = update(state, {
+    const newState = update(state, {
       documents: {
         [docId]: {
           nodes: {
             [nodeId]: {
-              content: { $set: text }
+              content: { $set: text },
+              height: { $set: nodeHeight ? nodeHeight : node.height }
             }
           }
         }
       }
     });
-
-    //? If height changed, recompute all positions.
-    if (nodeHeight) {
-      const nodes = update(doc.nodes, {
-        [nodeId]: {
-          dimensions: {
-            height: {
-              $set: nodeHeight
-            }
-          }
-        }
-      });
-      newState = update(newState, {
-        documents: {
-          [state.currentDoc.id]: {
-            nodes: { $set: repositionNodes(nodes, doc.edges) }
-          }
-        }
-      });
-    }
     setState(newState);
   },
   /**
@@ -212,9 +189,7 @@ const actions = {
         [state.currentDoc.id]: {
           nodes: {
             [nodeId]: {
-              dimensions: {
-                height: { $set: nodeHeight }
-              }
+              height: { $set: nodeHeight }
             }
           }
         }

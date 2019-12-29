@@ -17,7 +17,7 @@ import { calibratePosition, yBottomPadding } from "./../utils";
 const Node = ({
   id,
   position: { x, y, draggable },
-  dimensions: { height, width },
+  height,
   contentType,
   content,
   depth,
@@ -150,7 +150,7 @@ const Node = ({
 
   // Render relative to window innerHeight and innerWidth
   const { height: windowHeight, width: windowWidth } = useWindowSize();
-  const calibratedX = calibratePosition(x, windowWidth, width);
+  const calibratedX = calibratePosition(x, windowWidth, 300);
   const calibratedY =
     calibratePosition(y, windowHeight, height) + yBottomPadding * depth;
 
@@ -159,7 +159,7 @@ const Node = ({
       <Container
         ref={el}
         id={id}
-        width={width}
+        width={300}
         height={height}
         y={calibratedY}
         x={calibratedX}
@@ -191,10 +191,7 @@ Node.propTypes = {
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired
   }).isRequired,
-  dimensions: PropTypes.shape({
-    height: PropTypes.number,
-    width: PropTypes.number.isRequired
-  }).isRequired,
+  height: PropTypes.number.isRequired,
   contentType: PropTypes.string.isRequired,
   content: PropTypes.string,
   depth: PropTypes.number,
@@ -204,7 +201,8 @@ Node.propTypes = {
 
 Node.defaultProps = {
   showId: false,
-  showButtons: false
+  showButtons: false,
+  height: 0
 };
 
 export default Node;

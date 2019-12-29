@@ -21,20 +21,20 @@ const Edge = ({ id, humanId, nodeAId, nodeBId }) => {
   //! Compute Node A Position
   const {
     position: { y: aY, x: aX },
-    dimensions: { width: aWidth, height: aHeight }
+    height: aHeight
   } = nodes[nodeAId];
 
-  const calibratedAX = calibratePosition(aX, windowWidth, aWidth);
+  const calibratedAX = calibratePosition(aX, windowWidth, 300);
   const calibratedAY = calibratePosition(aY, windowHeight, aHeight);
 
   //! Compute Node B position
   const {
     position: { y: bY, x: bX },
-    dimensions: { width: bWidth, height: bHeight },
+    height: bHeight,
     depth: bDepth
   } = nodes[nodeBId];
 
-  const calibratedBX = calibratePosition(bX, windowWidth, bWidth);
+  const calibratedBX = calibratePosition(bX, windowWidth, 300);
   const calibratedBY = calibratePosition(bY, windowHeight, bHeight);
 
   //! Compute Edge position

@@ -9,20 +9,6 @@ import Edge from "../data/models/Edge";
 
 //! Node Serializer
 
-const serializeNode = node => ({
-  ...node,
-  position: {
-    x: null,
-    y: null
-  },
-  dimensions: {
-    height: 0,
-    // the default width
-    width: 300
-  },
-  depth: undefined
-});
-
 //! Create Router
 const router = express();
 
@@ -57,7 +43,7 @@ router.post("/", async function createNode(
 
     //? Return node and edge
     res.status(201);
-    res.send([serializeNode(node), edge]);
+    res.send([node, edge]);
   } catch (error) {
     res.send(error.message);
   }
@@ -127,4 +113,3 @@ router.delete("/:id", async function deleteNode({ params: { id } }, res) {
 });
 
 export default router;
-export { serializeNode };

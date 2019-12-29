@@ -6,8 +6,6 @@ import db from "../data/db";
 import Document from "../data/models/Document";
 import Node from "../data/models/Node";
 import Edge from "../data/models/Edge";
-// Serializers
-import { serializeNode } from "./node";
 
 //! Create Router
 const router = express();
@@ -87,7 +85,7 @@ router.get("/:id", async function fetchDocumentDetails(
       .where({ document: id, deleted_at: null });
     //? Add to id value map with additional details
     nodes.forEach(node => {
-      details.nodes[node.id] = serializeNode(node);
+      details.nodes[node.id] = node;
     });
     //? Create a list of node ids for querying edges
     const nodeIds = nodes.map(({ id }) => id);

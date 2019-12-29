@@ -8,6 +8,8 @@ import Node from "./Node";
 import Edge from "./Edge";
 import InteractiveSVG from "./InteractiveSVG";
 import Actions from "./Actions";
+// Rendering Enginers
+import { renderTree } from "./graphRenderers";
 
 const Document = () => {
   const [
@@ -38,27 +40,22 @@ const Document = () => {
     <>
       <Actions />
       <InteractiveSVG>
-        {Object.values(currentDocument.nodes).map(
-          ({
-            id: nodeId,
-            dimensions,
-            position,
-            contentType,
-            content,
-            depth
-          }) => (
+        {Object.values(
+          renderTree(currentDocument.nodes, currentDocument.edges)
+        ).map(
+          ({ id: nodeId, height, position, contentType, content, depth }) => (
             <Node
               key={nodeId}
               id={nodeId}
               position={position}
-              dimensions={dimensions}
+              height={height}
               contentType={contentType}
               content={content}
               depth={depth}
             />
           )
         )}
-        {Object.values(currentDocument.edges).map(
+        {/* {Object.values(currentDocument.edges).map(
           ({ id, humanId, nodeA, nodeB }) => (
             <Edge
               key={id}
@@ -68,7 +65,7 @@ const Document = () => {
               nodeBId={nodeB}
             />
           )
-        )}
+        )} */}
       </InteractiveSVG>
     </>
   ) : (

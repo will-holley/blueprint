@@ -13,10 +13,7 @@ const computeNodePositions = nodes => {
   const layout = flextree({
     // Determines how far adjacent nodes in that diagram should appear
     spacing: 300,
-    nodeSize: ({ data: { id, dimensions } }) => [
-      dimensions.width,
-      dimensions.height
-    ]
+    nodeSize: ({ data: { id, height } }) => [300, height ? height : 0]
   });
 
   // Get positions
@@ -30,7 +27,7 @@ const computeNodePositions = nodes => {
  * Repositions all nodes, handling conversion from an object to an
  * array and back again.
  */
-const repositionNodes = (nodes, edges) => {
+const renderTree = (nodes, edges) => {
   const _nodes = nodes;
   //? Iterate through each of the edges and add parent/child associations
   //? to the nodes. `parentId` is required for the current layout engine.
@@ -50,4 +47,4 @@ const repositionNodes = (nodes, edges) => {
   return _nodes;
 };
 
-export { computeNodePositions, repositionNodes };
+export { renderTree };
