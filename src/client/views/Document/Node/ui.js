@@ -5,17 +5,19 @@ const Container = styled.foreignObject`
   height: ${({ height }) => height}px;
   width: ${({ width }) => width}px;
   cursor: default;
-  border: 1px solid black;
+  ${({ dev }) => dev && "border: 1px solid black;"}
 `;
 
 Container.propTypes = {
   height: PropTypes.number.isRequired,
   width: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
-  x: PropTypes.number.isRequired
+  x: PropTypes.number.isRequired,
+  dev: PropTypes.bool.isRequired
 };
 
 const Text = styled.p`
+  color: ${({ active }) => (active ? "#1976D2" : "inherit")};
   padding: 2rem 0.75rem;
   height: auto;
   width: 100%;
@@ -35,7 +37,9 @@ const Text = styled.p`
   }
 `;
 
-Text.propTypes = {};
+Text.propTypes = {
+  active: PropTypes.bool.isRequired
+};
 
 const NewChildButton = styled.a`
   display: block;

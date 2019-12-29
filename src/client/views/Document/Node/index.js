@@ -11,17 +11,15 @@ import useStore from "client/data/store";
 // Components
 import { Container, Text, NewChildButton } from "./ui";
 import { P } from "client/components/tags";
-// Utils
-import { calibratePosition, yBottomPadding } from "./../utils";
 
 const Node = ({
   id,
+  humanId,
   position: { x, y, draggable },
-  height,
   contentType,
   content,
   depth,
-  showId,
+  dev,
   showButtons
 }) => {
   //! ============
@@ -36,20 +34,11 @@ const Node = ({
   //* Ref used for tracking container height.
   const el = useRef(null);
   const textInput = useRef(null);
+  const [height, setHeight] = useState(0);
 
   //! ===============
   //! == UTILITIES ==
   //! ===============
-
-  /**
-   * Calculates the height of container based on the height
-   * of all child elements.
-   */
-  const calculateHeight = () => {
-    return Array.from(el.current.children)
-      .map(({ offsetHeight }) => offsetHeight)
-      .reduce((acc, height) => (acc += height), 0);
-  };
 
   /**
    * Shifts the cursor to end of text's innerHTML.
@@ -69,6 +58,17 @@ const Node = ({
   //! ===============
 
   /**
+   * When node renders, calculate its height.
+   */
+  useEffect(() => {
+    //* Calculate height
+    const height = Array.from(el.current.children)
+      .map(({ offsetHeight }) => offsetHeight)
+      .reduce((acc, height) => (acc += height), 0);
+    setHeight(height);
+  });
+
+  /**
    * When `isActive` changes, check if this node should
    * be focused.
    */
@@ -86,14 +86,6 @@ const Node = ({
     }
   }, [isActive]);
 
-  /**
-   * When node renders, set height property in the store.
-   */
-  useEffect(() => {
-    // on mount
-    actions.updateNodeHeight(id, calculateHeight());
-  }, []);
-
   //! ====================
   //! == EVENT HANDLERS ==
   //! ====================
@@ -110,16 +102,8 @@ const Node = ({
    * @param {Object} event
    */
   const handleTextInput = async ({ target: { innerText } }) => {
-    // Compute the current height of the node and determine whether or not it has
-    // changed since the last text change. If it has changed, update the height
-    // as well as the visible text.
-    const nodeHeight = calculateHeight();
     //* Track text area size.
-    await actions.updateNodeText(
-      id,
-      innerText,
-      nodeHeight !== height ? nodeHeight : null
-    );
+    await actions.updateNodeText(id, innerText);
     //* Ensure the cursor remains at the end of the value
     cursorToEnd();
   };
@@ -148,14 +132,25 @@ const Node = ({
 
   //$ Position Calibration
 
-  // Render relative to window innerHeight and innerWidth
+  //? Render relative to window innerHeight and innerWidth
   const { height: windowHeight, width: windowWidth } = useWindowSize();
-  const calibratedX = calibratePosition(x, windowWidth, 300);
-  const calibratedY =
-    calibratePosition(y, windowHeight, height) + yBottomPadding * depth;
+  //* How many pixels should be between nodes
+  const yBottomPadding = 75;
+  const calibrateX = coord => windowWidth / 2 + coord - 300 / 2;
+  const calibrateY = coord => windowHeight / 2 + coord - height / 2;
+  const calibratedX = calibrateX(x);
+  const calibratedY = calibrateY(y) + yBottomPadding * depth;
+  const edgeEnter = [calibratedX + 150, calibratedY];
+  const edgeExit = [calibratedX + 150, calibratedY + height];
 
   return (
     <>
+      {dev && (
+        <>
+          <circle cx={edgeEnter[0]} cy={edgeEnter[1]} r="3" fill="red" />
+          <circle cx={edgeExit[0]} cy={edgeExit[1]} r="3" fill="blue" />
+        </>
+      )}
       <Container
         ref={el}
         id={id}
@@ -163,13 +158,18 @@ const Node = ({
         height={height}
         y={calibratedY}
         x={calibratedX}
+        dev={dev}
+        data-edge-enter={edgeEnter}
+        data-edge-exit={edgeExit}
       >
-        {showId && (
+        {dev && (
           <small>
-            {id} - {depth} - ({calibratedX},{calibratedY})
+            {humanId} - depth: {depth} - (x: {calibratedX}, y:
+            {calibratedY})
           </small>
         )}
         <Text
+          active={isActive}
           ref={textInput}
           onClick={handleClick}
           contentEditable={true}
@@ -187,20 +187,20 @@ const Node = ({
 
 Node.propTypes = {
   id: PropTypes.string.isRequired,
+  humanId: PropTypes.string.isRequired,
   position: PropTypes.shape({
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired
   }).isRequired,
-  height: PropTypes.number.isRequired,
   contentType: PropTypes.string.isRequired,
   content: PropTypes.string,
   depth: PropTypes.number,
-  showId: PropTypes.bool.isRequired,
+  dev: PropTypes.bool.isRequired,
   showButtons: PropTypes.bool.isRequired
 };
 
 Node.defaultProps = {
-  showId: false,
+  dev: false,
   showButtons: false,
   height: 0
 };

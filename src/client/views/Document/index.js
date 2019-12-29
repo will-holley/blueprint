@@ -32,6 +32,7 @@ const Document = () => {
      */
     async function loadDocument() {
       await actions.setActiveDocument(params.humanId);
+      // TODO: set node heights here so edges will respect
     }
     loadDocument();
   }, [params.humanId]);
@@ -43,19 +44,19 @@ const Document = () => {
         {Object.values(
           renderTree(currentDocument.nodes, currentDocument.edges)
         ).map(
-          ({ id: nodeId, height, position, contentType, content, depth }) => (
+          ({ id: nodeId, humanId, position, contentType, content, depth }) => (
             <Node
               key={nodeId}
+              humanId={humanId}
               id={nodeId}
               position={position}
-              height={height}
               contentType={contentType}
               content={content}
               depth={depth}
             />
           )
         )}
-        {/* {Object.values(currentDocument.edges).map(
+        {Object.values(currentDocument.edges).map(
           ({ id, humanId, nodeA, nodeB }) => (
             <Edge
               key={id}
@@ -65,7 +66,7 @@ const Document = () => {
               nodeBId={nodeB}
             />
           )
-        )} */}
+        )}
       </InteractiveSVG>
     </>
   ) : (

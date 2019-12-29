@@ -148,10 +148,7 @@ const actions = {
     setState(newState);
     return node.id;
   },
-  updateNodeText: (nodeId, text, nodeHeight) => async ({
-    setState,
-    getState
-  }) => {
+  updateNodeText: (nodeId, text) => async ({ setState, getState }) => {
     const state = getState();
     const docId = state.currentDoc.id;
     const doc = state.documents[docId];
@@ -170,26 +167,7 @@ const actions = {
         [docId]: {
           nodes: {
             [nodeId]: {
-              content: { $set: text },
-              height: { $set: nodeHeight ? nodeHeight : node.height }
-            }
-          }
-        }
-      }
-    });
-    setState(newState);
-  },
-  /**
-   * Called immediately after a node is mounted
-   */
-  updateNodeHeight: (nodeId, nodeHeight) => ({ setState, getState }) => {
-    const state = getState();
-    const newState = update(state, {
-      documents: {
-        [state.currentDoc.id]: {
-          nodes: {
-            [nodeId]: {
-              height: { $set: nodeHeight }
+              content: { $set: text }
             }
           }
         }

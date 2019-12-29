@@ -3,6 +3,15 @@ import { hri } from "human-readable-ids";
 import { stratify } from "d3-hierarchy"; // https://github.com/d3/d3-hierarchy#hierarchy
 import { flextree } from "d3-flextree"; // https://github.com/Klortho/d3-flextree
 
+const calculateNodeHeight = id => {
+  const el = document.getElementById(id);
+  return el
+    ? Array.from(el.children)
+        .map(({ offsetHeight }) => offsetHeight)
+        .reduce((acc, height) => (acc += height), 0)
+    : 100;
+};
+
 /**
  * Assigns hierarchical x/y coordinates to nodes
  */
@@ -13,7 +22,7 @@ const computeNodePositions = nodes => {
   const layout = flextree({
     // Determines how far adjacent nodes in that diagram should appear
     spacing: 300,
-    nodeSize: ({ data: { id, height } }) => [300, height ? height : 0]
+    nodeSize: ({ data: { id } }) => [300, calculateNodeHeight(id)]
   });
 
   // Get positions
