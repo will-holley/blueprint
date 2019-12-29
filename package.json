@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
-    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "d3-flextree": "^2.1.1",
     "d3-hierarchy": "^1.1.9",
@@ -35,6 +34,7 @@
     "knex": "^0.20.4",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
+    "morgan": "^1.9.1",
     "pg": "^7.15.1",
     "pg-hstore": "^2.3.3",
     "react-router-dom": "^5.1.2",
