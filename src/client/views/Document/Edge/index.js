@@ -37,13 +37,6 @@ const Edge = ({ id, humanId, nodeAId, nodeBId }) => {
   const calibratedBX = calibratePosition(bX, windowWidth, bWidth);
   const calibratedBY = calibratePosition(bY, windowHeight, bHeight);
 
-  // console.log({
-  //   calibratedAY,
-  //   aHeight,
-  //   calibratedBY,
-  //   bHeight
-  // });
-
   //! Compute Edge position
   const d = [
     "M",

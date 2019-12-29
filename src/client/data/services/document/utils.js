@@ -37,14 +37,12 @@ const repositionNodes = (nodes, edges) => {
   Object.values(edges).forEach(({ nodeA, nodeB, hasParent }) => {
     //? There are currently no peer edges so `hasParent` should always be true.
     //? The current layout engine also does not support horizontal hierarchy.
-    if (!hasParent) return;
-    _nodes[nodeB].parentId = nodeA;
+    _nodes[nodeB].parentId = !hasParent ? null : nodeA;
   });
 
   const asArray = Object.values(_nodes);
   computeNodePositions(asArray).forEach(node => {
     // Add position to this node
-    console.log(node);
     _nodes[node.id].position = { x: node.x, y: node.y };
     // Add depth to this node
     _nodes[node.id].depth = node.depth;
