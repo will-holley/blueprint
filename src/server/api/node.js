@@ -100,19 +100,22 @@ router.delete("/:id", async function deleteNode({ params: { id } }, res) {
     `);
     //? Gather all of the node ids
     const nodeIds = new Set();
-    rows.forEach(({ node_a, node_b }) => {
-      nodeIds.add(node_a);
-      nodeIds.add(node_b);
-    });
-    //? Delete Edges
-    await db(Edge.table)
-      .whereIn(
-        "id",
-        rows.map(({ id }) => id)
-      )
-      //$ Include the parent edge of this node
-      .orWhere("node_b", id)
-      .del();
+    nodeIds.add(id);
+    if (rows) {
+      rows.forEach(({ node_a, node_b }) => {
+        nodeIds.add(node_a);
+        nodeIds.add(node_b);
+      });
+      //? Delete Edges
+      await db(Edge.table)
+        .whereIn(
+          "id",
+          rows.map(({ id }) => id)
+        )
+        //$ Include the parent edge of this node
+        .orWhere("node_b", id)
+        .del();
+    }
     //? Delete Nodes
     await db(Node.table)
       .whereIn("id", [...nodeIds])
