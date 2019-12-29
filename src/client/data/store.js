@@ -8,13 +8,12 @@ import {
 import initialState from "./state";
 // Actions
 import { default as docActions } from "./services/document/actions";
-import { default as graphActions } from "./services/graph/actions";
 import { default as uiActions } from "./services/ui/actions";
 
 // Config
 defaults.devtools = process.env.NODE_ENV == "development";
 
-const actions = [docActions, graphActions, uiActions];
+const actions = [docActions, uiActions];
 
 const store = createStore({
   initialState,

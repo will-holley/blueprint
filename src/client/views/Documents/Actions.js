@@ -20,7 +20,7 @@ const Actions = () => {
   return (
     <RightActions>
       <EmojiButton onClick={createDocument} disabled={disabled}>
-        🌀
+        ➕
       </EmojiButton>
     </RightActions>
   );

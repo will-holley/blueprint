@@ -84,7 +84,8 @@ const useKeyboardHotkeys = () => {
   useHotkeys(
     "cmd+backspace",
     event => {
-      if (activeNodeId) actions.deleteNode(activeNodeId);
+      // Do not allow the base node to be deleted.
+      if (activeNodeId && activeNode.parentId) actions.deleteNode(activeNodeId);
       return false;
     },
     [activeNodeId]
@@ -114,12 +115,13 @@ const useKeyboardHotkeys = () => {
     "cmd+down",
     event => {
       if (!activeNode) return;
-      const edgeIds = Object.values(activeNode.edges).filter(id => {
-        const { parent, child } = edges[id];
-        return parent === activeNodeId;
-      });
-      if (!edgeIds.length) actions.addNode(activeNodeId);
-      else actions.setActiveNode(edges[edgeIds[0]].child);
+      const childIds = Object.values(edges)
+        .filter(({ nodeA }) => {
+          return nodeA === activeNodeId;
+        })
+        .map(({ nodeB }) => nodeB);
+      if (!childIds.length) actions.addNode(activeNodeId);
+      else actions.setActiveNode(childIds[0]);
     },
     [activeNodeId]
   );
@@ -131,11 +133,12 @@ const useKeyboardHotkeys = () => {
    */
   const handleHorizontalNavigation = computeNextIndex => {
     if (!activeNode || !activeNode.parentId) return;
-    const levelIds = Object.keys(nodes[activeNode.parentId].edges);
-    const index = levelIds.indexOf(activeNode.id);
-    const nextIndex = computeNextIndex(index, levelIds);
-    //console.log(computeNextIndex, levelIds, levelIds[nextIndex]);
-    actions.setActiveNode(levelIds[nextIndex]);
+    const siblingIds = Object.values(edges)
+      .filter(({ nodeA }) => activeNode.parentId === nodeA)
+      .map(({ nodeB }) => nodeB);
+    const index = siblingIds.indexOf(activeNode.id);
+    const nextIndex = computeNextIndex(index, siblingIds);
+    actions.setActiveNode(siblingIds[nextIndex]);
   };
 
   /**

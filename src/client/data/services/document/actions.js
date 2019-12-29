@@ -1,71 +1,89 @@
 import update from "immutability-helper";
 import { request } from "client/utils/api";
+import {
+  repositionNodes,
+  createEdge,
+  markChildNodesForDeletion
+} from "./utils";
+
+//TODO: go through actions and use `dispatch` to decompose them,
+//TODO: particularly the actions having to do with node position
+//TODO: computation.
 
 const actions = {
+  //! ======================
+  //! == Document Actions ==
+  //! ======================
   populateAllDocuments: () => async ({ setState, getState }) => {
-    // TODO: check if there are any documents we don't have
-    // TODO: or set up pagination?
-    // TODO: all in all decide on an appropriate way to handle
-    // TODO: fetching and pagination
+    // TODO: search + pagination
     // Check if documents have been populated
     const { documents } = getState();
     if (Object.keys(documents).length) return;
     // If not, fetch them
     const response = await request("document", "GET");
-    // Map to a dict with the empty nodes and edges arrays.
-    const documentMap = response.reduce(
-      (obj, doc) => ({ ...obj, [doc.id]: { ...doc } }),
-      {}
-    );
-    setState({
-      documents: documentMap
-    });
+    setState({ documents: response });
   },
   /**
-   * Look up the id of the request document.
+   * Lookup the document id corresponding to this humanId and load
+   * all nodes for that document if they have not yet been loaded.
+   * Nodes are not loaded by default when documents are populated.
+   * @param {string} humanId : the human id of this doc
+   * @param {string} activeNodeId : the node which should be active when the doc re-renders
+   * @param {number} zoom : the zoom level this document should re-render at
    */
-  setActiveDocument: humanId => ({ setState, getState }) => {
+  setActiveDocument: (humanId, activeNodeId = undefined, zoom = 1) => async ({
+    setState,
+    getState
+  }) => {
     const state = getState();
+    //? Look up the id which corresponds to this human id
     const [id, _] = Object.entries(state.documents).find(
       ([id, doc]) => doc.humanId === humanId
     );
+    //? Query document details
+    //TODO: determine when these should be cached
+    const { nodes, edges } = await request(`document/${id}`, "GET");
+
+    //? Make the base node the active node
+    const baseNode = Object.values(nodes).find(({ parentId }) => !parentId);
+
+    //? Update the state
     const newState = update(state, {
       currentDoc: {
         id: { $set: id },
         // reset zoom back to default
-        zoom: { $set: 1 }
+        zoom: { $set: zoom },
+        activeNodeId: { $set: activeNodeId ? activeNodeId : baseNode.id }
+      },
+      documents: {
+        [id]: {
+          nodes: { $set: repositionNodes(nodes, edges) },
+          edges: { $set: edges }
+        }
       }
     });
     setState(newState);
   },
-  zoomIn: () => ({ setState, getState }) => {
+  setZoom: newZoom => ({ setState, getState }) => {
+    const newState = update(getState(), {
+      currentDoc: {
+        zoom: { $set: newZoom }
+      }
+    });
+    setState(newState);
+  },
+  zoomIn: () => ({ getState, dispatch }) => {
     const state = getState();
     const newZoom = state.currentDoc.zoom + 0.1;
-    const newState = update(state, {
-      currentDoc: {
-        zoom: { $set: newZoom }
-      }
-    });
-    setState(newState);
+    dispatch(actions.setZoom(newZoom));
   },
-  zoomOut: () => ({ setState, getState }) => {
+  zoomOut: () => ({ getState, dispatch }) => {
     const state = getState();
     const newZoom = state.currentDoc.zoom - 0.1;
-    const newState = update(state, {
-      currentDoc: {
-        zoom: { $set: newZoom }
-      }
-    });
-    setState(newState);
+    dispatch(actions.setZoom(newZoom));
   },
-  resetZoom: () => ({ setState, getState }) => {
-    const state = getState();
-    const newState = update(state, {
-      currentDoc: {
-        zoom: { $set: 1 }
-      }
-    });
-    setState(newState);
+  resetZoom: () => ({ dispatch }) => {
+    dispatch(actions.setZoom(1));
   },
   createDocument: () => async ({ setState, getState }) => {
     const state = getState();
@@ -77,6 +95,153 @@ const actions = {
     });
     setState(newState);
     return document.humanId;
+  },
+  //! ==================
+  //! == Node Actions ==
+  //! ==================
+  /**
+   * Adds a new node to document
+   */
+  addNode: parentNodeId => async ({ setState, getState }) => {
+    const state = getState();
+    const { id, nodes, edges } = state.documents[state.currentDoc.id];
+
+    //? Create default node and add it to nodes before update nodes positions
+    const [node, edge] = await request(
+      "node",
+      "POST",
+      {},
+      {
+        documentId: id,
+        parentNodeId: parentNodeId
+      }
+    );
+
+    //? Add node to nodes map
+    nodes[node.id] = node;
+    //? Add edge to edges map
+    edges[edge.id] = edge;
+
+    //? Update all nodes
+    const newState = update(state, {
+      documents: {
+        [id]: {
+          nodes: {
+            $set: repositionNodes(nodes, edges)
+          },
+          edges: { $set: edges }
+        }
+      },
+      currentDoc: {
+        activeNodeId: {
+          $set: node.id
+        }
+      }
+    });
+
+    setState(newState);
+    return node.id;
+  },
+  updateNodeText: (nodeId, text, nodeHeight) => async ({
+    setState,
+    getState
+  }) => {
+    const state = getState();
+    const docId = state.currentDoc.id;
+    const doc = state.documents[docId];
+
+    //? Sync with the server.
+    try {
+      await request(`node/${nodeId}`, "PATCH", {}, { content: text });
+    } catch (error) {
+      // TODO: do something!
+    }
+
+    //? Update state
+    let newState = update(state, {
+      documents: {
+        [docId]: {
+          nodes: {
+            [nodeId]: {
+              content: { $set: text }
+            }
+          }
+        }
+      }
+    });
+
+    //? If height changed, recompute all positions.
+    if (nodeHeight) {
+      const nodes = update(doc.nodes, {
+        [nodeId]: {
+          dimensions: {
+            height: {
+              $set: nodeHeight
+            }
+          }
+        }
+      });
+      newState = update(newState, {
+        documents: {
+          [state.currentDoc.id]: {
+            nodes: { $set: repositionNodes(nodes, doc.edges) }
+          }
+        }
+      });
+    }
+    setState(newState);
+  },
+  /**
+   * Called immediately after a node is mounted
+   */
+  updateNodeHeight: (nodeId, nodeHeight) => ({ setState, getState }) => {
+    const state = getState();
+    const newState = update(state, {
+      documents: {
+        [state.currentDoc.id]: {
+          nodes: {
+            [nodeId]: {
+              dimensions: {
+                height: { $set: nodeHeight }
+              }
+            }
+          }
+        }
+      }
+    });
+    setState(newState);
+  },
+  setActiveNode: nodeId => ({ setState, getState }) => {
+    const state = getState();
+    const newState = update(state, {
+      currentDoc: {
+        activeNodeId: { $set: nodeId }
+      }
+    });
+    setState(newState);
+  },
+  deleteNode: nodeId => async ({ setState, getState, dispatch }) => {
+    const state = getState();
+    const docId = state.currentDoc.id;
+    const doc = state.documents[docId];
+    //? Determine where to re-focus by finding the edge to this nodes parent
+    const edge = Object.values(doc.edges).find(({ nodeB }) => nodeB === nodeId);
+    const activeNodeId = edge.nodeA;
+
+    try {
+      await request(`node/${nodeId}`, "DELETE");
+    } catch (error) {
+      //TODO: something
+    }
+
+    // Re-load the document with the updated nodes + edges
+    dispatch(
+      actions.setActiveDocument(
+        doc.humanId,
+        activeNodeId,
+        state.currentDoc.zoom
+      )
+    );
   }
 };
 

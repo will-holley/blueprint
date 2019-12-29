@@ -1,10 +1,11 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 // Data
 import useStore from "client/data/store";
 // Components
 import Node from "./Node";
+import Edge from "./Edge";
 import InteractiveSVG from "./InteractiveSVG";
 import Actions from "./Actions";
 
@@ -17,23 +18,21 @@ const Document = () => {
     actions
   ] = useStore();
   const params = useParams();
-
   const currentDocument = id ? documents[id] : null;
 
   /**
-   * On document mount
+   *! On document mount
    */
   useEffect(() => {
-    //! Set the humanId from the url param
-    actions.setLoading(true);
-    actions.setActiveDocument(params.humanId);
-    actions.setLoading(false);
-    //! If this is a new document and there are no nodes, create one
-    if (id && !currentDocument.nodes.length) {
-      const nodeId = actions.addNode();
-      actions.setActiveNode(nodeId);
+    /**
+     * Sets the active document and fetches node & edge data.
+     * Creates an initial node if one does not exist.
+     */
+    async function loadDocument() {
+      await actions.setActiveDocument(params.humanId);
     }
-  }, [id]);
+    if (!id) loadDocument();
+  }, []);
 
   return currentDocument ? (
     <>
@@ -42,22 +41,31 @@ const Document = () => {
         {Object.values(currentDocument.nodes).map(
           ({
             id: nodeId,
-            parentId,
             dimensions,
             position,
+            contentType,
             content,
-            depth,
-            edges
+            depth
           }) => (
             <Node
               key={nodeId}
               id={nodeId}
-              parentId={parentId}
               position={position}
               dimensions={dimensions}
+              contentType={contentType}
               content={content}
               depth={depth}
-              edges={edges}
+            />
+          )
+        )}
+        {Object.values(currentDocument.edges).map(
+          ({ id, humanId, nodeA, nodeB }) => (
+            <Edge
+              key={id}
+              id={id}
+              humanId={humanId}
+              nodeAId={nodeA}
+              nodeBId={nodeB}
             />
           )
         )}

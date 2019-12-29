@@ -8,6 +8,7 @@ import { EmojiButton } from "client/components/Buttons";
 // Data
 import useStore from "client/data/store";
 // Hooks
+import { useHistory } from "react-router-dom";
 import { useHotkeys } from "client/utils/hooks";
 import { useKeyboardHotkeys } from "./events";
 
@@ -27,6 +28,7 @@ const keyboardShortcuts = [
 ];
 
 const Actions = () => {
+  const { push } = useHistory();
   const [
     {
       currentDoc: { id, zoom },
@@ -63,11 +65,16 @@ const Actions = () => {
   useHotkeys("cmd+=", handleZoomIn, [zoom]);
   useHotkeys("cmd+-", handleZoomOut, [zoom]);
 
+  //! Navigation Handlers
+  const navigateToDashboard = () => push("/");
+
   //! Render
   return (
     <>
       <LeftActions>
-        <EmojiButton onClick={event => actions.addNode(null)}>🌀</EmojiButton>
+        <EmojiButton onClick={navigateToDashboard}>🎨</EmojiButton>
+        {/* Hide the add button while the document does not support multiple base nodes. */}
+        {/* <EmojiButton onClick={event => actions.addNode(null)}>🌀</EmojiButton> */}
         <Title>{name ? name : humanId}</Title>
       </LeftActions>
       <RightActions>

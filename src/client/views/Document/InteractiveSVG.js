@@ -140,7 +140,7 @@ const InteractiveSVG = ({ children }) => {
 };
 
 InteractiveSVG.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.element).isRequired
+  children: PropTypes.array.isRequired
 };
 
 export default InteractiveSVG;

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import PropTypes from "prop-types";
 
-const Edge = styled.path`
+const Path = styled.path`
   fill: transparent;
   stroke: #e2e2e2;
   stroke-width: 1pt;
@@ -9,8 +9,8 @@ const Edge = styled.path`
   stroke-linecap: round;
 `;
 
-Edge.propTypes = {
+Path.propTypes = {
   id: PropTypes.string.isRequired
 };
 
-export { Edge };
+export { Path };

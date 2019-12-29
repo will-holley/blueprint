@@ -25,7 +25,7 @@ const Documents = () => {
       {documentsExist ? (
         Object.entries(documents).map(([id, doc]) => {
           // TODO: public vs. private
-          const _private = false;
+          const _private = Math.random() > 0.35;
           const gradient = getRandomGradient();
           return (
             <DocumentInformation

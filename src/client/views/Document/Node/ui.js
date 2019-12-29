@@ -5,7 +5,7 @@ const Container = styled.foreignObject`
   height: ${({ height }) => height}px;
   width: ${({ width }) => width}px;
   cursor: default;
-  //border: 1px solid black;
+  border: 1px solid black;
 `;
 
 Container.propTypes = {

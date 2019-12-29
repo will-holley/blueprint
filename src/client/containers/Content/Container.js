@@ -11,6 +11,10 @@ import { useTransition, animated } from "react-spring";
 import useStore from "client/data/store";
 //* Components
 import ColoredH1 from "client/components/ColoredH1";
+//* Styles
+import { getRandomGradient } from "client/styles/gradients";
+// Use a single gradient per session.
+const gradient = getRandomGradient();
 
 const Loading = styled.div`
   padding: 5rem 10rem;
@@ -55,7 +59,7 @@ const ContentContainer = ({ children }) => {
     <Container>
       {loading ? (
         <Loading>
-          <ColoredH1>Loading</ColoredH1>
+          <ColoredH1 gradient={gradient}>Loading</ColoredH1>
         </Loading>
       ) : (
         transitions.map(

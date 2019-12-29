@@ -1,12 +1,5 @@
 import _ from "lodash";
 
-const camelizeKeys = record => {
-  return Object.keys(record).reduce(
-    (obj, key) => ({ ...obj, [_.camelCase(key)]: record[key] }),
-    {}
-  );
-};
-
 const request = async (router, method, headers = {}, data = {}) => {
   // Build request args
   const hasBody = !["GET", "HEAD"].includes(method);
@@ -24,17 +17,7 @@ const request = async (router, method, headers = {}, data = {}) => {
       }),
       body: hasBody ? JSON.stringify(data) : null
     });
-    const body = await response.json();
-
-    //$ Clean Response
-    // Convert snake to camel case
-    //TODO: do this in SQL using `as`
-    const camelized = Array.isArray(body)
-      ? body.map(camelizeKeys)
-      : camelizeKeys(body);
-
-    //$ Return cleaned
-    return camelized;
+    return response.json();
   } catch (error) {
     return new Error(error);
   }
