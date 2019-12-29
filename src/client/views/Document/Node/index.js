@@ -200,8 +200,8 @@ Node.propTypes = {
 };
 
 Node.defaultProps = {
-  dev: false,
-  showButtons: false,
+  dev: true,
+  showButtons: true,
   height: 0
 };
 
