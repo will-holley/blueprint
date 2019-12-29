@@ -36,6 +36,17 @@ const actions = {
     getState
   }) => {
     const state = getState();
+    //? Check if active doc is being unset
+    if (!humanId) {
+      setState(
+        update(state, {
+          currentDoc: {
+            id: { $set: null }
+          }
+        })
+      );
+      return;
+    }
     //? Look up the id which corresponds to this human id
     const [id, _] = Object.entries(state.documents).find(
       ([id, doc]) => doc.humanId === humanId

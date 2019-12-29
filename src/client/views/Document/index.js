@@ -21,7 +21,7 @@ const Document = () => {
   const currentDocument = id ? documents[id] : null;
 
   /**
-   *! On document mount
+   *! When the document has changed.
    */
   useEffect(() => {
     /**
@@ -31,8 +31,8 @@ const Document = () => {
     async function loadDocument() {
       await actions.setActiveDocument(params.humanId);
     }
-    if (!id) loadDocument();
-  }, []);
+    loadDocument();
+  }, [params.humanId]);
 
   return currentDocument ? (
     <>
