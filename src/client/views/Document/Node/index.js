@@ -109,13 +109,13 @@ const Node = ({
    * Also updates node height in state if number of text lines has changed.
    * @param {Object} event
    */
-  const handleTextInput = ({ target: { innerText } }) => {
+  const handleTextInput = async ({ target: { innerText } }) => {
     // Compute the current height of the node and determine whether or not it has
     // changed since the last text change. If it has changed, update the height
     // as well as the visible text.
     const nodeHeight = calculateHeight();
     //* Track text area size.
-    actions.updateNodeText(
+    await actions.updateNodeText(
       id,
       innerText,
       nodeHeight !== height ? nodeHeight : null
