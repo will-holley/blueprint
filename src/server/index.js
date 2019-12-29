@@ -2,6 +2,7 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
+import morgan from "morgan";
 // Data
 import db, { dbUrl } from "./data/db";
 import models from "./data/models";
@@ -19,6 +20,8 @@ const FORCE_TABLES = false;
 const app = express();
 // Attach Middleware
 app.use(cors());
+app.use(morgan("tiny", { stream: logger.stream.write }));
+app.use(express.json());
 // Attach API Router
 app.use("/api/1", router);
 

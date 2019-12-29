@@ -18,37 +18,6 @@ class Edge extends Model {
       .defaultTo(false)
       .notNullable();
   }
-
-  static async create({ body: { nodeA, nodeB, hasParent } }, res) {
-    const rows = await this.db(this.table).insert(
-      {
-        human_id: this._generateHumanId(),
-        node_a: nodeA,
-        node_b: nodeB,
-        has_parent: hasParent
-      },
-      ["id"]
-    );
-    res.status(201);
-    res.send(rows[0]);
-  }
-
-  /**
-   * TODO: merge this with the identical function
-   * from `node.js`.
-   * edge/?d=<document_uuid>
-   */
-  static async fetchAll({ query: { d } }, res) {
-    try {
-      const rows = await this.db(this.table)
-        .select("*")
-        .where({ document: d, deleted_at: null });
-      res.status(200);
-      res.send(rows);
-    } catch (error) {
-      res.send(error);
-    }
-  }
 }
 
 export default Edge;
