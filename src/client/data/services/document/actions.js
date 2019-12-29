@@ -51,7 +51,7 @@ const actions = {
     const { nodes, edges } = await request(`document/${id}`, "GET");
 
     //? Make the base node the active node
-    const baseNode = Object.values(nodes).find(({ parentId }) => !parentId);
+    const baseNode = Object.values(nodes).find(({ isBase }) => isBase);
 
     //? Update the state
     const newState = update(state, {
