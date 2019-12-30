@@ -26,21 +26,24 @@ router.post("/", async function createNode(
       .returning(["id", "human_id as humanId", "content_type as contentType"]);
 
     //? Create edge
-    const [edge] = await db(Edge.table)
-      .insert({
-        human_id: hri.random(),
-        node_a: parentNodeId,
-        node_b: node.id,
-        has_parent: true
-      })
-      .returning([
-        "id",
-        "human_id as humanId",
-        "node_a as nodeA",
-        "node_b as nodeB",
-        "has_parent as hasParent"
-      ]);
-
+    let edge = null;
+    if (parentNodeId) {
+      const rows = await db(Edge.table)
+        .insert({
+          human_id: hri.random(),
+          node_a: parentNodeId,
+          node_b: node.id,
+          has_parent: true
+        })
+        .returning([
+          "id",
+          "human_id as humanId",
+          "node_a as nodeA",
+          "node_b as nodeB",
+          "has_parent as hasParent"
+        ]);
+      edge = rows[0];
+    }
     //? Return node and edge
     res.status(201);
     res.send([node, edge]);

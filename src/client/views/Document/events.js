@@ -18,6 +18,15 @@ const useKeyboardHotkeys = () => {
   const { nodes, edges } = documents[docId];
   const activeNode = activeNodeId && nodes[activeNodeId];
 
+  //! ===============
+  //! == UTILITIES ==
+  //! ===============
+
+  const findParentId = nodeId => {
+    const edge = Object.values(edges).find(({ nodeB }) => nodeB === nodeId);
+    return edge ? edge.nodeA : null;
+  };
+
   //! ==============
   //! == DOCUMENT ==
   //! ==============
@@ -85,7 +94,7 @@ const useKeyboardHotkeys = () => {
     "cmd+backspace",
     event => {
       // Do not allow the base node to be deleted.
-      if (activeNodeId && activeNode.parentId) actions.deleteNode(activeNodeId);
+      if (activeNodeId) actions.deleteNode(activeNodeId);
       return false;
     },
     [activeNodeId]
@@ -102,9 +111,11 @@ const useKeyboardHotkeys = () => {
   useHotkeys(
     "cmd+up",
     event => {
-      if (!activeNode) return;
+      if (!activeNodeId) return;
+      //? Determine if there is an edge where this node is the target
+      const parentId = findParentId(activeNodeId);
       // If active node is not a base node, navigate to its parent.
-      if (activeNode.parentId) actions.setActiveNode(activeNode.parentId);
+      if (parentId) actions.setActiveNode(parentId);
     }, // but when they can, append `node`. // Current only memoize if activeNode changes.  Parent Nodes cannot be deleted right now,
     [activeNodeId]
   );
@@ -132,9 +143,10 @@ const useKeyboardHotkeys = () => {
    * @param {function} computeNextIndex : child index computer
    */
   const handleHorizontalNavigation = computeNextIndex => {
-    if (!activeNode || !activeNode.parentId) return;
+    if (!activeNode) return;
+    const parentId = findParentId(activeNodeId);
     const siblingIds = Object.values(edges)
-      .filter(({ nodeA }) => activeNode.parentId === nodeA)
+      .filter(({ nodeA }) => parentId === nodeA)
       .map(({ nodeB }) => nodeB);
     const index = siblingIds.indexOf(activeNode.id);
     const nextIndex = computeNextIndex(index, siblingIds);

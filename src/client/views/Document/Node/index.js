@@ -1,11 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 // Hooks
-import {
-  useWindowSize,
-  useOnClickOutside,
-  useHotkeys
-} from "client/utils/hooks";
+import { useOnClickOutside, useHotkeys } from "client/utils/hooks";
 // Data
 import useStore from "client/data/store";
 // Components
@@ -15,10 +11,9 @@ import { P } from "client/components/tags";
 const Node = ({
   id,
   humanId,
-  position: { x, y, draggable },
+  position: { x, y },
   contentType,
   content,
-  depth,
   dev,
   showButtons
 }) => {
@@ -130,42 +125,20 @@ const Node = ({
   //! == RENDER ==
   //! ============
 
-  //$ Position Calibration
-
-  //? Render relative to window innerHeight and innerWidth
-  const { height: windowHeight, width: windowWidth } = useWindowSize();
-  //* How many pixels should be between nodes
-  const yBottomPadding = 75;
-  const calibrateX = coord => windowWidth / 2 + coord - 300 / 2;
-  const calibrateY = coord => windowHeight / 2 + coord - height / 2;
-  const calibratedX = calibrateX(x);
-  const calibratedY = calibrateY(y) + yBottomPadding * depth;
-  const edgeEnter = [calibratedX + 150, calibratedY];
-  const edgeExit = [calibratedX + 150, calibratedY + height];
-
   return (
     <>
-      {dev && (
-        <>
-          <circle cx={edgeEnter[0]} cy={edgeEnter[1]} r="3" fill="red" />
-          <circle cx={edgeExit[0]} cy={edgeExit[1]} r="3" fill="blue" />
-        </>
-      )}
       <Container
         ref={el}
         id={id}
         width={300}
         height={height}
-        y={calibratedY}
-        x={calibratedX}
+        y={y}
+        x={x}
         dev={dev}
-        data-edge-enter={edgeEnter}
-        data-edge-exit={edgeExit}
       >
         {dev && (
           <small>
-            {humanId} - depth: {depth} - (x: {calibratedX}, y:
-            {calibratedY})
+            {humanId} - {id}
           </small>
         )}
         <Text
@@ -194,15 +167,13 @@ Node.propTypes = {
   }).isRequired,
   contentType: PropTypes.string.isRequired,
   content: PropTypes.string,
-  depth: PropTypes.number,
   dev: PropTypes.bool.isRequired,
   showButtons: PropTypes.bool.isRequired
 };
 
 Node.defaultProps = {
-  dev: true,
-  showButtons: true,
-  height: 0
+  dev: false,
+  showButtons: false
 };
 
 export default Node;

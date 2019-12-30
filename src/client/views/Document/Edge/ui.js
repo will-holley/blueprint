@@ -9,8 +9,6 @@ const Path = styled.path`
   stroke-linecap: round;
 `;
 
-Path.propTypes = {
-  id: PropTypes.string.isRequired
-};
+Path.propTypes = {};
 
 export { Path };

@@ -125,8 +125,10 @@ const actions = {
 
     //? Add node to nodes map
     nodes[node.id] = node;
-    //? Add edge to edges map
-    edges[edge.id] = edge;
+    if (edge) {
+      //? Add edge to edges map
+      edges[edge.id] = edge;
+    }
 
     //? Update all nodes
     const newState = update(state, {
@@ -188,9 +190,14 @@ const actions = {
     const state = getState();
     const docId = state.currentDoc.id;
     const doc = state.documents[docId];
-    //? Determine where to re-focus by finding the edge to this nodes parent
+
+    //? If this is the last node, don't do anything.
+    if (Object.keys(doc.nodes).length === 1) return;
+
+    //? Determine where to re-focus by finding the edge to this nodes parent.  If the
+    //? node has no parent, focus will return to the base node.
     const edge = Object.values(doc.edges).find(({ nodeB }) => nodeB === nodeId);
-    const activeNodeId = edge.nodeA;
+    const activeNodeId = edge ? edge.nodeA : null;
 
     try {
       await request(`node/${nodeId}`, "DELETE");

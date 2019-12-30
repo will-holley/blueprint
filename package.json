@@ -26,6 +26,7 @@
     "cors": "^2.8.5",
     "d3-flextree": "^2.1.1",
     "d3-hierarchy": "^1.1.9",
+    "dagre": "^0.8.5",
     "dotenv": "^7.0.0",
     "express": "^4.17.1",
     "hotkeys-js": "^3.7.3",

@@ -5,31 +5,28 @@ import { Path } from "./ui";
 // Hooks
 import { useWindowSize } from "client/utils/hooks";
 
-const Edge = ({ id, humanId, nodeAId, nodeBId }) => {
-  //? Re-render the edge when the window resizes or when nodes update
-  const _ = useWindowSize();
-
-  //? Get references to the nodes
-  const nodeAEl = document.getElementById(nodeAId);
-  const nodeBEl = document.getElementById(nodeBId);
-
-  if (nodeAEl && nodeBEl) {
-    const [aX, aY] = nodeAEl.dataset.edgeExit.split(",");
-    const [bX, bY] = nodeBEl.dataset.edgeEnter.split(",");
-    const d = ["M", aX, aY, "L", bX, bY].join(" ");
-    console.log(d);
-    return <Path id={humanId} d={d} />;
-  } else {
-    return <></>;
-  }
+const Edge = ({
+  position: [{ x: x1, y: y1 }, { x: x2, y: y2 }, { x, y }],
+  elbow
+}) => {
+  //? Create a bezier curve.
+  const bezier = `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x} ${y}`;
+  //? Create a straight line.
+  const straight = `M ${x1} ${y1} L ${x} ${y}`;
+  return <Path d={elbow ? bezier : straight} />;
 };
 
 Edge.propTypes = {
-  id: PropTypes.string.isRequired,
-  humanId: PropTypes.string.isRequired,
-  nodeAId: PropTypes.string.isRequired,
-  nodeBId: PropTypes.string.isRequired
+  position: PropTypes.arrayOf(
+    PropTypes.shape({
+      x: PropTypes.number.isRequired,
+      y: PropTypes.number.isRequired
+    })
+  ).isRequired,
+  elbow: PropTypes.bool.isRequired
 };
-Edge.defaultProps = {};
+Edge.defaultProps = {
+  elbow: true
+};
 
 export default Edge;
