@@ -82,9 +82,15 @@ router.get("/:id", async function fetchDocumentDetails(
         "content",
         "content_type as contentType"
       ])
-      .where({ document: id, deleted_at: null });
-    //? Add to id value map with additional details
+      .where({ document: id, deleted_at: null })
+      .orderBy("created_at");
+    //? Add to id value map with additional details. Denote the base node.
+    let baseMarked = false;
     nodes.forEach(node => {
+      if (!baseMarked) {
+        node.isBase = true;
+        baseMarked = true;
+      }
       details.nodes[node.id] = node;
     });
     //? Create a list of node ids for querying edges

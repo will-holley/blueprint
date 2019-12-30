@@ -6,13 +6,22 @@ import { useWindowSize } from "client/utils/hooks";
 
 const Group = styled.g.attrs(({ zoom }) => ({
   transform: `scale(${zoom})`
-}))``;
+}))`
+  opacity: ${({ opacity }) => opacity && opacity};
+`;
 
 /**
  * https://css-tricks.com/creating-a-panning-effect-for-svg/
  * @param {object} props
  */
-const InteractiveSVG = ({ children }) => {
+const InteractiveSVG = ({ children, opacity }) => {
+  const [
+    {
+      currentDoc: { activeNodeId, zoom }
+    },
+    actions
+  ] = useStore();
+
   //! Get the window size.  It is used to set <svg> dimensions.
   const { height, width } = useWindowSize();
 
@@ -86,13 +95,7 @@ const InteractiveSVG = ({ children }) => {
   //? DEV:
   //console.log(`Viewbox: ${viewBoxString}`);
 
-  // Activating a node centers it.
-  const [
-    {
-      currentDoc: { activeNodeId, zoom }
-    },
-    actions
-  ] = useStore();
+  //! Activating a node centers it.
   useEffect(() => {
     // By default there is no active node until the user creates
     // a base node.
@@ -131,7 +134,7 @@ const InteractiveSVG = ({ children }) => {
         onTouchEnd={handlePointerUp}
         onTouchMove={handlePointerMove}
       >
-        <Group zoom={zoom} ref={group}>
+        <Group zoom={zoom} ref={group} opacity={opacity}>
           {children}
         </Group>
       </svg>
@@ -140,7 +143,8 @@ const InteractiveSVG = ({ children }) => {
 };
 
 InteractiveSVG.propTypes = {
-  children: PropTypes.array.isRequired
+  children: PropTypes.array.isRequired,
+  opacity: PropTypes.number.isRequired
 };
 
 export default InteractiveSVG;

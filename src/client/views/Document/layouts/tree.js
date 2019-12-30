@@ -1,16 +1,6 @@
-import uuidv4 from "uuid/v4";
-import { hri } from "human-readable-ids";
 import { stratify } from "d3-hierarchy"; // https://github.com/d3/d3-hierarchy#hierarchy
 import { flextree } from "d3-flextree"; // https://github.com/Klortho/d3-flextree
-
-const calculateNodeHeight = id => {
-  const el = document.getElementById(id);
-  return el
-    ? Array.from(el.children)
-        .map(({ offsetHeight }) => offsetHeight)
-        .reduce((acc, height) => (acc += height), 0)
-    : 100;
-};
+import { calculateNodeHeight } from "./utils";
 
 /**
  * Assigns hierarchical x/y coordinates to nodes
@@ -56,4 +46,4 @@ const renderTree = (nodes, edges) => {
   return _nodes;
 };
 
-export { renderTree };
+export default renderTree;

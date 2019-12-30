@@ -74,7 +74,7 @@ const Actions = () => {
       <LeftActions>
         <EmojiButton onClick={navigateToDashboard}>🎨</EmojiButton>
         {/* Hide the add button while the document does not support multiple base nodes. */}
-        {/* <EmojiButton onClick={event => actions.addNode(null)}>🌀</EmojiButton> */}
+        <EmojiButton onClick={event => actions.addNode(null)}>🌀</EmojiButton>
         <Title>{name ? name : humanId}</Title>
       </LeftActions>
       <RightActions>
