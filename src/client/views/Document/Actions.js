@@ -24,7 +24,7 @@ const keyboardShortcuts = [
   ["cmd + arrow down", "move down"],
   ["cmd + arrow left", "move left"],
   ["cmd + arrow right", "move right"],
-  ["cmd + k", "show keyboard shortcuts"]
+  ["cmd + k", "show/hide hotkeys"]
 ];
 
 const Actions = () => {
@@ -42,7 +42,7 @@ const Actions = () => {
   useKeyboardHotkeys();
 
   //! Hotkey Menu
-  const [showHotkeyMenu, setShowHotkeyMenu] = useState(false);
+  const [showHotkeyMenu, setShowHotkeyMenu] = useState(true);
   const toggleHotkeyMenu = event => setShowHotkeyMenu(!showHotkeyMenu);
   useHotkeys("cmd+k", toggleHotkeyMenu, [showHotkeyMenu]);
 
@@ -85,7 +85,7 @@ const Actions = () => {
       </RightActions>
       {showHotkeyMenu && (
         <HotkeyShortcutsContainer>
-          <h2>shortcuts</h2>
+          <h2>Hotkeys</h2>
           {keyboardShortcuts.map(([cmd, action]) => (
             <div key={cmd}>
               <code>{cmd}</code>

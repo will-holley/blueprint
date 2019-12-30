@@ -51,8 +51,10 @@ const useKeyboardHotkeys = () => {
   useHotkeys(
     "cmd+shift+enter",
     event => {
-      if (activeNodeId && activeNode.parentId)
-        actions.addNode(activeNode.parentId);
+      if (activeNodeId) {
+        const parentId = findParentId(activeNodeId);
+        actions.addNode(parentId);
+      }
       return false;
     },
     [activeNodeId]
