@@ -191,8 +191,10 @@ const actions = {
     const docId = state.currentDoc.id;
     const doc = state.documents[docId];
 
-    //? If this is the last node, don't do anything.
-    if (Object.keys(doc.nodes).length === 1) return;
+    //? If this is the last node, remove its text.
+    if (Object.keys(doc.nodes).length === 1) {
+      return dispatch(actions.updateNodeText(nodeId, null));
+    }
 
     //? Determine where to re-focus by finding the edge to this nodes parent.  If the
     //? node has no parent, focus will return to the base node.
