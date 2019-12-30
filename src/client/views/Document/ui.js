@@ -6,6 +6,8 @@ const Title = styled.h1`
   display: inline-block;
   font-weight: 800;
   font-size: 18px;
+  border-bottom: 1px dashed #e2e2e2;
+  padding: 0px 2rem;
 `;
 
 const ActionInfo = styled(Actions)`
