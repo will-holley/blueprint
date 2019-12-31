@@ -12,32 +12,7 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader",
-          options: {
-            presets: [
-              [
-                "@babel/preset-env",
-                {
-                  targets: {
-                    node: "current"
-                  }
-                }
-              ],
-              "@babel/preset-react"
-            ],
-            plugins: [
-              [
-                "babel-plugin-styled-components",
-                {
-                  ssr: false,
-                  fileName: true,
-                  minify: true
-                }
-              ],
-              "@babel/plugin-proposal-class-properties",
-              "@babel/plugin-transform-async-to-generator"
-            ]
-          }
+          loader: "babel-loader"
         }
       },
       {
