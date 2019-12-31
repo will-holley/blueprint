@@ -8,7 +8,6 @@ const routes = {
     Component: Documents,
     authenticated: false,
     label: "Dashboard"
-    //nav: false
   },
   //$ Document
   "/d/:humanId": {

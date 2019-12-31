@@ -8,13 +8,11 @@ import {
 } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 // Config
-import routes from "./config/routes";
-import Head from "./config/Head";
+import routes from "./routes";
+import Head from "./components/Head";
 import { dark, light } from "./styles/styledThemes";
 import GlobalStyle from "./styles/globalStyles";
-// Our Components
-import Nav from "./components/Nav";
-import ContentContainer from "./containers/Content/Container";
+import ContentContainer from "./layout/Container";
 
 const App = () => {
   // TODO: make a hook (https://usehooks.com/useRequireAuth/)

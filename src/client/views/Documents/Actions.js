@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 // Data
 import useStore from "client/data/store";
 // Components
-import { RightActions } from "client/containers/Content/Actions";
+import { RightActions } from "client/layout/Actions";
 import { EmojiButton } from "client/components/Buttons";
 
 const Actions = () => {

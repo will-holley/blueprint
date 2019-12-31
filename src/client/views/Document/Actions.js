@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 // Content Container Action Containers
-import { LeftActions, RightActions } from "client/containers/Content/Actions";
+import { LeftActions, RightActions } from "client/layout/Actions";
 // Local UI Elements
 import { Title, HotkeyShortcutsContainer } from "./ui";
 // Global UI Elements

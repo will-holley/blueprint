@@ -50,11 +50,6 @@ const Document = () => {
   }, [params.humanId]);
 
   if (currentDocument) {
-    // `renderTree`
-    // const nodes = Object.values(
-    //   renderTree(currentDocument.nodes, currentDocument.edges)
-    // );
-    // const edges = Object.values(currentDocument.edges);
     const result = dagger(currentDocument.nodes, currentDocument.edges);
     const nodes = Object.values(result[0]);
     const edges = Object.values(result[1]);

@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { Actions } from "client/containers/Content/Actions";
+import { Actions } from "client/layout/Actions";
 
 const Title = styled.input`
   display: inline-block;

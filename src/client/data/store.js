@@ -7,8 +7,8 @@ import {
 // State
 import initialState from "./state";
 // Actions
-import { default as docActions } from "./services/document/actions";
-import { default as uiActions } from "./services/ui/actions";
+import { default as docActions } from "./actions/document";
+import { default as uiActions } from "./actions/ui";
 
 // Config
 defaults.devtools = process.env.NODE_ENV == "development";
