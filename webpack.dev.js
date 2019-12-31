@@ -9,9 +9,9 @@ const webpack = require("webpack");
 const ENTRY_FILE = "index.html";
 
 module.exports = {
+  mode: "development",
   // Client Entrypoint
   entry: path.resolve(__dirname, "src/client", "index.js"),
-  //devtool: "inline-source-map",
   // Build Destination
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -68,6 +68,7 @@ module.exports = {
   ],
   devtool: "eval-source-map",
   devServer: {
+    hot: true,
     open: true,
     contentBase: path.join(__dirname, "dist/client"),
     compress: true, // gzip compression
