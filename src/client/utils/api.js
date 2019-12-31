@@ -1,23 +1,22 @@
-import _ from "lodash";
+import axios from "axios";
 
-const request = async (router, method, headers = {}, data = {}) => {
-  // Build request args
-  const hasBody = !["GET", "HEAD"].includes(method);
-  const endpoint = `${process.env.API_ADDRESS}/api/1/${router}`;
+const api = axios.create({
+  baseURL: `${process.env.API_ADDRESS}/api/1/`,
+  timeout: 1000
+});
 
+const request = async (url, method, headers = {}, data = {}) => {
   //$ Request Data from the API
+  console.log(url, method);
   try {
-    const response = await fetch(endpoint, {
+    const response = await api({
       method,
-      mode: "cors",
-      cache: "no-cache",
-      credentials: "same-origin",
-      headers: Object.assign(headers, {
-        "Content-Type": "application/json"
-      }),
-      body: hasBody ? JSON.stringify(data) : null
+      url,
+      headers,
+      data,
+      responseType: "json"
     });
-    return response.json();
+    return response.data;
   } catch (error) {
     return new Error(error);
   }
