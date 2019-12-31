@@ -68,6 +68,10 @@ const Actions = () => {
   //! Navigation Handlers
   const navigateToDashboard = () => push("/");
 
+  //! Event Handlers
+  const updateName = ({ target: { value } }) =>
+    actions.updateDocumentName(id, value);
+
   //! Render
   return (
     <>
@@ -75,7 +79,7 @@ const Actions = () => {
         <EmojiButton onClick={navigateToDashboard}>🎨</EmojiButton>
         {/* Hide the add button while the document does not support multiple base nodes. */}
         <EmojiButton onClick={event => actions.addNode(null)}>🌀</EmojiButton>
-        <Title>{name ? name : humanId}</Title>
+        <Title value={name !== null ? name : humanId} onChange={updateName} />
       </LeftActions>
       <RightActions>
         <EmojiButton onClick={toggleHotkeyMenu}>⌨️</EmojiButton>

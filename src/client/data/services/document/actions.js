@@ -9,6 +9,27 @@ const actions = {
   //! ======================
   //! == Document Actions ==
   //! ======================
+  updateDocumentName: (docId, name) => async ({ setState, getState }) => {
+    const state = getState();
+    //? If the user deletes the full text, do not save
+    try {
+      if (name !== "") {
+        await request(`document/${docId}`, "PUT", {}, { name });
+      }
+      console.log(name);
+      const newState = update(state, {
+        documents: {
+          [docId]: {
+            name: { $set: name }
+          }
+        }
+      });
+      setState(newState);
+    } catch (error) {
+      console.log(error);
+      //TODO
+    }
+  },
   populateAllDocuments: () => async ({ setState, getState }) => {
     // TODO: search + pagination
     // Check if documents have been populated

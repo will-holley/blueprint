@@ -118,7 +118,23 @@ router.get("/:id", async function fetchDocumentDetails(
   }
 });
 
-router.put("/:id", async function updateDocumentDetails(req, res) {});
+router.put("/:id", async function updateDocumentDetails(
+  { params: { id }, body: { name } },
+  res
+) {
+  //? Compose update object with allowable fields
+  const fields = {};
+  if (name) fields["name"] = name;
+  //? Update
+  try {
+    await db(Document.table)
+      .where("id", id)
+      .update(fields);
+    res.sendStatus(200);
+  } catch (error) {
+    res.send(error.message);
+  }
+});
 
 router.delete("/:id", async function deleteDocument({ params: { id } }, res) {
   try {
@@ -129,7 +145,7 @@ router.delete("/:id", async function deleteDocument({ params: { id } }, res) {
     const responseStatus = updatedCount !== 0 ? 200 : 400;
     res.sendStatus(responseStatus);
   } catch (error) {
-    res.send(error);
+    res.send(error.message);
   }
 });
 

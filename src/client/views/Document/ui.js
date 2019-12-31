@@ -2,12 +2,16 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import { Actions } from "client/containers/Content/Actions";
 
-const Title = styled.h1`
+const Title = styled.input`
   display: inline-block;
   font-weight: 800;
   font-size: 18px;
+  text-align: center;
+  border: 0;
   border-bottom: 1px dashed #e2e2e2;
-  padding: 0px 2rem;
+  &:focus {
+    outline: none;
+  }
 `;
 
 const ActionInfo = styled(Actions)`
