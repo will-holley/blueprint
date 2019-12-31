@@ -1,12 +1,11 @@
 import styled from "styled-components";
 import PropTypes from "prop-types";
-// Components
-import { H1 } from "client/components/tags";
 // Styles
 import { getRandomGradient } from "../styles/gradients";
 
-const ColoredH1 = styled(H1)`
-  background: ${({ gradient }) => (gradient ? gradient : getRandomGradient())};
+const gradient = getRandomGradient();
+const GradientText = styled.span`
+  background: ${({ dynamic }) => (dynamic ? getRandomGradient() : gradient)};
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 
@@ -21,14 +20,14 @@ const ColoredH1 = styled(H1)`
   }
 `;
 
-ColoredH1.propTypes = {
+GradientText.propTypes = {
   interactive: PropTypes.bool.isRequired,
-  gradient: PropTypes.string
+  dynamic: PropTypes.bool.isRequired
 };
 
-ColoredH1.defaultProps = {
+GradientText.defaultProps = {
   interactive: false,
-  gradient: null
+  dynamic: false
 };
 
-export default ColoredH1;
+export default GradientText;

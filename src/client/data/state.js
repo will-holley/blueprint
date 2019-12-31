@@ -15,7 +15,8 @@ const initialState = {
   ui: {
     // By default the application starts loading
     loading: true
-  }
+  },
+  user: null
 };
 
 export default initialState;

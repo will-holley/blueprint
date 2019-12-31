@@ -7,8 +7,8 @@ import Moment from "moment";
 import useStore from "client/data/store";
 // Components
 import { Container, DocumentInformation } from "./ui";
-import ColoredH1 from "client/components/ColoredH1";
-import { H3, H4 } from "client/components/tags";
+import GradientText from "client/components/GradientText";
+import { H1, H3, H4 } from "client/components/tags";
 import Actions from "./Actions";
 // Styles
 import { getRandomGradient } from "client/styles/gradients";
@@ -36,9 +36,9 @@ const Documents = () => {
               key={id}
               onClick={() => push(`d/${doc.humanId}`)}
             >
-              <ColoredH1 interactive gradient={gradient}>
-                {doc.name ? doc.name : doc.humanId}
-              </ColoredH1>
+              <GradientText interactive>
+                <H1>{doc.name ? doc.name : doc.humanId}</H1>
+              </GradientText>
               {/* <H3>tag1, tag2, tag3</H3> */}
               <H4>{_private ? "Private 😎" : "Public 🥳"}</H4>
               <H4>
