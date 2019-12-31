@@ -16,10 +16,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "echo \"Error: no lint specified\" && exit 1",
-    "build": "rimraf dist && babel src --out-dir dist && webpack --mode production --config webpack.config.js",
     "server-dev": "nodemon --inspect --exec babel-node src/server/index.js",
     "server-prod": "node dist/server/index.js",
-    "client": "webpack-dev-server --mode development --config webpack.config.js"
+    "client": "webpack-dev-server --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
