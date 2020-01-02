@@ -28,28 +28,30 @@ const Container = styled.div`
 const ContentContainer = ({ children }) => {
   const [
     {
-      ui: { loading }
+      ui: { loading },
+      user
     },
     actions
   ] = useStore();
 
+  /**
+   * Load any data which should be populated in application
+   * on initialization and when the authentication state changes.
+   */
   useEffect(() => {
-    /**
-     * Load any data which should be populated in application
-     * on initialization.
-     */
-    async function loadData() {
+    (async () => {
       await actions.loadUser();
       await actions.populateAllDocuments();
       // After content has loaded
       setTimeout(() => actions.setLoading(false), 600);
-    }
-
-    loadData();
-  }, [window.location.href]);
+    })();
+  }, [window.location.href, Boolean(user)]);
 
   const transitions = useTransition(!loading, null, {
-    from: { position: "absolute", opacity: 0 },
+    from: {
+      position: "absolute",
+      opacity: 0
+    },
     enter: { opacity: 1 },
     leave: { opacity: 0 }
   });

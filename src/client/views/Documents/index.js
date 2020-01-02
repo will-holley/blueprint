@@ -28,7 +28,7 @@ const Documents = () => {
       <Actions />
       {documentsExist ? (
         Object.entries(documents).map(([id, doc]) => {
-          const ownedByUser = user.id === doc.createdBy;
+          const ownedByUser = user ? user.id === doc.createdBy : false;
           const gradient = getRandomGradient();
           return (
             <DocumentInformation
