@@ -42,7 +42,7 @@ const Actions = () => {
   useKeyboardHotkeys();
 
   //! Hotkey Menu
-  const [showHotkeyMenu, setShowHotkeyMenu] = useState(true);
+  const [showHotkeyMenu, setShowHotkeyMenu] = useState(false);
   const toggleHotkeyMenu = event => setShowHotkeyMenu(!showHotkeyMenu);
   useHotkeys("cmd+k", toggleHotkeyMenu, [showHotkeyMenu]);
 
