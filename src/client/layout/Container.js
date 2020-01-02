@@ -39,6 +39,7 @@ const ContentContainer = ({ children }) => {
      * on initialization.
      */
     async function loadData() {
+      await actions.loadUser();
       await actions.populateAllDocuments();
       // After content has loaded
       setTimeout(() => actions.setLoading(false), 600);
