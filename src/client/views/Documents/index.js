@@ -50,7 +50,9 @@ const Documents = () => {
           );
         })
       ) : (
-        <ColoredH1>Click ➕ to start</ColoredH1>
+        <GradientText>
+          <H1>Click ➕ to start</H1>
+        </GradientText>
       )}
     </Container>
   );
