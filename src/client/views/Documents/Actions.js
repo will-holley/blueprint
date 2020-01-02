@@ -20,9 +20,12 @@ const Actions = () => {
   return (
     <RightActions>
       {state.user ? (
-        <EmojiButton onClick={createDocument} disabled={disabled}>
-          ➕
-        </EmojiButton>
+        <>
+          <EmojiButton onClick={createDocument} disabled={disabled}>
+            ➕
+          </EmojiButton>
+          <ActionLink onClick={actions.logout}>Logout</ActionLink>
+        </>
       ) : (
         <>
           <ActionLink to="/join">Join</ActionLink>
