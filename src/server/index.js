@@ -11,18 +11,20 @@ import logger from "./utils/logger";
 // API
 import router from "./api/routes";
 
-// Environment
+//! Environment
 const { SERVER_PORT, NODE_ENV } = process.env;
 const isDev = NODE_ENV === "development";
 const FORCE_TABLES = false;
 
-// Create server instance
+//! Create server instance
 const app = express();
-// Attach Middleware
+
+//! Attach Middleware
 app.use(cors());
 app.use(morgan("tiny", { stream: logger.stream.write }));
 app.use(express.json());
-// Attach API Router
+
+//! Attach API Router
 app.use("/api/1", router);
 
 async function connectDatabase() {
