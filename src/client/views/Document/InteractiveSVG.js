@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import useStore from "client/data/store";
+import { useCurrentDocument } from "client/data/selectors/document";
 import { useWindowSize } from "client/utils/hooks";
 
 const Group = styled.g.attrs(({ zoom }) => ({
@@ -15,12 +15,9 @@ const Group = styled.g.attrs(({ zoom }) => ({
  * @param {object} props
  */
 const InteractiveSVG = ({ children, opacity }) => {
-  const [
-    {
-      currentDoc: { activeNodeId, zoom }
-    },
-    actions
-  ] = useStore();
+  const [{ activeNodeId, zoom }, actions] = useCurrentDocument();
+
+  console.log(activeNodeId);
 
   //! Get the window size.  It is used to set <svg> dimensions.
   const { height, width } = useWindowSize();
