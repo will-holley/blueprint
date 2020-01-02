@@ -16,12 +16,31 @@ const router = express();
 //! == Endpoints ==
 //! ===============
 
+const fields = [
+  "id",
+  "human_id as humanId",
+  "name",
+  "updated_at as updatedAt",
+  "created_by as createdBy",
+  "private"
+];
+
 router.get("/", async function fetchAllDocuments(req, res) {
   try {
+    //? Check if there is a logged in user
+    const user = req.user && req.user._id ? req.user : null;
     //? Query all documents
     const rows = await db(Document.table)
-      .select(["id", "human_id as humanId", "name", "updated_at as updatedAt"])
+      .select(fields)
       .where("deleted_at", null)
+      .andWhere(function() {
+        //? Select public documents
+        this.where("private", false);
+        //? Select all of user's documents
+        if (user) {
+          this.orWhere("created_by", user._id);
+        }
+      })
       .orderBy("updated_at", "desc");
     //? Create a map of document ids to documents, including empty objects for nodes
     //? and edges.
@@ -47,12 +66,7 @@ router.post("/", requiresAuthentication, async function createDocument(
         human_id: hri.random(),
         created_by: user._id
       })
-      .returning([
-        "id",
-        "human_id as humanId",
-        "name",
-        "updated_at as updatedAt"
-      ]);
+      .returning(fields);
     //? Client expects empty objects.
     document.edges = {};
     document.nodes = {};
