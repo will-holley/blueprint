@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 // Data
-import useStore from "client/data/store";
+import { useCurrentDocument } from "client/data/selectors/document";
 // Components
 import Node from "./Node";
 import Edge from "./Edge";
@@ -13,16 +13,7 @@ import renderTree from "./layouts/tree";
 import dagger from "./layouts/dagre";
 
 const Document = () => {
-  const [
-    {
-      currentDoc: { id },
-      documents
-    },
-    actions
-  ] = useStore();
-  const params = useParams();
-  const currentDocument = id ? documents[id] : null;
-
+  const [currentDocument, actions] = useCurrentDocument();
   /**
    * Wait until nodes have rendered to display them.
    */
@@ -37,6 +28,7 @@ const Document = () => {
   /**
    *! When the document has changed.
    */
+  const params = useParams();
   useEffect(() => {
     /**
      * Sets the active document and fetches node & edge data.

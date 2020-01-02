@@ -76,7 +76,9 @@ const actions = {
         id: { $set: id },
         // reset zoom back to default
         zoom: { $set: zoom },
-        activeNodeId: { $set: activeNodeId ? activeNodeId : baseNode.id }
+        activeNodeId: {
+          $set: activeNodeId ? activeNodeId : baseNode ? baseNode.id : null
+        }
       },
       documents: {
         [id]: {
