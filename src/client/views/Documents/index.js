@@ -28,7 +28,7 @@ const Documents = () => {
       <Actions />
       {documentsExist ? (
         Object.entries(documents).map(([id, doc]) => {
-          const _private = Math.random() > 0.35;
+          const ownedByUser = user.id === doc.createdBy;
           const gradient = getRandomGradient();
           return (
             <DocumentInformation
@@ -39,7 +39,11 @@ const Documents = () => {
                 <H1>{doc.name ? doc.name : doc.humanId}</H1>
               </GradientText>
               {/* <H3>tag1, tag2, tag3</H3> */}
-              <H4>{doc.private ? "Private 😎" : "Public 🥳"}</H4>
+              <H4>
+                {doc.private
+                  ? "For your eyes only 😎"
+                  : `${ownedByUser ? "Yours - " : ""}Public 🥳`}
+              </H4>
               <H4>
                 {Moment(doc.updatedAt)
                   .startOf("day")
