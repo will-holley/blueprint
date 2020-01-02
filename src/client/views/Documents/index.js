@@ -14,7 +14,7 @@ import Actions from "./Actions";
 import { getRandomGradient } from "client/styles/gradients";
 
 const Documents = () => {
-  const [{ documents }, actions] = useStore();
+  const [{ documents, user }, actions] = useStore();
   const { push } = useHistory();
 
   const documentsExist = Object.keys(documents).length;
@@ -49,10 +49,12 @@ const Documents = () => {
             </DocumentInformation>
           );
         })
-      ) : (
+      ) : user ? (
         <GradientText>
           <H1>Click ➕ to start</H1>
         </GradientText>
+      ) : (
+        <H1>👀 ➡️</H1>
       )}
     </Container>
   );
