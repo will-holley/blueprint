@@ -6,13 +6,15 @@ import db from "../data/db";
 import Document from "../data/models/Document";
 import Node from "../data/models/Node";
 import Edge from "../data/models/Edge";
+// Middleware
+import { requiresAuthentication } from "./middleware";
 
 //! Node Serializer
 
 //! Create Router
 const router = express();
 
-router.post("/", async function createNode(
+router.post("/", requiresAuthentication, async function createNode(
   { body: { documentId, parentNodeId } },
   res
 ) {
@@ -52,7 +54,7 @@ router.post("/", async function createNode(
   }
 });
 
-router.patch("/:id", async function updateNode(
+router.patch("/:id", requiresAuthentication, async function updateNode(
   { params: { id }, body: { content } },
   res
 ) {
@@ -70,7 +72,10 @@ router.patch("/:id", async function updateNode(
  * Delete node, all child nodes, and all edges pointing to this node.
  * TODO: get this down to 1 query with a recursive delete + join!
  */
-router.delete("/:id", async function deleteNode({ params: { id } }, res) {
+router.delete("/:id", requiresAuthentication, async function deleteNode(
+  { params: { id } },
+  res
+) {
   try {
     //? Get edge ids
     const { rows } = await db.raw(`

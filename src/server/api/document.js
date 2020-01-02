@@ -6,6 +6,8 @@ import db from "../data/db";
 import Document from "../data/models/Document";
 import Node from "../data/models/Node";
 import Edge from "../data/models/Edge";
+// Middleware
+import { requiresAuthentication } from "./middleware";
 
 //! Create Router
 const router = express();
@@ -34,7 +36,10 @@ router.get("/", async function fetchAllDocuments(req, res) {
   }
 });
 
-router.post("/", async function createDocument(req, res) {
+router.post("/", requiresAuthentication, async function createDocument(
+  req,
+  res
+) {
   try {
     //? Insert the document record
     const [document] = await db(Document.table)
@@ -118,7 +123,7 @@ router.get("/:id", async function fetchDocumentDetails(
   }
 });
 
-router.put("/:id", async function updateDocumentDetails(
+router.put("/:id", requiresAuthentication, async function updateDocumentDetails(
   { params: { id }, body: { name } },
   res
 ) {
@@ -136,7 +141,10 @@ router.put("/:id", async function updateDocumentDetails(
   }
 });
 
-router.delete("/:id", async function deleteDocument({ params: { id } }, res) {
+router.delete("/:id", requiresAuthentication, async function deleteDocument(
+  { params: { id } },
+  res
+) {
   try {
     const updatedCount = await db(Document.table)
       .where("id", id)
