@@ -37,13 +37,16 @@ router.get("/", async function fetchAllDocuments(req, res) {
 });
 
 router.post("/", requiresAuthentication, async function createDocument(
-  req,
+  { user },
   res
 ) {
   try {
     //? Insert the document record
     const [document] = await db(Document.table)
-      .insert({ human_id: hri.random() })
+      .insert({
+        human_id: hri.random(),
+        created_by: user._id
+      })
       .returning([
         "id",
         "human_id as humanId",
