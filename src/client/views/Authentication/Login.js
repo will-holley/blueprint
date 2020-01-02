@@ -4,6 +4,7 @@ import GradientText from "client/components/GradientText";
 import { H1, H3 } from "client/components/tags";
 import { Container, Input, Button } from "./ui";
 import { RightActions, ActionLink, ActionDivider } from "client/layout/Actions";
+import Password from "./components/Password";
 // Hooks
 import { useTransition, animated } from "react-spring";
 import { useHistory } from "react-router-dom";
@@ -59,9 +60,9 @@ const Login = () => {
         <br />
         <br />
         <Input placeholder="What's your email?" onChange={handleEmailChange} />
-        <Input
-          placeholder="And your password?"
+        <Password
           onChange={handlePasswordChange}
+          placeholder="And your password?"
         />
         {error && (
           <>

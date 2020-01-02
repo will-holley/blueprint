@@ -13,8 +13,16 @@ const Input = styled.input`
   display: block;
   margin: 2rem 0;
   padding: 1rem 2rem;
-  width: 50%;
+  width: 75%;
   border-bottom: 1px dashed #e2e2e2;
 `;
 
-export { Container, Input };
+const Checkbox = styled(Input).attrs(props => ({
+  type: "checkbox"
+}))`
+  display: inline-block;
+  width: unset;
+  margin-right: 1.25rem;
+`;
+
+export { Container, Input, Checkbox };

@@ -4,6 +4,7 @@ import GradientText from "client/components/GradientText";
 import { H1, H2, H3, H4 } from "client/components/tags";
 import { Container, Input, Button } from "./ui";
 import { RightActions, ActionLink, ActionDivider } from "client/layout/Actions";
+import Password from "./components/Password";
 // Hooks
 import { useTransition, animated } from "react-spring";
 import { useHistory } from "react-router-dom";
@@ -99,7 +100,7 @@ const Join = () => {
         <br />
         <Input placeholder="What's your name?" onChange={handleNameChange} />
         <Input placeholder="And your email?" onChange={handleEmailChange} />
-        <Input
+        <Password
           placeholder="Please enter a password"
           onChange={handlePasswordChange}
         />
