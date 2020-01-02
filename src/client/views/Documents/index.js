@@ -7,14 +7,14 @@ import Moment from "moment";
 import useStore from "client/data/store";
 // Components
 import { Container, DocumentInformation } from "./ui";
-import ColoredH1 from "client/components/ColoredH1";
-import { H3, H4 } from "client/components/tags";
+import GradientText from "client/components/GradientText";
+import { H1, H3, H4 } from "client/components/tags";
 import Actions from "./Actions";
 // Styles
 import { getRandomGradient } from "client/styles/gradients";
 
 const Documents = () => {
-  const [{ documents }, actions] = useStore();
+  const [{ documents, user }, actions] = useStore();
   const { push } = useHistory();
 
   const documentsExist = Object.keys(documents).length;
@@ -28,19 +28,22 @@ const Documents = () => {
       <Actions />
       {documentsExist ? (
         Object.entries(documents).map(([id, doc]) => {
-          // TODO: public vs. private
-          const _private = Math.random() > 0.35;
+          const ownedByUser = user ? user.id === doc.createdBy : false;
           const gradient = getRandomGradient();
           return (
             <DocumentInformation
               key={id}
               onClick={() => push(`d/${doc.humanId}`)}
             >
-              <ColoredH1 interactive gradient={gradient}>
-                {doc.name ? doc.name : doc.humanId}
-              </ColoredH1>
+              <GradientText interactive>
+                <H1>{doc.name ? doc.name : doc.humanId}</H1>
+              </GradientText>
               {/* <H3>tag1, tag2, tag3</H3> */}
-              <H4>{_private ? "Private 😎" : "Public 🥳"}</H4>
+              <H4>
+                {doc.private
+                  ? "For your eyes only 😎"
+                  : `${ownedByUser ? "Yours - " : ""}Public 🥳`}
+              </H4>
               <H4>
                 {Moment(doc.updatedAt)
                   .startOf("day")
@@ -49,8 +52,12 @@ const Documents = () => {
             </DocumentInformation>
           );
         })
+      ) : user ? (
+        <GradientText>
+          <H1>Click ➕ to start</H1>
+        </GradientText>
       ) : (
-        <ColoredH1>Click ➕ to start</ColoredH1>
+        <H1>👀 ➡️</H1>
       )}
     </Container>
   );

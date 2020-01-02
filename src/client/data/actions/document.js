@@ -1,5 +1,5 @@
 import update from "immutability-helper";
-import { request } from "client/utils/api";
+import API from "client/utils/api";
 
 //TODO: go through actions and use `dispatch` to decompose them,
 //TODO: particularly the actions having to do with node position
@@ -14,7 +14,7 @@ const actions = {
     //? If the user deletes the full text, do not save
     try {
       if (name !== "") {
-        await request(`document/${docId}`, "PUT", {}, { name });
+        await API.request(`document/${docId}`, "PUT", {}, { name });
       }
       console.log(name);
       const newState = update(state, {
@@ -30,13 +30,9 @@ const actions = {
       //TODO
     }
   },
-  populateAllDocuments: () => async ({ setState, getState }) => {
-    // TODO: search + pagination
-    // Check if documents have been populated
-    const { documents } = getState();
-    if (Object.keys(documents).length) return;
-    // If not, fetch them
-    const response = await request("document", "GET");
+  populateAllDocuments: () => async ({ setState }) => {
+    // TODO: search + pagination + caching
+    const response = await API.request("document", "GET");
     setState({ documents: response });
   },
   /**
@@ -69,7 +65,7 @@ const actions = {
     );
     //? Query document details
     //TODO: determine when these should be cached
-    const { nodes, edges } = await request(`document/${id}`, "GET");
+    const { nodes, edges } = await API.request(`document/${id}`, "GET");
 
     //? Make the base node the active node
     const baseNode = Object.values(nodes).find(({ isBase }) => isBase);
@@ -80,7 +76,9 @@ const actions = {
         id: { $set: id },
         // reset zoom back to default
         zoom: { $set: zoom },
-        activeNodeId: { $set: activeNodeId ? activeNodeId : baseNode.id }
+        activeNodeId: {
+          $set: activeNodeId ? activeNodeId : baseNode ? baseNode.id : null
+        }
       },
       documents: {
         [id]: {
@@ -114,7 +112,7 @@ const actions = {
   },
   createDocument: () => async ({ setState, getState }) => {
     const state = getState();
-    const document = await request("document", "POST");
+    const document = await API.request("document", "POST");
     const newState = update(state, {
       documents: {
         [document.id]: { $set: document }
@@ -134,7 +132,7 @@ const actions = {
     const { id, nodes, edges } = state.documents[state.currentDoc.id];
 
     //? Create default node and add it to nodes before update nodes positions
-    const [node, edge] = await request(
+    const [node, edge] = await API.request(
       "node",
       "POST",
       {},
@@ -179,7 +177,7 @@ const actions = {
 
     //? Sync with the server.
     try {
-      await request(`node/${nodeId}`, "PATCH", {}, { content: text });
+      await API.request(`node/${nodeId}`, "PATCH", {}, { content: text });
     } catch (error) {
       // TODO: do something!
     }
@@ -223,7 +221,7 @@ const actions = {
     const activeNodeId = edge ? edge.nodeA : null;
 
     try {
-      await request(`node/${nodeId}`, "DELETE");
+      await API.request(`node/${nodeId}`, "DELETE");
     } catch (error) {
       //TODO: something
     }

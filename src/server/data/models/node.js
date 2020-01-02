@@ -1,7 +1,5 @@
 import Model from "./_model";
 import Document from "./document";
-import Edge from "./edge";
-import update from "immutability-helper";
 
 class Node extends Model {
   static get table() {

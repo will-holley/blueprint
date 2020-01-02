@@ -1,91 +1,104 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 // Content Container Action Containers
 import { LeftActions, RightActions } from "client/layout/Actions";
 // Local UI Elements
 import { Title, HotkeyShortcutsContainer } from "./ui";
 // Global UI Elements
 import { EmojiButton } from "client/components/Buttons";
-// Data
-import useStore from "client/data/store";
+// Hooks
+import {
+  useDocumentPermissions,
+  useCurrentDocument,
+  findParentNodeId
+} from "client/data/selectors/document";
 // Hooks
 import { useHistory } from "react-router-dom";
 import { useHotkeys } from "client/utils/hooks";
-import { useKeyboardHotkeys } from "./events";
-
-const keyboardShortcuts = [
-  ["cmd + =", "zoom in"],
-  ["cmd + -", "zoom out"],
-  ["cmd + enter", "create base node"],
-  ["escape, with node selected", "de-select node"],
-  ["enter, with node selected", "create child node"],
-  ["cmd + shift + enter, with node selected", "create sibling node"],
-  ["cmd + delete", "delete node"],
-  ["cmd + arrow up", "move up"],
-  ["cmd + arrow down", "move down"],
-  ["cmd + arrow left", "move left"],
-  ["cmd + arrow right", "move right"],
-  ["cmd + k", "show/hide hotkeys"]
-];
+import useZoom from "./hotkeys/zoom";
+import useArrowNavigation from "./hotkeys/arrows";
+import useEscape from "./hotkeys/escape";
+import useBackspace from "./hotkeys/backspace";
+import useEnter from "./hotkeys/enter";
+import useDisableHotkeys from "./hotkeys/disable";
 
 const Actions = () => {
   const { push } = useHistory();
   const [
-    {
-      currentDoc: { id, zoom },
-      documents
-    },
+    { name, humanId, activeNodeId, id: docId },
     actions
-  ] = useStore();
-  const { name, humanId } = documents[id];
+  ] = useCurrentDocument();
+  const [permissions] = useDocumentPermissions();
 
-  //! Attach Node keyboard shortcuts
-  useKeyboardHotkeys();
+  //! ================
+  //! == Hotkey Map ==
+  //! ================
+
+  // TODO: wrap this up in a useEffect
+
+  const keyboardShortcuts = [
+    ["cmd + =", "zoom in"],
+    ["cmd + -", "zoom out"],
+    ["escape, with node selected", "de-select node"],
+    ["cmd + arrow up", "move up"],
+    ["cmd + arrow down", "move down"],
+    ["cmd + arrow left", "move left"],
+    ["cmd + arrow right", "move right"],
+    ["cmd + k", "show/hide hotkeys"]
+  ];
+
+  if (permissions.addNode) {
+    keyboardShortcuts.push(["cmd + enter", "create base node"]);
+    keyboardShortcuts.push(["enter, with node selected", "create child node"]);
+    keyboardShortcuts.push([
+      "cmd + shift + enter, with node selected",
+      "create sibling node"
+    ]);
+  }
+
+  if (!permissions.readOnly) {
+    keyboardShortcuts.push(["cmd + delete", "delete node"]);
+  }
+
+  //! ====================
+  //! == Attach Hotkeys ==
+  //! ====================
+  useZoom();
+  useArrowNavigation();
+  useEscape();
+  useBackspace();
+  useEnter();
+  useDisableHotkeys();
+
+  //* Auditing
+  ////useHotkeys("*", event => console.info(event)
 
   //! Hotkey Menu
-  const [showHotkeyMenu, setShowHotkeyMenu] = useState(true);
+  const [showHotkeyMenu, setShowHotkeyMenu] = useState(false);
   const toggleHotkeyMenu = event => setShowHotkeyMenu(!showHotkeyMenu);
   useHotkeys("cmd+k", toggleHotkeyMenu, [showHotkeyMenu]);
-
-  //! Zoom
-  const handleZoomIn = event => {
-    actions.zoomIn();
-    return false;
-  };
-
-  const handleZoomOut = event => {
-    actions.zoomOut();
-    return false;
-  };
-
-  const resetZoom = event => {
-    actions.resetZoom();
-    return false;
-  };
-
-  useHotkeys("cmd+=", handleZoomIn, [zoom]);
-  useHotkeys("cmd+-", handleZoomOut, [zoom]);
-
-  //! Navigation Handlers
-  const navigateToDashboard = () => push("/");
-
-  //! Event Handlers
-  const updateName = ({ target: { value } }) =>
-    actions.updateDocumentName(id, value);
 
   //! Render
   return (
     <>
       <LeftActions>
-        <EmojiButton onClick={navigateToDashboard}>🎨</EmojiButton>
-        {/* Hide the add button while the document does not support multiple base nodes. */}
-        <EmojiButton onClick={event => actions.addNode(null)}>🌀</EmojiButton>
-        <Title value={name !== null ? name : humanId} onChange={updateName} />
+        <EmojiButton onClick={() => push("/")}>🎨</EmojiButton>
+        {permissions.addNodes && (
+          <EmojiButton onClick={event => actions.addNode(null)}>🌀</EmojiButton>
+        )}
+        <Title
+          disabled={!permissions.editTitle}
+          value={name !== null ? name : humanId}
+          onChange={({ target: { value } }) =>
+            actions.updateDocumentName(id, value)
+          }
+        />
       </LeftActions>
       <RightActions>
         <EmojiButton onClick={toggleHotkeyMenu}>⌨️</EmojiButton>
-        <EmojiButton onClick={handleZoomIn}>➕</EmojiButton>
-        <EmojiButton onClick={resetZoom}>🔍</EmojiButton>
-        <EmojiButton onClick={handleZoomOut}>➖</EmojiButton>
+        <EmojiButton onClick={actions.zoomIn}>➕</EmojiButton>
+        <EmojiButton onClick={actions.resetZoom}>🔍</EmojiButton>
+        <EmojiButton onClick={actions.zoomOut}>➖</EmojiButton>
       </RightActions>
       {showHotkeyMenu && (
         <HotkeyShortcutsContainer>

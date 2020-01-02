@@ -28,20 +28,12 @@ const H5 = styled.h5`
 const P = styled.p``;
 
 const A = styled(Link)`
-  font-size: 16px;
-  font-weight: 400;
   text-decoration: none;
-  ${props =>
-    props.current &&
-    `
-		cursor:pointer;
-		border-bottom: 1px solid;
-	`}
+  cursor: pointer;
+  &:hover {
+    border-bottom: 1px solid inherit;
+  }
 `;
-
-A.propTypes = {
-  current: PropTypes.bool.isRequired
-};
 
 const Input = styled.input`
   font-size: 2rem;

@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 // Data
 import useStore from "client/data/store";
 // Components
-import { RightActions } from "client/layout/Actions";
+import { RightActions, ActionLink, ActionDivider } from "client/layout/Actions";
 import { EmojiButton } from "client/components/Buttons";
 
 const Actions = () => {
@@ -19,9 +19,20 @@ const Actions = () => {
 
   return (
     <RightActions>
-      <EmojiButton onClick={createDocument} disabled={disabled}>
-        ➕
-      </EmojiButton>
+      {state.user ? (
+        <>
+          <EmojiButton onClick={createDocument} disabled={disabled}>
+            ➕
+          </EmojiButton>
+          <ActionLink onClick={actions.logout}>Logout</ActionLink>
+        </>
+      ) : (
+        <>
+          <ActionLink to="/join">Join</ActionLink>
+          <ActionDivider>or</ActionDivider>
+          <ActionLink to="/login">Login</ActionLink>
+        </>
+      )}
     </RightActions>
   );
 };

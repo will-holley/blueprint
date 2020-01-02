@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { useOnClickOutside, useHotkeys } from "client/utils/hooks";
 // Data
 import useStore from "client/data/store";
+import { useDocumentPermissions } from "client/data/selectors/document";
 // Components
 import { Container, Text, NewChildButton } from "./ui";
 import { P } from "client/components/tags";
@@ -20,6 +21,8 @@ const Node = ({
   //! ============
   //! == CONFIG ==
   //! ============
+
+  const [permissions] = useDocumentPermissions();
 
   const [state, actions] = useStore();
 
@@ -70,9 +73,11 @@ const Node = ({
   useEffect(() => {
     const _el = textInput.current;
     if (isActive) {
-      // focus
+      //? Focus
       _el.focus();
-      // Set cursor to end of content
+      //? If this node cannot be edited, do not move cursor.
+      if (permissions.readOnly) return;
+      //? Set cursor to end of content
       if (_el.innerHTML.length) cursorToEnd();
     } else if (window.document.activeElement === _el) {
       // Programmatically de-focus if this element is not active
@@ -145,14 +150,17 @@ const Node = ({
           active={isActive}
           ref={textInput}
           onClick={handleClick}
-          contentEditable={true}
+          readOnly={permissions.readOnly}
+          contentEditable={!permissions.readOnly}
           suppressContentEditableWarning={true}
           onInput={handleTextInput}
           placeholder={"💭"}
         >
           {content}
         </Text>
-        {showButtons && <NewChildButton onClick={addChild}>➕</NewChildButton>}
+        {showButtons && !permissions.readOnly && (
+          <NewChildButton onClick={addChild}>➕</NewChildButton>
+        )}
       </Container>
     </>
   );
@@ -172,8 +180,8 @@ Node.propTypes = {
 };
 
 Node.defaultProps = {
-  dev: false,
-  showButtons: false
+  dev: true,
+  showButtons: true
 };
 
 export default Node;

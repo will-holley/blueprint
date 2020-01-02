@@ -26,7 +26,7 @@ const Text = styled.p`
   font-weight: bold;
   line-height: 1.25;
   text-align: center;
-  cursor: text;
+  cursor: ${({ readOnly }) => (readOnly ? "default" : "text")};
   &:empty:before {
     content: attr(placeholder);
     display: block;
@@ -38,7 +38,8 @@ const Text = styled.p`
 `;
 
 Text.propTypes = {
-  active: PropTypes.bool.isRequired
+  active: PropTypes.bool.isRequired,
+  readOnly: PropTypes.bool.isRequired
 };
 
 const NewChildButton = styled.a`

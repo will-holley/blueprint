@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import styled from "styled-components";
 import { Actions } from "client/layout/Actions";
 
@@ -11,6 +10,10 @@ const Title = styled.input`
   border-bottom: 1px dashed #e2e2e2;
   &:focus {
     outline: none;
+  }
+  &:disabled {
+    border-bottom: 0;
+    cursor: default;
   }
 `;
 

@@ -17,6 +17,13 @@ class Model {
   }
 
   /**
+   * Should this table include a human id field?
+   */
+  static get _hasHumanId() {
+    return true;
+  }
+
+  /**
    * @private
    */
   static _addFields(table) {
@@ -48,10 +55,12 @@ class Model {
         .primary()
         .defaultTo(db.raw("gen_random_uuid()"));
       //? Human Readable ID
-      table
-        .string("human_id")
-        .unique()
-        .notNullable();
+      if (_this._hasHumanId) {
+        table
+          .string("human_id")
+          .unique()
+          .notNullable();
+      }
       //? Timestamps
       table.timestamp("created_at").defaultTo(db.fn.now());
       table.timestamp("updated_at").defaultTo(db.fn.now());
