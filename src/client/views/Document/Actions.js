@@ -43,21 +43,12 @@ const Actions = () => {
     ["cmd + arrow down", "move down"],
     ["cmd + arrow left", "move left"],
     ["cmd + arrow right", "move right"],
-    ["cmd + k", "show/hide hotkeys"]
+    ["cmd + k", "show/hide hotkeys"],
+    ["cmd + enter", "create base node"],
+    ["enter, with node selected", "create child node"],
+    ["cmd + shift + enter, with node selected", "create sibling node"],
+    ["cmd + delete", "delete node"]
   ];
-
-  if (permissions.addNode) {
-    keyboardShortcuts.push(["cmd + enter", "create base node"]);
-    keyboardShortcuts.push(["enter, with node selected", "create child node"]);
-    keyboardShortcuts.push([
-      "cmd + shift + enter, with node selected",
-      "create sibling node"
-    ]);
-  }
-
-  if (!permissions.readOnly) {
-    keyboardShortcuts.push(["cmd + delete", "delete node"]);
-  }
 
   //! ====================
   //! == Attach Hotkeys ==
