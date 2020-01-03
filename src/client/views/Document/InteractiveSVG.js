@@ -106,9 +106,35 @@ const InteractiveSVG = ({ children, opacity }) => {
     setViewBoxX(-xOffset);
   }, [activeNodeId]);
 
+  //! Animate viewbox transitions
+  //$ viewBoxString gets used when mouse is down.  We don't want double
+  //$ animations.
   const viewBoxString = `${viewBoxX} ${viewBoxY} ${width} ${height}`;
-  //? DEV:
-  //console.log(`Viewbox: ${viewBoxString}`);
+  const viewBoxXRef = useRef();
+  const viewBoxYRef = useRef();
+  const heightRef = useRef();
+  const widthRef = useRef();
+  const viewBoxTransition = useSpring({
+    from: {
+      viewBox: `${viewBoxXRef.current ? viewBoxYRef.current : 0} ${
+        viewBoxYRef.current ? viewBoxYRef.current : 0
+      } ${widthRef.current ? widthRef.current : width} ${
+        heightRef.current ? heightRef.current : height
+      }`
+    },
+    to: { viewBox: viewBoxString }
+  });
+  useEffect(() => {
+    viewBoxXRef.current = viewBoxX;
+    viewBoxYRef.current = viewBoxY;
+    widthRef.current = width;
+    heightRef.current = height;
+  }, [
+    viewBoxXRef.current,
+    viewBoxYRef.current,
+    widthRef.current,
+    heightRef.current
+  ]);
 
   //! Animate Zoom
   const zoomRef = useRef(1);
@@ -122,12 +148,12 @@ const InteractiveSVG = ({ children, opacity }) => {
   });
   useEffect(() => {
     zoomRef.current = zoom;
-  });
+  }, [zoom]);
 
   return (
     <animated.svg
       ref={svg}
-      viewBox={viewBoxString}
+      viewBox={isPointerDown ? viewBoxString : viewBoxTransition.viewBox}
       style={{ width }}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}

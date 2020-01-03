@@ -1,7 +1,7 @@
 //* Libraries
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-import { Spring } from "react-spring/renderprops";
+import { Spring } from "react-spring";
 //* Hooks
 import { useOnClickOutside, useHotkeys } from "client/utils/hooks";
 //* Data
