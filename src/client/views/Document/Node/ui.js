@@ -19,7 +19,7 @@ Container.propTypes = {
 
 const Text = styled.p`
   color: ${({ active }) => (active ? "#1976D2" : "inherit")};
-  padding: 1rem;
+  padding: 1rem 0;
   height: auto;
   width: 100%;
   // * Constrain padding to text to make the entire container clickable.

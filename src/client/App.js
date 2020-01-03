@@ -23,7 +23,7 @@ const App = () => {
   return (
     <>
       <Head />
-      <ThemeProvider theme={light}>
+      <ThemeProvider theme={dark}>
         <GlobalStyle />
         <Router basename="/">
           <ContentContainer>
