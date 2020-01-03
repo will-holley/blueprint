@@ -1,11 +1,13 @@
+//* Libraries
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-// Hooks
+import { Spring } from "react-spring/renderprops";
+//* Hooks
 import { useOnClickOutside, useHotkeys } from "client/utils/hooks";
-// Data
+//* Data
 import useStore from "client/data/store";
 import { useDocumentPermissions } from "client/data/selectors/document";
-// Components
+//* Components
 import { Container, Text, NewChildButton } from "./ui";
 import { P } from "client/components/tags";
 
@@ -131,38 +133,41 @@ const Node = ({
   //! ============
 
   return (
-    <>
-      <Container
-        ref={el}
-        id={id}
-        width={300}
-        height={height}
-        y={y}
-        x={x}
-        dev={dev}
-      >
-        {dev && (
-          <small>
-            {humanId} - {id}
-          </small>
-        )}
-        <Text
-          active={isActive}
-          ref={textInput}
-          onClick={handleClick}
-          readOnly={permissions.readOnly}
-          contentEditable={!permissions.readOnly}
-          suppressContentEditableWarning={true}
-          onInput={handleTextInput}
-          placeholder={"💭"}
+    <Spring from={{ opacity: 0 }} to={{ opacity: 1 }}>
+      {props => (
+        <Container
+          style={props}
+          ref={el}
+          id={id}
+          width={300}
+          height={height}
+          y={y}
+          x={x}
+          dev={dev}
         >
-          {content}
-        </Text>
-        {showButtons && !permissions.readOnly && (
-          <NewChildButton onClick={addChild}>➕</NewChildButton>
-        )}
-      </Container>
-    </>
+          {dev && (
+            <small>
+              {humanId} - {id}
+            </small>
+          )}
+          <Text
+            active={isActive}
+            ref={textInput}
+            onClick={handleClick}
+            readOnly={permissions.readOnly}
+            contentEditable={!permissions.readOnly}
+            suppressContentEditableWarning={true}
+            onInput={handleTextInput}
+            placeholder={"💭"}
+          >
+            {content}
+          </Text>
+          {showButtons && !permissions.readOnly && (
+            <NewChildButton onClick={addChild}>➕</NewChildButton>
+          )}
+        </Container>
+      )}
+    </Spring>
   );
 };
 

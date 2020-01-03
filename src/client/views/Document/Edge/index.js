@@ -1,8 +1,9 @@
+//* Libraries
 import React from "react";
 import PropTypes from "prop-types";
-// Components
+//* Components
 import { Path } from "./ui";
-// Hooks
+//* Hooks
 import { useWindowSize } from "client/utils/hooks";
 
 const Edge = ({
