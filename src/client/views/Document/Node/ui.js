@@ -5,6 +5,7 @@ const Container = styled.foreignObject`
   height: ${({ height }) => height}px;
   width: ${({ width }) => width}px;
   cursor: default;
+  z-index: 2;
   ${({ dev }) => dev && "border: 1px solid black;"}
 `;
 
@@ -18,7 +19,7 @@ Container.propTypes = {
 
 const Text = styled.p`
   color: ${({ active }) => (active ? "#1976D2" : "inherit")};
-  padding: 2rem 0.75rem 0 0.75rem;
+  padding: 1rem;
   height: auto;
   width: 100%;
   // * Constrain padding to text to make the entire container clickable.
@@ -33,7 +34,7 @@ const Text = styled.p`
   &:empty:before {
     content: attr(placeholder);
     display: block;
-    font-size: 26px;
+    font-size: 32px;
   }
   &:focus {
     outline: none;
