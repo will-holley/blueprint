@@ -89,7 +89,7 @@ const Actions = () => {
           disabled={!permissions.editTitle}
           value={name !== null ? name : humanId}
           onChange={({ target: { value } }) =>
-            actions.updateDocumentName(id, value)
+            actions.updateDocumentName(docId, value)
           }
         />
       </LeftActions>
