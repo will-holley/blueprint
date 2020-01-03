@@ -4,10 +4,16 @@ import { Actions } from "client/layout/Actions";
 const Title = styled.input`
   display: inline-block;
   font-weight: 800;
-  font-size: 18px;
-  text-align: center;
+  font-size: 2rem;
+  letter-spacing: -0.03em;
+  padding-left: 0.5rem;
   border: 0;
   border-bottom: 1px dashed #e2e2e2;
+  width: ${({ value }) => {
+    const pixels = value.length * 15;
+    console.log(value.length);
+    return `${pixels}px`;
+  }};
   &:focus {
     outline: none;
   }

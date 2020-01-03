@@ -22,11 +22,14 @@ const Text = styled.p`
   height: auto;
   width: 100%;
   // * Constrain padding to text to make the entire container clickable.
-  font-size: 20px;
-  font-weight: bold;
-  line-height: 1.25;
   text-align: center;
   cursor: ${({ readOnly }) => (readOnly ? "default" : "text")};
+
+  // https://rsms.me/inter/dynmetrics/
+  font-size: 15px;
+  letter-spacing: -0.00879776em;
+  line-height: 21px;
+
   &:empty:before {
     content: attr(placeholder);
     display: block;

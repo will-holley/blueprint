@@ -180,8 +180,8 @@ Node.propTypes = {
 };
 
 Node.defaultProps = {
-  dev: true,
-  showButtons: true
+  dev: false,
+  showButtons: false
 };
 
 export default Node;

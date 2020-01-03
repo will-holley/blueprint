@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 // Components
 import GradientText from "client/components/GradientText";
-import { H1, H2, H3, H4 } from "client/components/tags";
+import { H1, H2, H3, P } from "client/components/tags";
 import { Container, Input, Button } from "./ui";
 import { RightActions, ActionLink, ActionDivider } from "client/layout/Actions";
 import Password from "./components/Password";
@@ -107,7 +107,7 @@ const Join = () => {
         {error && (
           <>
             <br />
-            <H4>{error}</H4>
+            <P>{error}</P>
           </>
         )}
         <br />

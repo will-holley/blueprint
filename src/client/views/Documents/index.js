@@ -8,7 +8,7 @@ import useStore from "client/data/store";
 // Components
 import { Container, DocumentInformation } from "./ui";
 import GradientText from "client/components/GradientText";
-import { H1, H3, H4 } from "client/components/tags";
+import { H1, H3, P } from "client/components/tags";
 import Actions from "./Actions";
 // Styles
 import { getRandomGradient } from "client/styles/gradients";
@@ -39,16 +39,16 @@ const Documents = () => {
                 <H1>{doc.name ? doc.name : doc.humanId}</H1>
               </GradientText>
               {/* <H3>tag1, tag2, tag3</H3> */}
-              <H4>
+              <P>
                 {doc.private
                   ? "For your eyes only 😎"
                   : `${ownedByUser ? "Yours - " : ""}Public 🥳`}
-              </H4>
-              <H4>
+              </P>
+              <P>
                 {Moment(doc.updatedAt)
                   .startOf("day")
                   .fromNow()}
-              </H4>
+              </P>
             </DocumentInformation>
           );
         })

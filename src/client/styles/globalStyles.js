@@ -8,6 +8,8 @@ import InterMediumWoffTwo from "./../static/fonts/inter/Inter-Medium.woff2";
 import InterMediumWoff from "./../static/fonts/inter/Inter-Medium.woff";
 import InterBoldWoffTwo from "./../static/fonts/inter/Inter-Bold.woff2";
 import InterBoldWoff from "./../static/fonts/inter/Inter-Bold.woff";
+import InterExtraBoldWoffTwo from "./../static/fonts/inter/Inter-ExtraBold.woff2";
+import InterExtraBoldWoff from "./../static/fonts/inter/Inter-ExtraBold.woff";
 import InterLightWoffTwo from "./../static/fonts/inter/Inter-Light-BETA.woff2";
 import InterLightWoff from "./../static/fonts/inter/Inter-Light-BETA.woff";
 import InterThinWoffTwo from "./../static/fonts/inter/Inter-Thin-BETA.woff2";
@@ -66,6 +68,14 @@ const GlobalStyle = createGlobalStyle`
       url('${InterBoldWoffTwo}') format('woff2'),
       url('${InterBoldWoff}') format('woff');
 	}
+	@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 800;
+    src:
+      url('${InterExtraBoldWoffTwo}') format('woff2'),
+      url('${InterExtraBoldWoff}') format('woff');
+	}
 
 	// Declarations
   html {
@@ -76,13 +86,18 @@ const GlobalStyle = createGlobalStyle`
   	box-sizing: inherit;
   	padding: 0;
   	margin: 0;
-  	font-family: 'Inter', sans-serif;
   	color: inherit;
   	-webkit-font-smoothing: antialiased;
   	-moz-osx-font-smoothing: grayscale;
 	}
 	body {
-		font-size: 1.6rem;
+		// Typography
+		font: 15px/22px 'Inter', system-ui, sans-serif;
+		letter-spacing: -0.004em;
+		font-kerning: normal;
+		font-variant-ligatures: contextual common-ligatures;
+		font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+
 		min-height: 100vh;
 		// Project Defaults ^
 		// Typography

@@ -6,6 +6,7 @@ const Container = styled.div`
 
 const DocumentInformation = styled.div`
   cursor: pointer;
+  margin-bottom: 4rem;
 `;
 
 export { Container, DocumentInformation };
