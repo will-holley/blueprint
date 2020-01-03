@@ -45,7 +45,7 @@ const ContentContainer = ({ children }) => {
       // After content has loaded
       setTimeout(() => actions.setLoading(false), 600);
     })();
-  }, [window.location.href, Boolean(user)]);
+  }, [Boolean(user)]);
 
   const transitions = useTransition(!loading, null, {
     from: {
