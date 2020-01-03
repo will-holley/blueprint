@@ -64,7 +64,6 @@
     "react-router-dom": "^5.1.2",
     "react-spring": "^8.0.27",
     "react-sweet-state": "^1.1.1",
-    "reselect": "^4.0.0",
     "styled-components": "^4.2.0",
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.3",
