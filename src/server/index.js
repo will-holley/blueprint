@@ -1,59 +1,59 @@
-// Imports
+//* Libraries
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
-import morgan from "morgan";
-// Data
-import db, { dbUrl } from "./data/db";
-import models from "./data/models";
-// Utils
-import logger from "./utils/logger";
-// API
+//* Database
+import db from "./data/db";
+//* Utils
+import logger, { httpLogger } from "./utils/logger";
+//* API
 import router from "./api/routes";
+//* Environment Variables
+const { SERVER_PORT } = process.env;
 
-//! Environment
-const { SERVER_PORT, NODE_ENV } = process.env;
-const isDev = NODE_ENV === "development";
-const FORCE_TABLES = false;
-
-//! Create server instance
+//? Create server instance
 const app = express();
 
-//! Attach Middleware
+//? Attach Middleware
 app.use(cors());
-app.use(morgan("tiny", { stream: logger.stream.write }));
+app.use(httpLogger);
 app.use(express.json());
 
-//! Attach API Router
+//? Attach API Router
 app.use("/api/1", router);
 
-async function connectDatabase() {
-  // If `FORCE_TABLES` is true, tables are deleted and recreated.
-  // Ensure this occurs within a single transaction to avoid deadlocks.
-  if (FORCE_TABLES && isDev) {
-    const commands = Object.values(models).map(
-      api => `DROP TABLE IF EXISTS ${api.schema}.${api.table} CASCADE;`
-    );
-    await db.raw(commands.join(""));
+/**
+ * Checks that the database is connected.
+ */
+async function validateDatabaseConnection() {
+  try {
+    const {
+      rows: [{ result }],
+      ...response
+    } = await db.raw("select 1+1 as result");
+    if (result === 2) {
+      logger.info("Database connection initialized");
+    } else {
+      throw new Error(response.toString());
+    }
+  } catch (error) {
+    logger.error(error);
+    throw error;
   }
-  // Create tables if they don't exist
-  Object.entries(models).forEach(async ([name, api]) => {
-    await api.createTable();
-  });
 }
 
-// TODO Check if any migrations need to be applied
-async function applyMigrations() {
-  return;
-}
-
+/**
+ * Starts Express server.
+ */
 async function startServer() {
   await app.listen(SERVER_PORT);
   logger.info(`Server live on localhost:${SERVER_PORT}`);
 }
 
 (async () => {
-  await connectDatabase();
-  await applyMigrations();
+  await validateDatabaseConnection();
   await startServer();
 })();
+
+//? Export for testing
+export default app;

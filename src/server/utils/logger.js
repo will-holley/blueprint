@@ -1,21 +1,37 @@
+//* Libraries
+import path from "path";
 import winston from "winston";
+import morgan from "morgan";
 const { format, transports } = winston;
 
 const logger = winston.createLogger({
   format: format.combine(format.timestamp(), format.prettyPrint()),
-  defaultMeta: {
-    env: process.env.NODE_ENV
-  },
-  transports: [new transports.Console()]
+  transports: []
 });
 
-// If we're not in production then log to the `console` with the format:
-// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-if (process.env.NODE_ENV !== "production") {
-  // TODO: pipe out!
-  // logger.add(new transports.Console({
-  //   format: format.simple()
-  // }));
+const env = process.env.NODE_ENV;
+let morganFormat = "tiny";
+
+if (env === "development") {
+  // Log to console
+  logger.add(new transports.Console());
+} else if (env === "test") {
+  // Write to log file
+  logger.add(
+    new transports.File({
+      filename: path.resolve(__dirname, "./../../../logs/server.test.log")
+    })
+  );
+} else if (env === "production") {
+  // Save to bucket
+  morganFormat = "combined";
 }
 
+const httpLogger = morgan(morganFormat, {
+  stream: {
+    write: (message, encoding) => logger.info(message)
+  }
+});
+
 export default logger;
+export { httpLogger };
