@@ -1,7 +1,12 @@
+import React from "react";
 import styled from "styled-components";
 import { Actions } from "client/layout/Actions";
 
-const Title = styled.input`
+/**
+ * Memoize so pixels is not being recomputed every time an updated
+ * is made to the parent document.
+ */
+const Title = React.memo(styled.input`
   display: inline-block;
   font-weight: 800;
   font-size: 2rem;
@@ -11,7 +16,6 @@ const Title = styled.input`
   border-bottom: 1px dashed #e2e2e2;
   width: ${({ value }) => {
     const pixels = value.length * 15;
-    console.log(value.length);
     return `${pixels}px`;
   }};
   &:focus {
@@ -21,7 +25,7 @@ const Title = styled.input`
     border-bottom: 0;
     cursor: default;
   }
-`;
+`);
 
 const ActionInfo = styled(Actions)`
   top: unset;
