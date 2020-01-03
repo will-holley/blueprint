@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
+import { useSpring, animated } from "react-spring";
 import styled from "styled-components";
 import { useCurrentDocument } from "client/data/selectors/document";
-import { useWindowSize } from "client/utils/hooks";
+import { useWindowSize, useWhyDidYouUpdate } from "client/utils/hooks";
 
-const Group = styled.g.attrs(({ zoom }) => ({
-  transform: `scale(${zoom})`
-}))`
+const Group = styled(animated.g)`
   opacity: ${({ opacity }) => opacity && opacity};
 `;
 
@@ -86,10 +85,6 @@ const InteractiveSVG = ({ children, opacity }) => {
     setViewBoxY(viewBoxY - (y - pointerOriginY));
   };
 
-  const viewBoxString = `${viewBoxX} ${viewBoxY} ${width} ${height}`;
-  //? DEV:
-  //console.log(`Viewbox: ${viewBoxString}`);
-
   //! Activating a node centers it.
   useEffect(() => {
     // By default there is no active node until the user creates
@@ -111,29 +106,45 @@ const InteractiveSVG = ({ children, opacity }) => {
     setViewBoxX(-xOffset);
   }, [activeNodeId]);
 
+  const viewBoxString = `${viewBoxX} ${viewBoxY} ${width} ${height}`;
+  //? DEV:
+  //console.log(`Viewbox: ${viewBoxString}`);
+
+  //! Animate Zoom
+  const zoomRef = useRef(1);
+  const animatedZoom = useSpring({
+    from: {
+      transform: `scale(${zoomRef.current})`
+    },
+    to: {
+      transform: `scale(${zoom})`
+    }
+  });
+  useEffect(() => {
+    zoomRef.current = zoom;
+  });
+
   return (
-    <>
-      <svg
-        ref={svg}
-        viewBox={viewBoxString}
-        style={{ width }}
-        onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
-        onPointerMove={handlePointerMove}
-        onMouseDown={handlePointerDown}
-        onMouseUp={handlePointerUp}
-        onMouseLeave={handlePointerUp}
-        onMouseMove={handlePointerMove}
-        onTouchStart={handlePointerDown}
-        onTouchEnd={handlePointerUp}
-        onTouchMove={handlePointerMove}
-      >
-        <Group zoom={zoom} ref={group} opacity={opacity}>
-          {children}
-        </Group>
-      </svg>
-    </>
+    <animated.svg
+      ref={svg}
+      viewBox={viewBoxString}
+      style={{ width }}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+      onPointerMove={handlePointerMove}
+      onMouseDown={handlePointerDown}
+      onMouseUp={handlePointerUp}
+      onMouseLeave={handlePointerUp}
+      onMouseMove={handlePointerMove}
+      onTouchStart={handlePointerDown}
+      onTouchEnd={handlePointerUp}
+      onTouchMove={handlePointerMove}
+    >
+      <Group style={animatedZoom} ref={group} opacity={opacity}>
+        {children}
+      </Group>
+    </animated.svg>
   );
 };
 
