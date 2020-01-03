@@ -8,8 +8,8 @@ function dagger(nodes, edges) {
   // Set up graph
   g.setGraph({
     rankDir: "TB",
-    nodesep: 100,
-    ranksep: 100
+    nodesep: 15,
+    ranksep: 25
   });
 
   // Default to assigning a new object as a label for each new edge.
