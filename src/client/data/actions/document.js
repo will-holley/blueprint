@@ -1,4 +1,7 @@
+//* Libraries
 import update from "immutability-helper";
+import { useHistory } from "react-router-dom";
+//* API
 import API from "client/utils/api";
 
 //TODO: go through actions and use `dispatch` to decompose them,
@@ -60,6 +63,8 @@ const actions = {
       return;
     }
     //? Look up the id which corresponds to this human id
+    //! NOTE: if a user tries to load a document that no longer exists, the following
+    //! line will break because `Object.entries()` will not return an iterable.
     const [id, _] = Object.entries(state.documents).find(
       ([id, doc]) => doc.humanId === humanId
     );
