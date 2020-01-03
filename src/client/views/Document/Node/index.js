@@ -22,7 +22,7 @@ const Node = ({
   //! == CONFIG ==
   //! ============
 
-  const [permissions] = useDocumentPermissions();
+  const permissions = useDocumentPermissions();
 
   const [state, actions] = useStore();
 

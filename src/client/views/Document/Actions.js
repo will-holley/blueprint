@@ -9,8 +9,7 @@ import { EmojiButton } from "client/components/Buttons";
 // Hooks
 import {
   useDocumentPermissions,
-  useCurrentDocument,
-  findParentNodeId
+  useCurrentDocument
 } from "client/data/selectors/document";
 // Hooks
 import { useHistory } from "react-router-dom";
@@ -28,7 +27,7 @@ const Actions = () => {
     { name, humanId, activeNodeId, id: docId },
     actions
   ] = useCurrentDocument();
-  const [permissions] = useDocumentPermissions();
+  const permissions = useDocumentPermissions();
 
   //! ================
   //! == Hotkey Map ==

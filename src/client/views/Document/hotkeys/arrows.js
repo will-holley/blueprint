@@ -1,8 +1,6 @@
 import { useHotkeys } from "client/utils/hooks";
-import {
-  useCurrentDocument,
-  findParentNodeId
-} from "client/data/selectors/document";
+import { useCurrentDocument } from "client/data/selectors/document";
+import { findParentNodeId } from "./utils";
 
 // TODO: activeNodeId isn't updating!
 const useArrowNavigation = () => {
@@ -11,7 +9,7 @@ const useArrowNavigation = () => {
   function up(event) {
     if (!activeNodeId) return;
     //? Determine if there is an edge where this node is the target
-    const [parentId] = findParentNodeId();
+    const parentId = findParentNodeId(activeNodeId, edges);
     // If active node is not a base node, navigate to its parent.
     if (parentId) actions.setActiveNode(parentId);
   }
@@ -36,7 +34,7 @@ const useArrowNavigation = () => {
    */
   const handleHorizontalNavigation = computeNextIndex => {
     if (!activeNodeId) return;
-    const [parentId] = findParentNodeId();
+    const parentId = findParentNodeId(activeNodeId, edges);
     const siblingIds = Object.values(edges)
       .filter(({ nodeA }) => parentId === nodeA)
       .map(({ nodeB }) => nodeB);
@@ -61,7 +59,7 @@ const useArrowNavigation = () => {
    * active, set the leftmost node as active.
    */
   function computeRight(index, levelIds) {
-    index + 1 <= levelIds.length - 1 ? index + 1 : 0;
+    return index + 1 <= levelIds.length - 1 ? index + 1 : 0;
   }
   function right(event) {
     handleHorizontalNavigation(computeRight);

@@ -17,8 +17,6 @@ const Group = styled.g.attrs(({ zoom }) => ({
 const InteractiveSVG = ({ children, opacity }) => {
   const [{ activeNodeId, zoom }, actions] = useCurrentDocument();
 
-  console.log(activeNodeId);
-
   //! Get the window size.  It is used to set <svg> dimensions.
   const { height, width } = useWindowSize();
 

@@ -14,6 +14,7 @@ import dagger from "./layouts/dagre";
 
 const Document = () => {
   const [currentDocument, actions] = useCurrentDocument();
+
   /**
    * Wait until nodes have rendered to display them.
    */

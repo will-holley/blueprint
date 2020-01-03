@@ -1,14 +1,12 @@
 import { useHotkeys } from "client/utils/hooks";
-import {
-  useCurrentDocument,
-  findParentNodeId
-} from "client/data/selectors/document";
+import { useCurrentDocument } from "client/data/selectors/document";
+import { findParentNodeId } from "./utils";
 
 /**
  * Delete a node.  Deletes all nodes underneath it.
  */
 const useEnter = () => {
-  const [{ activeNodeId }, actions] = useCurrentDocument();
+  const [{ activeNodeId, edges }, actions] = useCurrentDocument();
 
   function newBaseNode() {
     if (!activeNodeId) actions.addNode(null);
@@ -16,7 +14,7 @@ const useEnter = () => {
 
   function newSiblingNode() {
     if (activeNodeId) {
-      const [parentId] = findParentNodeId();
+      const parentId = findParentNodeId(activeNodeId, edges);
       actions.addNode(parentId);
     }
     return false;
