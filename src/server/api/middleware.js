@@ -14,10 +14,23 @@ const useJWT = jwt({
   }
 });
 
+const handleInvalidJWT = (err, req, res, next) => {
+  if (err.code === "invalid_token") {
+    res.status(401);
+    return res.send({
+      error: {
+        expired: err.inner.name === "TokenExpiredError",
+        message: "invalid token"
+      }
+    });
+  }
+  next();
+};
+
 // Protected routes can only be accessed by logged in users
 const requiresAuthentication = (req, res, next) => {
   if (!req.user) return res.sendStatus(403);
   next();
 };
 
-export { useJWT, requiresAuthentication };
+export { useJWT, requiresAuthentication, handleInvalidJWT };

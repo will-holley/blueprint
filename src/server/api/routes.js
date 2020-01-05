@@ -5,7 +5,7 @@ import nodeRouter from "./node";
 import documentRouter from "./document";
 import userRouter from "./user";
 // Middleware
-import { useJWT } from "./middleware";
+import { useJWT, handleInvalidJWT } from "./middleware";
 
 //$ Router Setup
 const router = express({
@@ -19,6 +19,7 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 // jwt for auth
 router.use(useJWT);
+router.use(handleInvalidJWT);
 
 //$ Health check the API
 router.get("/", (req, res) => res.sendStatus(200));

@@ -6,7 +6,7 @@ const actions = {
    * On application load, if there is a jwt token, load the
    * currently logged in user.
    */
-  loadUser: () => async ({ setState, getState }) => {
+  loadUser: () => async ({ setState, getState, dispatch }) => {
     const state = getState();
     //? If the API has not been authenticated, there is nothing to request.
     //? If there is already a user in the state, don't re-request.
@@ -14,7 +14,10 @@ const actions = {
     //? Fetch the user's information.
     try {
       const response = await API.request("/user", "get");
-      if (response.id) {
+      //? Check if the token has expired.
+      if (response.error && response.error.expired) {
+        return dispatch(actions.logout());
+      } else if (response.hasOwnProperty("id")) {
         // TODO: load private documents
         setState({ user: response });
       }
