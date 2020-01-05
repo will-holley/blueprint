@@ -8,10 +8,11 @@ const host = process.env[`${env}_DATABASE_HOST`];
 const name = process.env[`${env}_DATABASE_NAME`];
 const password = process.env[`${env}_DATABASE_PASSWORD`];
 const user = process.env[`${env}_DATABASE_USER`];
+const connection = `postgres://${user}:${password}@${host}:5432/${name}`;
 
 const db = knex({
   client: "pg",
-  connection: `postgres://${user}:${password}@${host}:5432/${name}`,
+  connection,
   // the default settings:
   pool: {
     min: 2,

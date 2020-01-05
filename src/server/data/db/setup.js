@@ -25,17 +25,22 @@ async function createExtensionsAndFunctions() {
   }
 }
 
+async function dropTables() {
+  //? This cannot run in production.
+  if (process.env.NODE_ENV === "production") return;
+  //? Drop
+  const commands = Object.values(models).map(
+    api => `DROP TABLE IF EXISTS ${api.schema}.${api.table} CASCADE;`
+  );
+  await db.raw(commands.join(""));
+}
+
 async function createTables(force = false) {
-  if (force && process.env.NODE_ENV !== "production") {
-    const commands = Object.values(models).map(
-      api => `DROP TABLE IF EXISTS ${api.schema}.${api.table} CASCADE;`
-    );
-    await db.raw(commands.join(""));
-  }
+  if (force) await dropTables();
   // Create tables if they don't exist
   Object.entries(models).forEach(async ([name, api]) => {
     await api.createTable();
   });
 }
 
-export { createExtensionsAndFunctions, createTables };
+export { createExtensionsAndFunctions, createTables, dropTables };

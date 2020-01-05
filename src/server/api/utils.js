@@ -22,6 +22,7 @@ const registrationValidation = Joi.object({
     .max(30)
     .required(),
   email: emailRules,
+  //TODO: this is temporary!
   password: passwordRules.pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
 });
 
