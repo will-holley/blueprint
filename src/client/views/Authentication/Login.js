@@ -8,12 +8,13 @@ import Password from "./components/Password";
 // Hooks
 import { useTransition, animated } from "react-spring";
 import { useHistory } from "react-router-dom";
-// Data
-import useStore from "client/data/store";
+//* Redux
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { login } from "client/data/services/user/actions";
 
-const Login = () => {
+const Login = ({ loginHandler }) => {
   const { push } = useHistory();
-  const [_, actions] = useStore();
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
 
@@ -27,7 +28,7 @@ const Login = () => {
   const submit = async event => {
     setError(null);
     setLoading(true);
-    const response = await actions.login(email, password);
+    const response = await loginHandler(email, password);
     if (response && response.error) {
       setError(response.error);
       setLoading(false);
@@ -88,4 +89,12 @@ const Login = () => {
   );
 };
 
-export default Login;
+Login.propTypes = {
+  loginHandler: PropTypes.func.isRequired
+};
+
+const mapDispatchToProps = dispatch => ({
+  loginHandler: async (email, password) => dispatch(login(email, password))
+});
+
+export default connect(null, mapDispatchToProps)(Login);

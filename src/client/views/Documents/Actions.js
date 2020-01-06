@@ -1,30 +1,35 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
-// Data
-import useStore from "client/data/store";
+// Redux
+import { connect } from "react-redux";
+import { logout } from "client/data/services/user/actions";
+import { createDocument } from "client/data/services/document/actions";
 // Components
 import { RightActions, ActionLink, ActionDivider } from "client/layout/Actions";
 import { EmojiButton } from "client/components/Buttons";
 
-const Actions = () => {
-  const [state, actions] = useStore();
+const Actions = ({ isLoggedIn, ...props }) => {
   const [disabled, setDisabled] = useState(false);
   const { push } = useHistory();
 
-  const createDocument = async () => {
+  const handleDocumentCreationButtonClick = async () => {
     setDisabled(true);
-    const humanId = await actions.createDocument();
+    const humanId = await props.createDocument();
     push(`d/${humanId}`);
   };
 
   return (
     <RightActions>
-      {state.user ? (
+      {isLoggedIn ? (
         <>
-          <EmojiButton onClick={createDocument} disabled={disabled}>
+          <EmojiButton
+            onClick={handleDocumentCreationButtonClick}
+            disabled={disabled}
+          >
             ➕
           </EmojiButton>
-          <ActionLink onClick={actions.logout}>Logout</ActionLink>
+          <ActionLink onClick={props.logout}>Logout</ActionLink>
         </>
       ) : (
         <>
@@ -37,4 +42,19 @@ const Actions = () => {
   );
 };
 
-export default Actions;
+Actions.propTypes = {
+  isLoggedIn: PropTypes.bool.isRequired,
+  createDocument: PropTypes.func.isRequired,
+  logout: PropTypes.func.isRequired
+};
+Actions.defaultProps = {};
+
+const mapStateToProps = ({ user: { id } }, ownProps) => ({
+  isLoggedIn: Boolean(id)
+});
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  logout: () => dispatch(logout()),
+  createDocument: async () => dispatch(createDocument())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Actions);

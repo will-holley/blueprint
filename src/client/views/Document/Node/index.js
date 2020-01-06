@@ -2,14 +2,20 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Spring } from "react-spring";
+import { useSelector, connect } from "react-redux";
 //* Hooks
 import { useOnClickOutside, useHotkeys } from "client/utils/hooks";
-//* Data
-import useStore from "client/data/store";
-import { useDocumentPermissions } from "client/data/selectors/document";
+//* Selectors
+import { documentPermissionsSelector } from "client/data/selectors/document";
 //* Components
 import { Container, Text, NewChildButton } from "./ui";
 import { P } from "client/components/tags";
+//* Actions
+import {
+  addNode,
+  setActiveNode,
+  updateNodeText
+} from "client/data/services/document/actions";
 
 const Node = ({
   id,
@@ -18,18 +24,19 @@ const Node = ({
   contentType,
   content,
   dev,
-  showButtons
+  showButtons,
+  // Redux
+  isActive,
+  addChildNode,
+  handleClickOutside,
+  setAsActive,
+  updateText
 }) => {
   //! ============
   //! == CONFIG ==
   //! ============
 
-  const permissions = useDocumentPermissions();
-
-  const [state, actions] = useStore();
-
-  //* Determine if this node is active
-  const isActive = state.currentDoc.activeNodeId === id;
+  const permissions = useSelector(documentPermissionsSelector);
 
   //* Ref used for tracking container height.
   const el = useRef(null);
@@ -93,30 +100,23 @@ const Node = ({
   //! ====================
 
   /**
-   * Adds a new child node.
-   * @param {Object} event
-   */
-  const addChild = event => actions.addNode(id);
-
-  /**
    * Controlled input logic that updates the Node's text as the user changes it.
    * Also updates node height in state if number of text lines has changed.
    * @param {Object} event
    */
   const handleTextInput = async ({ target: { innerText } }) => {
     //* Track text area size.
-    await actions.updateNodeText(id, innerText);
+    await updateText(innerText);
     //* Ensure the cursor remains at the end of the value
     cursorToEnd();
   };
 
-  const handleClick = event => actions.setActiveNode(id);
-
   /**
    * If this node is current active, set it as inactive
    */
-  useOnClickOutside(el, () => {
-    if (isActive) actions.setActiveNode(null);
+  useOnClickOutside(el, event => {
+    if (!isActive) return;
+    handleClickOutside();
   });
 
   //! =============
@@ -153,7 +153,7 @@ const Node = ({
           <Text
             active={isActive}
             ref={textInput}
-            onClick={handleClick}
+            onClick={setAsActive}
             readOnly={permissions.readOnly}
             contentEditable={!permissions.readOnly}
             suppressContentEditableWarning={true}
@@ -163,7 +163,7 @@ const Node = ({
             {content}
           </Text>
           {showButtons && !permissions.readOnly && (
-            <NewChildButton onClick={addChild}>➕</NewChildButton>
+            <NewChildButton onClick={addChildNode}>➕</NewChildButton>
           )}
         </Container>
       )}
@@ -181,12 +181,35 @@ Node.propTypes = {
   contentType: PropTypes.string.isRequired,
   content: PropTypes.string,
   dev: PropTypes.bool.isRequired,
-  showButtons: PropTypes.bool.isRequired
+  showButtons: PropTypes.bool.isRequired,
+  // Redux
+  isActive: PropTypes.bool.isRequired,
+  addChildNode: PropTypes.func.isRequired,
+  handleClickOutside: PropTypes.func.isRequired,
+  setAsActive: PropTypes.func.isRequired,
+  updateText: PropTypes.func.isRequired
 };
 
 Node.defaultProps = {
-  dev: false,
+  dev: true,
   showButtons: false
 };
 
-export default Node;
+const mapStateToProps = (
+  {
+    documents: {
+      active: { activeNodeId }
+    }
+  },
+  { id }
+) => ({
+  isActive: activeNodeId === id
+});
+const mapDispatchToProps = (dispatch, { id }) => ({
+  addChildNode: () => dispatch(addNode(id)),
+  handleClickOutside: () => dispatch(setActiveNode(null)),
+  setAsActive: () => dispatch(setActiveNode(id)),
+  updateText: async text => dispatch(updateNodeText(id, text))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Node);

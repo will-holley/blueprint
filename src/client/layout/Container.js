@@ -7,8 +7,11 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTransition, animated } from "react-spring";
-//* Hooks
-import useStore from "client/data/store";
+//* Redux
+import { connect } from "react-redux";
+import { loadUser } from "client/data/services/user/actions";
+import { populateAllDocuments } from "client/data/services/document/actions";
+import { setLoading } from "client/data/services/ui/actions";
 //* Components
 import GradientText from "client/components/GradientText";
 import { H1 } from "client/components/tags";
@@ -25,27 +28,17 @@ const Container = styled.div`
   //background: conic-gradient(#fff 90deg, #000 2turn);
 `;
 
-const ContentContainer = ({ children }) => {
-  const [
-    {
-      ui: { loading },
-      user
-    },
-    actions
-  ] = useStore();
-
+const ContentContainer = ({ children, loading, userIsLoggedIn, onLoad }) => {
   /**
    * Load any data which should be populated in application
    * on initialization and when the authentication state changes.
+   * TODO: fix -- this is loading twice!
    */
   useEffect(() => {
     (async () => {
-      await actions.loadUser();
-      await actions.populateAllDocuments();
-      // After content has loaded
-      setTimeout(() => actions.setLoading(false), 600);
+      await onLoad();
     })();
-  }, [Boolean(user)]);
+  }, [userIsLoggedIn]);
 
   const transitions = useTransition(!loading, null, {
     from: {
@@ -77,6 +70,24 @@ const ContentContainer = ({ children }) => {
   );
 };
 
-ContentContainer.propTypes = { children: PropTypes.node.isRequired };
+ContentContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+  loading: PropTypes.bool.isRequired,
+  userIsLoggedIn: PropTypes.bool.isRequired,
+  onLoad: PropTypes.func.isRequired
+};
 
-export default ContentContainer;
+const mapStateToProps = ({ ui: { loading }, user: { id } }, ownProps) => ({
+  loading,
+  userIsLoggedIn: Boolean(id)
+});
+
+const mapDispatchToProps = dispatch => ({
+  onLoad: async () => {
+    await dispatch(loadUser());
+    await dispatch(populateAllDocuments());
+    setTimeout(() => dispatch(setLoading(false)), 600);
+  }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContentContainer);

@@ -1,13 +1,20 @@
+//* libraries
+import { useSelector, useDispatch } from "react-redux";
+//* actions
+import { deleteNode } from "client/data/services/document/actions";
+//* hooks
 import { useHotkeys } from "client/utils/hooks";
-import { useCurrentDocument } from "client/data/selectors/document";
+//* selectors
+import { activeDocumentSelector } from "client/data/selectors/document";
 
 /**
  * Delete a node.  Deletes all nodes underneath it.
  */
 const useBackspace = () => {
-  const [{ activeNodeId }, actions] = useCurrentDocument();
+  const dispatch = useDispatch();
+  const { activeNodeId } = useSelector(activeDocumentSelector);
   const handler = () => {
-    if (activeNodeId) actions.deleteNode(activeNodeId);
+    if (activeNodeId) dispatch(deleteNode(activeNodeId));
     return false;
   };
   useHotkeys("cmd+backspace", handler, [activeNodeId]);

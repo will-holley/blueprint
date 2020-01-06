@@ -1,29 +1,42 @@
-import {
-  createStore,
-  createSubscriber,
-  createHook,
-  defaults
-} from "react-sweet-state";
-// State
-import initialState from "./state";
-// Actions
-import { default as docActions } from "./actions/document";
-import { default as uiActions } from "./actions/ui";
-import { default as userActions } from "./actions/user";
+//* Libraries
+import { applyMiddleware, compose, createStore } from "redux";
+import { createBrowserHistory } from "history";
+import thunk from "redux-thunk";
+import { routerMiddleware } from "connected-react-router";
+//* Configuration
+import createRootReducer from "./rootReducer";
+import { initialState as uiState } from "./services/ui/reducer";
+import { initialState as apiState } from "./services/api/reducer";
+import { initialState as userState } from "./services/user/reducer";
+import { initialState as documentState } from "./services/document/reducer";
 
-// Config
-defaults.devtools = process.env.NODE_ENV == "development";
+//? Compose the initial state
+const initialState = {
+  ui: uiState,
+  api: apiState,
+  user: userState,
+  documents: documentState
+};
 
-const actions = [docActions, uiActions, userActions];
+const history = createBrowserHistory();
+const enhancers = [];
+const middleware = [thunk, routerMiddleware(history)];
 
-const store = createStore({
+//? Add Redux Dev Tools in development
+if (process.env.NODE_ENV === "development") {
+  const devToolsExtension = window.__REDUX_DEVTOOLS_EXTENSION__;
+  if (typeof devToolsExtension === "function") {
+    enhancers.push(devToolsExtension());
+  }
+}
+
+const composedEnhancers = compose(applyMiddleware(...middleware), ...enhancers);
+
+const store = createStore(
+  createRootReducer(history),
   initialState,
-  actions: Object.assign({}, ...actions),
-  name: "globalStore"
-});
+  composedEnhancers
+);
 
-//const Store = createSubscriber(store);
-const useStore = createHook(store);
-
-export default useStore;
-export { store };
+export default store;
+export { history };

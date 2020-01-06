@@ -7,6 +7,7 @@ const Container = styled.div`
 const Input = styled.input`
   font-size: 24px;
   border: 0;
+  background: transparent;
   &:focus {
     outline: 0;
   }

@@ -3,32 +3,32 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import Moment from "moment";
-// Data
-import useStore from "client/data/store";
+import { connect } from "react-redux";
+//* Redux Actions
+import { setActiveDocument } from "client/data/services/document/actions";
 // Components
 import { Container, DocumentInformation } from "./ui";
 import GradientText from "client/components/GradientText";
 import { H1, H3, P } from "client/components/tags";
 import Actions from "./Actions";
+
 // Styles
 import { getRandomGradient } from "client/styles/gradients";
 
-const Documents = () => {
-  const [{ documents, user }, actions] = useStore();
+const Documents = ({ allDocs, activeDocId, userId }) => {
   const { push } = useHistory();
 
-  const documentsExist = Object.keys(documents).length;
-
   useEffect(() => {
-    actions.setActiveDocument(null);
-  }, []);
+    // Clear any active document
+    if (activeDocId) setActiveDocument(null);
+  }, [activeDocId]);
 
   return (
     <Container>
       <Actions />
-      {documentsExist ? (
-        Object.entries(documents).map(([id, doc]) => {
-          const ownedByUser = user ? user.id === doc.createdBy : false;
+      {allDocs.length ? (
+        allDocs.map(([id, doc]) => {
+          const ownedByUser = userId ? userId === doc.createdBy : false;
           const gradient = getRandomGradient();
           return (
             <DocumentInformation
@@ -52,7 +52,7 @@ const Documents = () => {
             </DocumentInformation>
           );
         })
-      ) : user ? (
+      ) : userId ? (
         <GradientText>
           <H1>Click ➕ to start</H1>
         </GradientText>
@@ -63,7 +63,17 @@ const Documents = () => {
   );
 };
 
-Documents.propTypes = {};
+Documents.propTypes = {
+  allDocs: PropTypes.array.isRequired,
+  activeDocId: PropTypes.string,
+  userId: PropTypes.string
+};
 Documents.defaultProps = {};
 
-export default Documents;
+const mapStateToProps = ({ documents, user }, ownProps) => ({
+  allDocs: Object.entries(documents.all),
+  activeDocId: documents.active.id,
+  userId: user.id
+});
+
+export default connect(mapStateToProps)(Documents);

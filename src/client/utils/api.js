@@ -61,7 +61,7 @@ class APISingleton {
       });
       return response.data;
     } catch (error) {
-      return error.response.data;
+      return error && error.response ? error.response.message : error;
     }
   }
 }

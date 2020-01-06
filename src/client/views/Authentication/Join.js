@@ -8,12 +8,13 @@ import Password from "./components/Password";
 // Hooks
 import { useTransition, animated } from "react-spring";
 import { useHistory } from "react-router-dom";
-// Data
-import useStore from "client/data/store";
+//* Redux
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { join } from "client/data/services/user/actions";
 
-const Join = () => {
+const Join = ({ joinHandler }) => {
   const { push } = useHistory();
-  const [_, actions] = useStore();
 
   //? Set up state variables
   const [name, setName] = useState(null);
@@ -39,9 +40,8 @@ const Join = () => {
   const submit = async event => {
     setError(null);
     setLoading(true);
-    const response = await actions.join(name, email, password);
+    const response = await joinHandler(name, email, password);
     if (response && response.error) {
-      console.error(response);
       setError(response.error);
       setLoading(false);
     } else {
@@ -128,4 +128,13 @@ const Join = () => {
   );
 };
 
-export default Join;
+Join.propTypes = {
+  joinHandler: PropTypes.func.isRequired
+};
+
+const mapDispatchToProps = dispatch => ({
+  joinHandler: async (name, email, password) =>
+    dispatch(join(name, email, password))
+});
+
+export default connect(null, mapDispatchToProps)(Join);

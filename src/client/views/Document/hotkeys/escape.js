@@ -1,12 +1,16 @@
+//* libraries
+import { useDispatch } from "react-redux";
+//* hooks
 import { useHotkeys } from "client/utils/hooks";
-import { useCurrentDocument } from "client/data/selectors/document";
+//* actions
+import { setActiveNode } from "client/data/services/document/actions";
 
 /**
  * Deactivate all nodes
  */
 const useEscape = () => {
-  const [, actions] = useCurrentDocument();
-  const handler = () => actions.setActiveNode(null);
+  const dispatch = useDispatch();
+  const handler = () => dispatch(setActiveNode(null));
   useHotkeys("Escape", handler);
 };
 

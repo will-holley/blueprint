@@ -50,7 +50,11 @@ module.exports = {
     new EnvironmentPlugin(["API_ADDRESS"]),
     new HtmlWebPackPlugin({
       hash: true,
-      template: path.resolve(__dirname, "../src/client", "index.html")
+      template: path.resolve(__dirname, "../src/client", "index.html"),
+      meta: {
+        viewport:
+          "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no"
+      }
     })
   ],
   output: {

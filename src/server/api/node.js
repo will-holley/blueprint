@@ -71,28 +71,31 @@ router.patch("/:id", requiresAuthentication, async function updateNode(
 /**
  * Delete node, all child nodes, and all edges pointing to this node.
  * TODO: get this down to 1 query with a recursive delete + join!
+ * TODO: fix a bug where this returns way more nodes / edges than are being deleted
  */
 router.delete("/:id", requiresAuthentication, async function deleteNode(
   { params: { id } },
   res
 ) {
   try {
-    //? Get edge ids
+    // Get edge ids
     const { rows } = await db.raw(`
     WITH RECURSIVE sub_tree AS (
-      SELECT id, node_a, node_b, 1 AS relative_depth
+      SELECT id, node_a, node_b, deleted_at, 1 AS relative_depth
       FROM edge
       WHERE node_a = '${id}'
 
       UNION ALL
 
-      SELECT e.id, e.node_a, e.node_b, st.relative_depth + 1
+      SELECT e.id, e.node_a, e.node_b, e.deleted_at, st.relative_depth + 1
       FROM edge e, sub_tree st
-      WHERE e.node_a = st.node_b
+      WHERE e.node_a = st.node_b AND e.deleted_at IS NOT NULL
     )
     SELECT * FROM sub_tree;
     `);
-    //? Gather all of the node ids
+    let edgeIds = rows.map(({ id }) => id);
+
+    // Gather all of the node ids
     const nodeIds = new Set();
     nodeIds.add(id);
     if (rows) {
@@ -100,21 +103,31 @@ router.delete("/:id", requiresAuthentication, async function deleteNode(
         nodeIds.add(node_a);
         nodeIds.add(node_b);
       });
-      //? Delete Edges
-      await db(Edge.table)
-        .whereIn(
-          "id",
-          rows.map(({ id }) => id)
-        )
-        //$ Include the parent edge of this node
+
+      // Update `edges.deleted_at`
+      const deletedEdges = await db(Edge.table)
+        .whereIn("id", edgeIds)
+        // Include the parent edge of this node
         .orWhere("node_b", id)
-        .del();
+        // Return deleted edge ids
+        .update({ deleted_at: new Date() }, ["id"]);
+
+      // Update edge ids to include parent edge id
+      edgeIds = deletedEdges.map(({ id }) => id);
     }
-    //? Delete Nodes
+
+    // Update `nodes.deleted_at`
+    const nodeIdArray = [...nodeIds];
     await db(Node.table)
-      .whereIn("id", [...nodeIds])
-      .del();
-    res.sendStatus(200);
+      .whereIn("id", nodeIdArray)
+      .update({ deleted_at: new Date() });
+
+    // Return an object containing the deleted node and edge ids
+    res.status(200);
+    res.send({
+      nodeIds: nodeIdArray,
+      edgeIds: edgeIds
+    });
   } catch (error) {
     res.send(error.message);
   }

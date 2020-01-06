@@ -1,21 +1,21 @@
-// 3rd Party Libs
+//* React Core
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  Redirect
-} from "react-router-dom";
-import { ThemeProvider } from "styled-components";
-// Config
+//* Redux & Routing
+import { Provider } from "react-redux";
+import { Route, Switch, Redirect } from "react-router-dom";
+import { ConnectedRouter } from "connected-react-router";
+import store, { history } from "./data/store";
 import routes from "./routes";
-import Head from "./components/Head";
+//* Styles & Meta Data
+import { ThemeProvider } from "styled-components";
 import { dark, light } from "./styles/styledThemes";
 import GlobalStyle from "./styles/globalStyles";
+//* Components
+import Head from "./components/Head";
 import ContentContainer from "./layout/Container";
 
 const App = () => {
-  // TODO: make a hook (https://usehooks.com/useRequireAuth/)
+  // TODO: pull from the store
   const isAuthenticated = () => {
     return true;
   };
@@ -23,30 +23,32 @@ const App = () => {
   return (
     <>
       <Head />
-      <ThemeProvider theme={dark}>
-        <GlobalStyle />
-        <Router basename="/">
-          <ContentContainer>
-            <Switch>
-              {Object.entries(routes).map(
-                ([path, { Component, beforeMount, exact, authenticated }]) =>
-                  // Handle authenticated Routes
-                  authenticated && !isAuthenticated ? (
-                    <Redirect to="/" />
-                  ) : (
-                    <Route
-                      key={`route-${path}`}
-                      path={path}
-                      exact={exact}
-                      component={Component}
-                    />
-                  )
-              )}
-              <Route render={() => <h1>Not Found</h1>} status={404} />
-            </Switch>
-          </ContentContainer>
-        </Router>
-      </ThemeProvider>
+      <Provider store={store}>
+        <ThemeProvider theme={light}>
+          <GlobalStyle />
+          <ConnectedRouter history={history} basename="/">
+            <ContentContainer>
+              <Switch>
+                {Object.entries(routes).map(
+                  ([path, { Component, beforeMount, exact, authenticated }]) =>
+                    // Handle authenticated Routes
+                    authenticated && !isAuthenticated ? (
+                      <Redirect to="/" />
+                    ) : (
+                      <Route
+                        key={`route-${path}`}
+                        path={path}
+                        exact={exact}
+                        component={Component}
+                      />
+                    )
+                )}
+                <Route render={() => <h1>Not Found</h1>} status={404} />
+              </Switch>
+            </ContentContainer>
+          </ConnectedRouter>
+        </ThemeProvider>
+      </Provider>
     </>
   );
 };

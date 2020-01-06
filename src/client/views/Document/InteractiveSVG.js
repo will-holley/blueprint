@@ -1,8 +1,10 @@
+//* Libraries
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useSpring, animated } from "react-spring";
 import styled from "styled-components";
-import { useCurrentDocument } from "client/data/selectors/document";
+import { connect } from "react-redux";
+//* Hooks
 import { useWindowSize, useWhyDidYouUpdate } from "client/utils/hooks";
 
 const Group = styled(animated.g)`
@@ -13,9 +15,7 @@ const Group = styled(animated.g)`
  * https://css-tricks.com/creating-a-panning-effect-for-svg/
  * @param {object} props
  */
-const InteractiveSVG = ({ children, opacity }) => {
-  const [{ activeNodeId, zoom }, actions] = useCurrentDocument();
-
+const InteractiveSVG = ({ children, opacity, activeNodeId, zoom }) => {
   //! Get the window size.  It is used to set <svg> dimensions.
   const { height, width } = useWindowSize();
 
@@ -176,7 +176,18 @@ const InteractiveSVG = ({ children, opacity }) => {
 
 InteractiveSVG.propTypes = {
   children: PropTypes.array.isRequired,
-  opacity: PropTypes.number.isRequired
+  opacity: PropTypes.number.isRequired,
+  activeNodeId: PropTypes.string,
+  zoom: PropTypes.number.isRequired
 };
 
-export default InteractiveSVG;
+const mapStateToProps = ({
+  documents: {
+    active: { activeNodeId, zoom }
+  }
+}) => ({
+  activeNodeId,
+  zoom
+});
+
+export default connect(mapStateToProps)(InteractiveSVG);

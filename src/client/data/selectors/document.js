@@ -1,26 +1,15 @@
-import useStore from "./../store";
-
 /**
  * Fetches full document information.
  */
-const useCurrentDocument = () => {
-  const [
-    {
-      currentDoc: { id, ...currentDoc },
-      documents
-    },
-    actions
-  ] = useStore();
-  const doc = id ? Object.assign(documents[id], currentDoc) : null;
-  return [doc, actions];
-};
+const activeDocumentSelector = ({ documents: { active, all } }) =>
+  active.id ? Object.assign(all[active.id], active) : null;
 
 /**
  * Select the current user's permissions for a document.
  */
-const useDocumentPermissions = () => {
-  const [doc] = useCurrentDocument();
-  const [{ user }] = useStore();
+const documentPermissionsSelector = state => {
+  const user = state.user;
+  const doc = activeDocumentSelector(state);
 
   //? Set default permissions
   const permissions = {
@@ -52,4 +41,4 @@ const useDocumentPermissions = () => {
   return permissions;
 };
 
-export { useCurrentDocument, useDocumentPermissions };
+export { activeDocumentSelector, documentPermissionsSelector };

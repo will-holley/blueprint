@@ -1,27 +1,35 @@
+//* libraries
+import { useSelector, useDispatch } from "react-redux";
+//* selectors
+import { activeDocumentSelector } from "client/data/selectors/document";
+//* actions
+import { addNode } from "client/data/services/document/actions";
+//* hooks
 import { useHotkeys } from "client/utils/hooks";
-import { useCurrentDocument } from "client/data/selectors/document";
+//* utils
 import { findParentNodeId } from "./utils";
 
 /**
  * Delete a node.  Deletes all nodes underneath it.
  */
 const useEnter = () => {
-  const [{ activeNodeId, edges }, actions] = useCurrentDocument();
+  const { activeNodeId, edges } = useSelector(activeDocumentSelector);
+  const dispatch = useDispatch();
 
   function newBaseNode() {
-    if (!activeNodeId) actions.addNode(null);
+    if (!activeNodeId) dispatch(addNode(null));
   }
 
   function newSiblingNode() {
     if (activeNodeId) {
       const parentId = findParentNodeId(activeNodeId, edges);
-      actions.addNode(parentId);
+      dispatch(addNode(parentId));
     }
     return false;
   }
 
   function newChildNode() {
-    if (activeNodeId) actions.addNode(activeNodeId);
+    if (activeNodeId) dispatch(addNode(activeNodeId));
     return false;
   }
 

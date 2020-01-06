@@ -153,6 +153,7 @@ router.get(
           "node_a as nodeA",
           "node_b as nodeB"
         ])
+        .where({ deleted_at: null })
         .whereIn("node_a", nodeIds)
         .orWhereIn("node_b", nodeIds);
       //? Map edges to object

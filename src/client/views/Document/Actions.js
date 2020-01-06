@@ -6,11 +6,19 @@ import { LeftActions, RightActions } from "client/layout/Actions";
 import { Title, HotkeyShortcutsContainer } from "./ui";
 // Global UI Elements
 import { EmojiButton } from "client/components/Buttons";
-// Hooks
+// Redux
 import {
-  useDocumentPermissions,
-  useCurrentDocument
+  activeDocumentSelector,
+  documentPermissionsSelector
 } from "client/data/selectors/document";
+import { connect, useSelector } from "react-redux";
+import {
+  addNode,
+  updateDocumentName,
+  zoomIn,
+  zoomOut,
+  resetZoom
+} from "client/data/services/document/actions";
 // Hooks
 import { useHistory } from "react-router-dom";
 import { useHotkeys } from "client/utils/hooks";
@@ -21,13 +29,18 @@ import useBackspace from "./hotkeys/backspace";
 import useEnter from "./hotkeys/enter";
 import useDisableHotkeys from "./hotkeys/disable";
 
-const Actions = () => {
+const Actions = ({
+  newBaseNode,
+  updateName,
+  handleZoomIn,
+  handleZoomOut,
+  handleResetZoom
+}) => {
   const { push } = useHistory();
-  const [
-    { name, humanId, activeNodeId, id: docId },
-    actions
-  ] = useCurrentDocument();
-  const permissions = useDocumentPermissions();
+  const { name, humanId, activeNodeId, id: docId } = useSelector(
+    activeDocumentSelector
+  );
+  const permissions = useSelector(documentPermissionsSelector);
 
   //! ================
   //! == Hotkey Map ==
@@ -38,6 +51,7 @@ const Actions = () => {
   const keyboardShortcuts = [
     ["cmd + =", "zoom in"],
     ["cmd + -", "zoom out"],
+    ["cmd + 0", "reset zoom"],
     ["escape, with node selected", "de-select node"],
     ["cmd + arrow up", "move up"],
     ["cmd + arrow down", "move down"],
@@ -61,7 +75,7 @@ const Actions = () => {
   useDisableHotkeys();
 
   //* Auditing
-  ////useHotkeys("*", event => console.info(event)
+  //useHotkeys("*", event => console.info(event));
 
   //! Hotkey Menu
   const [showHotkeyMenu, setShowHotkeyMenu] = useState(false);
@@ -74,21 +88,19 @@ const Actions = () => {
       <LeftActions>
         <EmojiButton onClick={() => push("/")}>🎨</EmojiButton>
         {permissions.addNodes && (
-          <EmojiButton onClick={event => actions.addNode(null)}>🌀</EmojiButton>
+          <EmojiButton onClick={newBaseNode}>🌀</EmojiButton>
         )}
         <Title
           disabled={!permissions.editTitle}
           value={name !== null ? name : humanId}
-          onChange={({ target: { value } }) =>
-            actions.updateDocumentName(docId, value)
-          }
+          onChange={({ target: { value } }) => updateName(value)}
         />
       </LeftActions>
       <RightActions>
         <EmojiButton onClick={toggleHotkeyMenu}>⌨️</EmojiButton>
-        <EmojiButton onClick={actions.zoomIn}>➕</EmojiButton>
-        <EmojiButton onClick={actions.resetZoom}>🔍</EmojiButton>
-        <EmojiButton onClick={actions.zoomOut}>➖</EmojiButton>
+        <EmojiButton onClick={handleZoomIn}>➕</EmojiButton>
+        <EmojiButton onClick={handleResetZoom}>🔍</EmojiButton>
+        <EmojiButton onClick={handleZoomOut}>➖</EmojiButton>
       </RightActions>
       {showHotkeyMenu && (
         <HotkeyShortcutsContainer>
@@ -105,4 +117,20 @@ const Actions = () => {
   );
 };
 
-export default Actions;
+Actions.propTypes = {
+  newBaseNode: PropTypes.func.isRequired,
+  updateName: PropTypes.func.isRequired,
+  handleZoomIn: PropTypes.func.isRequired,
+  handleZoomOut: PropTypes.func.isRequired,
+  handleResetZoom: PropTypes.func.isRequired
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  newBaseNode: () => dispatch(addNode(null)),
+  updateName: name => dispatch(updateDocumentName(name)),
+  handleZoomIn: () => dispatch(zoomIn()),
+  handleZoomOut: () => dispatch(zoomOut()),
+  handleResetZoom: () => dispatch(resetZoom())
+});
+
+export default connect(null, mapDispatchToProps)(Actions);

@@ -1,17 +1,23 @@
+//* libraries
+import { useSelector, useDispatch } from "react-redux";
+//* selectors
+import { activeDocumentSelector } from "client/data/selectors/document";
+//* actions
+import { setActiveNode, addNode } from "client/data/services/document/actions";
+//* everything else
 import { useHotkeys } from "client/utils/hooks";
-import { useCurrentDocument } from "client/data/selectors/document";
 import { findParentNodeId } from "./utils";
 
-// TODO: activeNodeId isn't updating!
 const useArrowNavigation = () => {
-  const [{ activeNodeId, edges, nodes }, actions] = useCurrentDocument();
+  const { activeNodeId, edges, nodes } = useSelector(activeDocumentSelector);
+  const dispatch = useDispatch();
 
   function up(event) {
     if (!activeNodeId) return;
     //? Determine if there is an edge where this node is the target
     const parentId = findParentNodeId(activeNodeId, edges);
     // If active node is not a base node, navigate to its parent.
-    if (parentId) actions.setActiveNode(parentId);
+    if (parentId) dispatch(setActiveNode(parentId));
   }
   /**
    * If active node has a child node, navigate to it.
@@ -24,8 +30,8 @@ const useArrowNavigation = () => {
         return nodeA === activeNodeId;
       })
       .map(({ nodeB }) => nodeB);
-    if (!childIds.length) actions.addNode(activeNodeId);
-    else actions.setActiveNode(childIds[0]);
+    if (!childIds.length) dispatch(addNode(activeNodeId));
+    else dispatch(setActiveNode(childIds[0]));
   }
   /**
    * If base node, do nothing.
@@ -40,7 +46,7 @@ const useArrowNavigation = () => {
       .map(({ nodeB }) => nodeB);
     const index = siblingIds.indexOf(activeNodeId);
     const nextIndex = computeNextIndex(index, siblingIds);
-    actions.setActiveNode(siblingIds[nextIndex]);
+    dispatch(setActiveNode(siblingIds[nextIndex]));
   };
   /**
    * Navigate to the active node's left sibling,
