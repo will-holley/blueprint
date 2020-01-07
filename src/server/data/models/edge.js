@@ -9,8 +9,14 @@ class Edge extends Model {
     //? Nodes
     table.uuid("node_a").notNullable();
     table.uuid("node_b").notNullable();
-    table.foreign("node_a").references(`${Node.table}.id`);
-    table.foreign("node_b").references(`${Node.table}.id`);
+    table
+      .foreign("node_a")
+      .references(`${Node.table}.id`)
+      .onDelete("CASCADE");
+    table
+      .foreign("node_b")
+      .references(`${Node.table}.id`)
+      .onDelete("CASCADE");
     table.unique(["node_a", "node_b"]);
     //? Has Parent?
     table
