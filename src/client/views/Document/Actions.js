@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 // Content Container Action Containers
 import { LeftActions, RightActions } from "client/layout/Actions";
 // Local UI Elements
-import { Title, HotkeyShortcutsContainer } from "./ui";
+import { Title } from "./ui";
+import Spotlight from "./Spotlight";
 // Global UI Elements
 import { EmojiButton } from "client/components/Buttons";
 // Redux
@@ -17,7 +18,8 @@ import {
   updateDocumentName,
   zoomIn,
   zoomOut,
-  resetZoom
+  resetZoom,
+  changeSpotlightVisibility
 } from "client/data/services/document/actions";
 // Hooks
 import { useHistory } from "react-router-dom";
@@ -34,35 +36,15 @@ const Actions = ({
   updateName,
   handleZoomIn,
   handleZoomOut,
-  handleResetZoom
+  handleResetZoom,
+  spotlightVisible,
+  handleSpotlightTrigger
 }) => {
   const { push } = useHistory();
   const { name, humanId, activeNodeId, id: docId } = useSelector(
     activeDocumentSelector
   );
   const permissions = useSelector(documentPermissionsSelector);
-
-  //! ================
-  //! == Hotkey Map ==
-  //! ================
-
-  // TODO: wrap this up in a useEffect
-
-  const keyboardShortcuts = [
-    ["cmd + =", "zoom in"],
-    ["cmd + -", "zoom out"],
-    ["cmd + 0", "reset zoom"],
-    ["escape, with node selected", "de-select node"],
-    ["cmd + arrow up", "move up"],
-    ["cmd + arrow down", "move down"],
-    ["cmd + arrow left", "move left"],
-    ["cmd + arrow right", "move right"],
-    ["cmd + k", "show/hide hotkeys"],
-    ["cmd + enter", "create base node"],
-    ["enter, with node selected", "create child node"],
-    ["cmd + shift + enter, with node selected", "create sibling node"],
-    ["cmd + delete", "delete node"]
-  ];
 
   //! ====================
   //! == Attach Hotkeys ==
@@ -78,9 +60,7 @@ const Actions = ({
   //useHotkeys("*", event => console.info(event));
 
   //! Hotkey Menu
-  const [showHotkeyMenu, setShowHotkeyMenu] = useState(false);
-  const toggleHotkeyMenu = event => setShowHotkeyMenu(!showHotkeyMenu);
-  useHotkeys("cmd+k", toggleHotkeyMenu, [showHotkeyMenu]);
+  useHotkeys("cmd+k", handleSpotlightTrigger, [spotlightVisible]);
 
   //! Render
   return (
@@ -97,22 +77,12 @@ const Actions = ({
         />
       </LeftActions>
       <RightActions>
-        <EmojiButton onClick={toggleHotkeyMenu}>⌨️</EmojiButton>
+        <EmojiButton onClick={handleSpotlightTrigger}>💡</EmojiButton>
         <EmojiButton onClick={handleZoomIn}>➕</EmojiButton>
         <EmojiButton onClick={handleResetZoom}>🔍</EmojiButton>
         <EmojiButton onClick={handleZoomOut}>➖</EmojiButton>
       </RightActions>
-      {showHotkeyMenu && (
-        <HotkeyShortcutsContainer>
-          <h2>Hotkeys</h2>
-          {keyboardShortcuts.map(([cmd, action]) => (
-            <div key={cmd}>
-              <code>{cmd}</code>
-              <span>{action}</span>
-            </div>
-          ))}
-        </HotkeyShortcutsContainer>
-      )}
+      {spotlightVisible && <Spotlight />}
     </>
   );
 };
@@ -122,7 +92,9 @@ Actions.propTypes = {
   updateName: PropTypes.func.isRequired,
   handleZoomIn: PropTypes.func.isRequired,
   handleZoomOut: PropTypes.func.isRequired,
-  handleResetZoom: PropTypes.func.isRequired
+  handleResetZoom: PropTypes.func.isRequired,
+  spotlightVisible: PropTypes.bool.isRequired,
+  handleSpotlightTrigger: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
@@ -130,7 +102,14 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   updateName: name => dispatch(updateDocumentName(name)),
   handleZoomIn: () => dispatch(zoomIn()),
   handleZoomOut: () => dispatch(zoomOut()),
-  handleResetZoom: () => dispatch(resetZoom())
+  handleResetZoom: () => dispatch(resetZoom()),
+  handleSpotlightTrigger: () => dispatch(changeSpotlightVisibility())
 });
 
-export default connect(null, mapDispatchToProps)(Actions);
+const mapStateToProps = ({
+  documents: {
+    active: { spotlightVisible }
+  }
+}) => ({ spotlightVisible });
+
+export default connect(mapStateToProps, mapDispatchToProps)(Actions);

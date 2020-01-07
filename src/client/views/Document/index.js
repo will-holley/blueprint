@@ -41,8 +41,6 @@ const Document = ({ id, nodes, edges, updateActiveDocument }) => {
     loadDocument();
   }, [params.humanId]);
 
-  console.log("rendering");
-
   if (id) {
     const result = dagger(nodes, edges);
     const positionedNodes = Object.values(result[0]);

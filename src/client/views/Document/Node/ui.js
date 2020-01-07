@@ -18,7 +18,7 @@ Container.propTypes = {
 };
 
 const Text = styled.p`
-  color: ${({ active }) => (active ? "#1976D2" : "inherit")};
+  color: ${({ active, theme }) => (active ? theme.colors.action : "inherit")};
   padding: 1rem 0;
   height: auto;
   width: 100%;
