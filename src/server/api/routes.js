@@ -5,7 +5,7 @@ import nodeRouter from "./node";
 import documentRouter from "./document";
 import userRouter from "./user";
 // Middleware
-import { handleInvalidJWT } from "./middleware";
+import { useJWT, handleInvalidJWT } from "./middleware";
 
 //$ Router Setup
 const router = express({
@@ -17,6 +17,10 @@ const router = express({
 router.use(bodyParser.json());
 // parse application/x-www-form-urlencoded
 router.use(bodyParser.urlencoded({ extended: true }));
+// jwt for auth
+router.use(useJWT);
+// TODO: possibly move this below route attachment
+router.use(handleInvalidJWT);
 
 //$ Health check the API
 router.get("/", (req, res) => res.sendStatus(200));
@@ -25,9 +29,6 @@ router.get("/", (req, res) => res.sendStatus(200));
 router.use("/node", nodeRouter);
 router.use("/document", documentRouter);
 router.use("/user", userRouter);
-
-//$ Attach middleware to handle expired JWT token errors
-router.use(handleInvalidJWT);
 
 // Export
 export default router;
