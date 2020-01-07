@@ -20,7 +20,7 @@ const documentPermissionsSelector = state => {
   };
 
   //? Check that there is both a current document and user.
-  if (!doc || !user) return permissions;
+  if (!doc || !user.id) return permissions;
 
   //? If there is a user logged in, the user's add/edit/delete
   //? permissions are more granular.
