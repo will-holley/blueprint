@@ -70,10 +70,10 @@ const useArrowNavigation = () => {
   function right(event) {
     handleHorizontalNavigation(computeRight);
   }
-  useHotkeys("cmd+up", up, [activeNodeId]);
-  useHotkeys("cmd+down", down, [activeNodeId]);
-  useHotkeys("cmd+left", left, [activeNodeId, nodes]);
-  useHotkeys("cmd+right", right, [activeNodeId, nodes]);
+  useHotkeys("up", up, [activeNodeId]);
+  useHotkeys("down", down, [activeNodeId]);
+  useHotkeys("left", left, [activeNodeId, nodes]);
+  useHotkeys("right", right, [activeNodeId, nodes]);
 };
 
 export default useArrowNavigation;
