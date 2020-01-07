@@ -13,18 +13,20 @@ const useArrowNavigation = () => {
   const dispatch = useDispatch();
 
   function up(event) {
-    if (!activeNodeId) return;
+    if (!activeNodeId) return false;
     //? Determine if there is an edge where this node is the target
     const parentId = findParentNodeId(activeNodeId, edges);
     // If active node is not a base node, navigate to its parent.
     if (parentId) dispatch(setActiveNode(parentId));
+    // Prevent default behavior (shifting cursor the beginning of text)
+    return false;
   }
   /**
    * If active node has a child node, navigate to it.
    * If it has multiple navigate to left most.
    */
   function down(event) {
-    if (!activeNodeId) return;
+    if (!activeNodeId) return false;
     const childIds = Object.values(edges)
       .filter(({ nodeA }) => {
         return nodeA === activeNodeId;
@@ -32,6 +34,8 @@ const useArrowNavigation = () => {
       .map(({ nodeB }) => nodeB);
     if (!childIds.length) dispatch(addNode(activeNodeId));
     else dispatch(setActiveNode(childIds[0]));
+    // Prevent default behavior
+    return false;
   }
   /**
    * If base node, do nothing.
@@ -40,13 +44,20 @@ const useArrowNavigation = () => {
    */
   const handleHorizontalNavigation = computeNextIndex => {
     if (!activeNodeId) return;
+    // Find sibling nodes
     const parentId = findParentNodeId(activeNodeId, edges);
     const siblingIds = Object.values(edges)
       .filter(({ nodeA }) => parentId === nodeA)
       .map(({ nodeB }) => nodeB);
+    // If there are no siblings, exit.
+    if (!siblingIds.length) return;
+    // Otherwise, find the sibling id
     const index = siblingIds.indexOf(activeNodeId);
     const nextIndex = computeNextIndex(index, siblingIds);
-    dispatch(setActiveNode(siblingIds[nextIndex]));
+    const id = siblingIds[nextIndex];
+    dispatch(setActiveNode(id));
+    // Prevent default behavior
+    return false;
   };
   /**
    * Navigate to the active node's left sibling,
@@ -70,10 +81,10 @@ const useArrowNavigation = () => {
   function right(event) {
     handleHorizontalNavigation(computeRight);
   }
-  useHotkeys("up", up, [activeNodeId]);
-  useHotkeys("down", down, [activeNodeId]);
-  useHotkeys("left", left, [activeNodeId, nodes]);
-  useHotkeys("right", right, [activeNodeId, nodes]);
+  useHotkeys("cmd+up", up, [activeNodeId]);
+  useHotkeys("cmd+down", down, [activeNodeId]);
+  useHotkeys("cmd+left", left, [activeNodeId, nodes]);
+  useHotkeys("cmd+right", right, [activeNodeId, nodes]);
 };
 
 export default useArrowNavigation;
