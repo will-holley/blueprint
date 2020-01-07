@@ -62,7 +62,7 @@ const Document = ({ id, nodes, edges, updateActiveDocument }) => {
             )
           )}
           {positionedEdges.map(({ id, position }) => (
-            <Edge key={id} position={position} />
+            <Edge key={id} position={position} id={id} />
           ))}
         </InteractiveSVG>
       </>

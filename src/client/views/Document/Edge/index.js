@@ -8,13 +8,14 @@ import { useWindowSize } from "client/utils/hooks";
 
 const Edge = ({
   position: [{ x: x1, y: y1 }, { x: x2, y: y2 }, { x, y }],
-  elbow
+  elbow,
+  id
 }) => {
   //? Create a bezier curve.
   const bezier = `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x} ${y}`;
   //? Create a straight line.
   const straight = `M ${x1} ${y1} L ${x} ${y}`;
-  return <Path d={elbow ? bezier : straight} />;
+  return <Path d={elbow ? bezier : straight} id={id} />;
 };
 
 Edge.propTypes = {
@@ -24,7 +25,8 @@ Edge.propTypes = {
       y: PropTypes.number.isRequired
     })
   ).isRequired,
-  elbow: PropTypes.bool.isRequired
+  elbow: PropTypes.bool.isRequired,
+  id: PropTypes.string.isRequired
 };
 Edge.defaultProps = {
   elbow: true
