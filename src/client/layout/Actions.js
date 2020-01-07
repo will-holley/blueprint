@@ -6,7 +6,7 @@ import { H3, A } from "client/components/tags";
 const Actions = styled.div`
   position: fixed;
   top: 0;
-  z-index: 99999;
+  z-index: 10;
   padding: 1rem;
 `;
 
