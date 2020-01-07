@@ -1,22 +1,22 @@
 //* API
+import { requestFailed } from "client/data/services/api/actions";
 import API from "client/utils/api";
 //* Constants
 import {
-  POPULATE_DOCUMENTS,
-  SET_ACTIVE_DOCUMENT,
-  UNSET_ACTIVE_DOCUMENT,
+  ADD_NODE,
   CREATE_DOCUMENT,
+  DELETE_NODE,
+  POPULATE_DOCUMENTS,
+  RESET_ZOOM,
+  SET_ACTIVE_DOCUMENT,
+  SET_ACTIVE_NODE,
+  UNSET_ACTIVE_DOCUMENT,
   UPDATE_DOCUMENT_NAME,
+  UPDATE_NODE_CONTENT,
   ZOOM_IN,
   ZOOM_OUT,
-  RESET_ZOOM,
-  ADD_NODE,
-  UPDATE_NODE_CONTENT,
-  SET_ACTIVE_NODE,
-  DELETE_NODE
+  CHANGE_SPOTLIGHT_VISIBILITY
 } from "./constants";
-
-import { requestFailed } from "client/data/services/api/actions";
 
 export const updateDocumentName = name => async (dispatch, getState) => {
   const {
@@ -86,6 +86,9 @@ export const setActiveDocument = (humanId, activeNodeId = undefined) => async (
   try {
     //TODO: determine when these should be cached
     const response = await API.request(`document/${id}`, "GET");
+    if (response.error) {
+      return requestFailed(response.error);
+    }
     nodes = response.nodes;
     edges = response.edges;
   } catch (error) {
@@ -180,3 +183,7 @@ export const deleteNode = nodeId => async dispatch => {
     return requestFailed(error);
   }
 };
+
+export const changeSpotlightVisibility = () => ({
+  type: CHANGE_SPOTLIGHT_VISIBILITY
+});

@@ -12,7 +12,8 @@ import {
   ADD_NODE,
   UPDATE_NODE_CONTENT,
   SET_ACTIVE_NODE,
-  DELETE_NODE
+  DELETE_NODE,
+  CHANGE_SPOTLIGHT_VISIBILITY
 } from "./constants";
 
 const initialState = {
@@ -26,7 +27,9 @@ const initialState = {
     // 1 by default
     zoom: 1,
     // Hotkeys, etc.
-    activeNodeId: null
+    activeNodeId: null,
+    // spotlight status
+    spotlightVisible: false
   }
 };
 
@@ -159,6 +162,13 @@ const reducer = (state = initialState, action) => {
         },
         active: {
           activeNodeId: { $set: edge ? edge.nodeA : null }
+        }
+      });
+    }
+    case CHANGE_SPOTLIGHT_VISIBILITY: {
+      return update(state, {
+        active: {
+          spotlightVisible: { $set: !state.active.spotlightVisible }
         }
       });
     }

@@ -9,6 +9,7 @@ export const UPDATE_DOCUMENT_NAME = "UPDATE_DOCUMENT_NAME";
 export const ZOOM_IN = "ZOOM_IN";
 export const ZOOM_OUT = "ZOOM_OUT";
 export const RESET_ZOOM = "RESET_ZOOM";
+export const CHANGE_SPOTLIGHT_VISIBILITY = "CHANGE_SPOTLIGHT_VISIBILITY";
 
 //* Node
 export const ADD_NODE = "ADD_NODE";
