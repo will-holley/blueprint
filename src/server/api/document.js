@@ -133,6 +133,7 @@ router.get(
         ])
         .where({ document: id, deleted_at: null })
         .orderBy("created_at");
+
       //? Add to id value map with additional details. Denote the base node.
       let baseMarked = false;
       nodes.forEach(node => {
@@ -142,6 +143,7 @@ router.get(
         }
         details.nodes[node.id] = node;
       });
+
       //? Create a list of node ids for querying edges
       const nodeIds = nodes.map(({ id }) => id);
       //? Query Edges
