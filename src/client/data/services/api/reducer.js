@@ -25,6 +25,7 @@ const reducer = (state = initialState, action) => {
       });
     }
     case API_REQUEST_FAILED: {
+      console.log(action.error);
       return update(state, {
         isRequesting: { $set: false },
         error: { $set: action.error.message }
