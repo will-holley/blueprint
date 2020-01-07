@@ -41,7 +41,7 @@ const Section = styled.div`
     margin-top: 2rem;
 
     p {
-      margin-top: 0.25rem;
+      margin-top: 0.75rem;
     }
   }
 `;
@@ -112,6 +112,22 @@ const Spotlight = ({ visibilityIsPrivate }) => (
           </p>
         </div>
       </Actions>
+      <Section>
+        <GradientText>
+          <H2>Tips</H2>
+        </GradientText>
+        <div>
+          <H4>Fullscreen is awesome</H4>
+          <p>
+            Try hiding your web browser's address and bookmark bars to remove
+            distractions and create more space for mindfulness and focus. On
+            Chrome, enlarge your browser to fullscreen then click the
+            <i>View</i> menu in the top left corner of your screen and deselect
+            "Always Show Toolbar in Full Screen" and "Always Show Bookmarks
+            Bar".
+          </p>
+        </div>
+      </Section>
     </Left>
     <Shortcuts>
       <GradientText>
