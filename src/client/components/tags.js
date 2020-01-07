@@ -21,7 +21,14 @@ const H2 = styled.h2`
 
 const H3 = styled.h3`
   font-weight: 500;
-  font-size: 20px;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+`;
+
+const H4 = styled.h4`
+  font-weight: 600;
+  font-size: 16px;
   line-height: 1;
   letter-spacing: -0.03em;
 `;
@@ -45,6 +52,9 @@ const Input = styled.input`
 
 const Button = styled.button`
   font-size: 2rem;
+  color: ${({ theme }) => theme.colors.action};
+  background: transparent;
+  border: 0;
 `;
 
-export { H1, H2, H3, P, A, Input, Button };
+export { H1, H2, H3, H4, P, A, Input, Button };
