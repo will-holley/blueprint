@@ -43,7 +43,9 @@ const App = () => {
                       />
                     )
                 )}
-                <Route render={() => <h1>Not Found</h1>} status={404} />
+                <Route status={404}>
+                  <Redirect to="/" />
+                </Route>
               </Switch>
             </ContentContainer>
           </ConnectedRouter>
