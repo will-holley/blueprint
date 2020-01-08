@@ -14,6 +14,12 @@ import GlobalStyle from "./styles/globalStyles";
 import Head from "./components/Head";
 import ContentContainer from "./layout/Container";
 
+//? Determine whether app should be in light or dark mode
+const colorMode =
+  window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? dark
+    : light;
+
 const App = () => {
   // TODO: pull from the store
   const isAuthenticated = () => {
@@ -24,7 +30,7 @@ const App = () => {
     <>
       <Head />
       <Provider store={store}>
-        <ThemeProvider theme={light}>
+        <ThemeProvider theme={colorMode}>
           <GlobalStyle />
           <ConnectedRouter history={history} basename="/">
             <ContentContainer>
