@@ -7,7 +7,10 @@ import { H1, H2, H4, Button } from "client/components/tags";
 import GradientText from "client/components/GradientText";
 import Toggle from "client/components/Toggle";
 //* Actions
-import { changeSpotlightVisibility } from "client/data/services/document/actions";
+import {
+  changeSpotlightVisibility,
+  updateDocumentPrivacy
+} from "client/data/services/document/actions";
 
 const Container = styled.div`
   // Position
@@ -77,7 +80,11 @@ const Shortcuts = styled(Section)`
   }
 `;
 
-const Spotlight = ({ visibilityIsPrivate, closeSpotlight }) => (
+const Spotlight = ({
+  visibilityIsPrivate,
+  closeSpotlight,
+  handleUpdateDocumentPrivate
+}) => (
   <Container>
     <CloseButton onClick={closeSpotlight}>🔴</CloseButton>
     <Left>
@@ -102,6 +109,7 @@ const Spotlight = ({ visibilityIsPrivate, closeSpotlight }) => (
             a={"👀 Public"}
             b="Private"
             active={visibilityIsPrivate ? "b" : "a"}
+            handleClick={handleUpdateDocumentPrivate}
           />
           <p>
             Update the visibility of this Blueprint. A private Blueprint is only
@@ -202,7 +210,8 @@ const Spotlight = ({ visibilityIsPrivate, closeSpotlight }) => (
 
 Spotlight.propTypes = {
   visibilityIsPrivate: PropTypes.bool.isRequired,
-  closeSpotlight: PropTypes.func.isRequired
+  closeSpotlight: PropTypes.func.isRequired,
+  handleUpdateDocumentPrivate: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ documents: { active, all } }, ownProps) => ({
@@ -210,7 +219,8 @@ const mapStateToProps = ({ documents: { active, all } }, ownProps) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  closeSpotlight: () => dispatch(changeSpotlightVisibility())
+  closeSpotlight: () => dispatch(changeSpotlightVisibility()),
+  handleUpdateDocumentPrivate: () => dispatch(updateDocumentPrivacy())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Spotlight);

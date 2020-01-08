@@ -15,7 +15,8 @@ import {
   UPDATE_NODE_CONTENT,
   ZOOM_IN,
   ZOOM_OUT,
-  CHANGE_SPOTLIGHT_VISIBILITY
+  CHANGE_SPOTLIGHT_VISIBILITY,
+  UPDATE_DOCUMENT_PRIVACY
 } from "./constants";
 
 export const updateDocumentName = name => async (dispatch, getState) => {
@@ -187,3 +188,32 @@ export const deleteNode = nodeId => async dispatch => {
 export const changeSpotlightVisibility = () => ({
   type: CHANGE_SPOTLIGHT_VISIBILITY
 });
+
+export const updateDocumentPrivacy = () => async (dispatch, getState) => {
+  const {
+    documents: {
+      active: { id: docId },
+      all
+    }
+  } = getState();
+
+  const { private: _private } = all[docId];
+  const updatedPrivacy = !_private;
+
+  try {
+    //? If the user deletes the full text, do not save to the database
+    await API.request(
+      `document/${docId}`,
+      "PUT",
+      {},
+      { private: updatedPrivacy }
+    );
+    return dispatch({
+      type: UPDATE_DOCUMENT_PRIVACY,
+      docId,
+      private: updatedPrivacy
+    });
+  } catch (error) {
+    return requestFailed(error);
+  }
+};

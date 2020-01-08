@@ -13,7 +13,8 @@ import {
   UPDATE_NODE_CONTENT,
   SET_ACTIVE_NODE,
   DELETE_NODE,
-  CHANGE_SPOTLIGHT_VISIBILITY
+  CHANGE_SPOTLIGHT_VISIBILITY,
+  UPDATE_DOCUMENT_PRIVACY
 } from "./constants";
 
 const initialState = {
@@ -71,6 +72,15 @@ const reducer = (state = initialState, action) => {
         all: {
           [action.docId]: {
             name: { $set: action.name }
+          }
+        }
+      });
+    }
+    case UPDATE_DOCUMENT_PRIVACY: {
+      return update(state, {
+        all: {
+          [action.docId]: {
+            private: { $set: action.private }
           }
         }
       });

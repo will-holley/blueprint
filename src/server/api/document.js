@@ -190,10 +190,14 @@ router.get(
 router.put(
   "/:id",
   [requiresAuthentication, lookupDocument, creatorOnly],
-  async function updateDocumentDetails({ doc: { id }, body: { name } }, res) {
+  async function updateDocumentDetails(
+    { doc: { id }, body: { name, private: _private } },
+    res
+  ) {
     //? Compose update object with allowable fields
     const fields = {};
     if (name) fields["name"] = name;
+    if (_private) fields["private"] = _private;
     //? Update
     try {
       await db(Document.table)
