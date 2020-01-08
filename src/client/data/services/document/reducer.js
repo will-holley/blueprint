@@ -14,7 +14,8 @@ import {
   SET_ACTIVE_NODE,
   DELETE_NODE,
   CHANGE_SPOTLIGHT_VISIBILITY,
-  UPDATE_DOCUMENT_PRIVACY
+  UPDATE_DOCUMENT_PRIVACY,
+  DELETE_DOCUMENT
 } from "./constants";
 
 const initialState = {
@@ -83,6 +84,15 @@ const reducer = (state = initialState, action) => {
             private: { $set: action.private }
           }
         }
+      });
+    }
+    case DELETE_DOCUMENT: {
+      //! Currently assumes docId is active
+      return update(state, {
+        all: {
+          $unset: [action.docId]
+        },
+        active: { $set: initialState.active }
       });
     }
     case ZOOM_IN: {

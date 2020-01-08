@@ -1,3 +1,5 @@
+//* Libraries
+import { push } from "connected-react-router";
 //* API
 import { requestFailed } from "client/data/services/api/actions";
 import API from "client/utils/api";
@@ -16,7 +18,8 @@ import {
   ZOOM_IN,
   ZOOM_OUT,
   CHANGE_SPOTLIGHT_VISIBILITY,
-  UPDATE_DOCUMENT_PRIVACY
+  UPDATE_DOCUMENT_PRIVACY,
+  DELETE_DOCUMENT
 } from "./constants";
 
 export const updateDocumentName = name => async (dispatch, getState) => {
@@ -74,13 +77,11 @@ export const setActiveDocument = (humanId, activeNodeId = undefined) => async (
 
   //? Look up the id which corresponds to this human id
   const { documents } = getState();
-  // TODO: create a selector for documents by human id
-  //! NOTE: if a user tries to load a document that no longer exists, the following
-  //! line will break because `Object.entries()` will not return an iterable (2nd order
-  //! consequence)
-  const [id, _] = Object.entries(documents.all).find(
+  const result = Object.entries(documents.all).find(
     ([id, doc]) => doc.humanId === humanId
   );
+  if (!result) return dispatch(push("/"));
+  const [id, _] = result;
 
   //? Query document details
   let nodes, edges;
@@ -213,6 +214,23 @@ export const updateDocumentPrivacy = () => async (dispatch, getState) => {
       docId,
       private: updatedPrivacy
     });
+  } catch (error) {
+    return requestFailed(error);
+  }
+};
+
+export const deleteDocument = () => async (dispatch, getState) => {
+  const {
+    documents: {
+      active: { id: docId },
+      all
+    }
+  } = getState();
+
+  try {
+    //? If the user deletes the full text, do not save to the database
+    await API.request(`document/${docId}`, "DELETE");
+    return dispatch({ type: DELETE_DOCUMENT, docId });
   } catch (error) {
     return requestFailed(error);
   }

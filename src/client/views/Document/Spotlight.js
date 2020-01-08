@@ -9,8 +9,10 @@ import Toggle from "client/components/Toggle";
 //* Actions
 import {
   changeSpotlightVisibility,
-  updateDocumentPrivacy
+  updateDocumentPrivacy,
+  deleteDocument
 } from "client/data/services/document/actions";
+import { push } from "connected-react-router";
 
 const Container = styled.div`
   // Position
@@ -83,15 +85,22 @@ const Shortcuts = styled(Section)`
 const Spotlight = ({
   visibilityIsPrivate,
   closeSpotlight,
-  handleUpdateDocumentPrivate
-}) => (
-  <Container>
-    <CloseButton onClick={closeSpotlight}>🔴</CloseButton>
-    <Left>
-      <Section>
-        <H1>Spotlight</H1>
-      </Section>
-      {/* <Tags>
+  handleUpdateDocumentPrivate,
+  handleDeleteDocument,
+  navigateToDashboard
+}) => {
+  const handleDelete = async event => {
+    await handleDeleteDocument();
+    navigateToDashboard();
+  };
+  return (
+    <Container>
+      <CloseButton onClick={closeSpotlight}>🔴</CloseButton>
+      <Left>
+        <Section>
+          <H1>Spotlight</H1>
+        </Section>
+        {/* <Tags>
         <GradientText>
           <H2>Tags</H2>
         </GradientText>
@@ -100,118 +109,122 @@ const Spotlight = ({
           <Tag>Dog</Tag>
         </div>
       </Tags> */}
-      <Actions>
+        <Actions>
+          <GradientText>
+            <H2>Actions</H2>
+          </GradientText>
+          <div>
+            <Toggle
+              a={"👀 Public"}
+              b="Private"
+              active={visibilityIsPrivate ? "b" : "a"}
+              handleClick={handleUpdateDocumentPrivate}
+            />
+            <p>
+              Update the visibility of this Blueprint. A private Blueprint is
+              only visible and editable by you. Public Blueprints are visible to
+              all and can be edited by member of the Blueprint community.
+            </p>
+          </div>
+          <div>
+            <Button>🍴 Duplicate</Button>
+            <p>
+              Duplicating this Blueprint creates an identical private copy of
+              it.
+            </p>
+          </div>
+          <div>
+            <Button onClick={handleDelete}>🗑 Add to Trash</Button>
+            <p>
+              Adding this Blueprint to the trash will hide it from your
+              Dashboard. Don't worry, you can always get it back by clicking the
+              🗑 on your dashboard.
+            </p>
+          </div>
+        </Actions>
+        <Section>
+          <GradientText>
+            <H2>Tips</H2>
+          </GradientText>
+          <div>
+            <H4>Fullscreen is awesome</H4>
+            <p>
+              Try hiding your web browser's address and bookmark bars to remove
+              distractions and create more space for mindfulness and focus. On
+              Chrome, enlarge your browser to fullscreen then click the
+              <i>View</i> menu in the top left corner of your screen and
+              deselect "Always Show Toolbar in Full Screen" and "Always Show
+              Bookmarks Bar".
+            </p>
+          </div>
+        </Section>
+      </Left>
+      <Shortcuts>
         <GradientText>
-          <H2>Actions</H2>
+          <H2>Shortcuts</H2>
         </GradientText>
         <div>
-          <Toggle
-            a={"👀 Public"}
-            b="Private"
-            active={visibilityIsPrivate ? "b" : "a"}
-            handleClick={handleUpdateDocumentPrivate}
-          />
-          <p>
-            Update the visibility of this Blueprint. A private Blueprint is only
-            visible and editable by you. Public Blueprints are visible to all
-            and can be edited by member of the Blueprint community.
-          </p>
+          <span>cmd + =</span>
+          <code>zoom in</code>
         </div>
         <div>
-          <Button>🍴 Duplicate</Button>
-          <p>
-            Duplicating this Blueprint creates an identical private copy of it.
-          </p>
+          <span>cmd + -</span>
+          <code>zoom out</code>
         </div>
         <div>
-          <Button>🗑 Add to Trash</Button>
-          <p>
-            Adding this Blueprint to the trash will hide it from your Dashboard.
-            Don't worry, you can always get it back by clicking the 🗑 on your
-            dashboard.
-          </p>
+          <span>cmd + 0</span>
+          <code>reset zoom</code>
         </div>
-      </Actions>
-      <Section>
-        <GradientText>
-          <H2>Tips</H2>
-        </GradientText>
         <div>
-          <H4>Fullscreen is awesome</H4>
-          <p>
-            Try hiding your web browser's address and bookmark bars to remove
-            distractions and create more space for mindfulness and focus. On
-            Chrome, enlarge your browser to fullscreen then click the
-            <i>View</i> menu in the top left corner of your screen and deselect
-            "Always Show Toolbar in Full Screen" and "Always Show Bookmarks
-            Bar".
-          </p>
+          <span>cmd + enter</span>
+          <code>create a new base node</code>
         </div>
-      </Section>
-    </Left>
-    <Shortcuts>
-      <GradientText>
-        <H2>Shortcuts</H2>
-      </GradientText>
-      <div>
-        <span>cmd + =</span>
-        <code>zoom in</code>
-      </div>
-      <div>
-        <span>cmd + -</span>
-        <code>zoom out</code>
-      </div>
-      <div>
-        <span>cmd + 0</span>
-        <code>reset zoom</code>
-      </div>
-      <div>
-        <span>cmd + enter</span>
-        <code>create a new base node</code>
-      </div>
-      <div>
-        <span>cmd + k</span>
-        <code>hide/show spotlight</code>
-      </div>
-      <div>
-        <H4>With a node selected</H4>
-      </div>
-      <div>
-        <span>cmd + up arrow</span>
-        <code>move up</code>
-      </div>
-      <div>
-        <span>cmd + down arrow</span>
-        <code>move down</code>
-      </div>
-      <div>
-        <span>cmd + left arrow</span>
-        <code>move left</code>
-      </div>
-      <div>
-        <span>cmd + right arrow</span>
-        <code>move right</code>
-      </div>
-      <div>
-        <span>enter</span>
-        <code>create a child node</code>
-      </div>
-      <div>
-        <span>shift + enter</span>
-        <code>create a sibling node</code>
-      </div>
-      <div>
-        <span>cmd + delete</span>
-        <code>delete node</code>
-      </div>
-    </Shortcuts>
-  </Container>
-);
+        <div>
+          <span>cmd + k</span>
+          <code>hide/show spotlight</code>
+        </div>
+        <div>
+          <H4>With a node selected</H4>
+        </div>
+        <div>
+          <span>cmd + up arrow</span>
+          <code>move up</code>
+        </div>
+        <div>
+          <span>cmd + down arrow</span>
+          <code>move down</code>
+        </div>
+        <div>
+          <span>cmd + left arrow</span>
+          <code>move left</code>
+        </div>
+        <div>
+          <span>cmd + right arrow</span>
+          <code>move right</code>
+        </div>
+        <div>
+          <span>enter</span>
+          <code>create a child node</code>
+        </div>
+        <div>
+          <span>shift + enter</span>
+          <code>create a sibling node</code>
+        </div>
+        <div>
+          <span>cmd + delete</span>
+          <code>delete node</code>
+        </div>
+      </Shortcuts>
+    </Container>
+  );
+};
 
 Spotlight.propTypes = {
   visibilityIsPrivate: PropTypes.bool.isRequired,
   closeSpotlight: PropTypes.func.isRequired,
-  handleUpdateDocumentPrivate: PropTypes.func.isRequired
+  handleUpdateDocumentPrivate: PropTypes.func.isRequired,
+  handleDeleteDocument: PropTypes.func.isRequired,
+  navigateToDashboard: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ documents: { active, all } }, ownProps) => ({
@@ -220,7 +233,9 @@ const mapStateToProps = ({ documents: { active, all } }, ownProps) => ({
 
 const mapDispatchToProps = dispatch => ({
   closeSpotlight: () => dispatch(changeSpotlightVisibility()),
-  handleUpdateDocumentPrivate: () => dispatch(updateDocumentPrivacy())
+  handleUpdateDocumentPrivate: () => dispatch(updateDocumentPrivacy()),
+  handleDeleteDocument: async () => dispatch(deleteDocument()),
+  navigateToDashboard: () => dispatch(push("/"))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Spotlight);
