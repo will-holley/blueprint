@@ -78,7 +78,7 @@ router.delete("/:id", requiresAuthentication, async function deleteNode(
   res
 ) {
   try {
-    // Get edge ids
+    // Gather all of the edges below this node
     const { rows } = await db.raw(`
     WITH RECURSIVE sub_tree AS (
       SELECT id, node_a, node_b, deleted_at, 1 AS relative_depth
@@ -89,13 +89,14 @@ router.delete("/:id", requiresAuthentication, async function deleteNode(
 
       SELECT e.id, e.node_a, e.node_b, e.deleted_at, st.relative_depth + 1
       FROM edge e, sub_tree st
-      WHERE e.node_a = st.node_b AND e.deleted_at IS NOT NULL
+      WHERE e.node_a = st.node_b AND e.deleted_at IS NULL
     )
     SELECT * FROM sub_tree;
     `);
+
     let edgeIds = rows.map(({ id }) => id);
 
-    // Gather all of the node ids
+    //? Gather the node ids referenced by each edge
     const nodeIds = new Set();
     nodeIds.add(id);
     if (rows) {
@@ -104,23 +105,24 @@ router.delete("/:id", requiresAuthentication, async function deleteNode(
         nodeIds.add(node_b);
       });
 
-      // Update `edges.deleted_at`
+      //? Mark the edges as deleted
       const deletedEdges = await db(Edge.table)
         .whereIn("id", edgeIds)
         // Include the parent edge of this node
         .orWhere("node_b", id)
         // Return deleted edge ids
         .update({ deleted_at: new Date() }, ["id"]);
+      ////.select("*");
 
-      // Update edge ids to include parent edge id
+      //? Update edge ids to include parent edge id
       edgeIds = deletedEdges.map(({ id }) => id);
     }
 
-    // Update `nodes.deleted_at`
+    //? Mark the nodes as deleted
     const nodeIdArray = [...nodeIds];
-    await db(Node.table)
-      .whereIn("id", nodeIdArray)
-      .update({ deleted_at: new Date() });
+    // await db(Node.table)
+    //   .whereIn("id", nodeIdArray)
+    //   .update({ deleted_at: new Date() });
 
     // Return an object containing the deleted node and edge ids
     res.status(200);
