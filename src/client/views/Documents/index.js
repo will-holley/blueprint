@@ -15,6 +15,8 @@ import Actions from "./Actions";
 // Styles
 import { getRandomGradient } from "client/styles/gradients";
 
+const TODAY = new Date();
+
 const Documents = ({ allDocs, activeDocId, userId }) => {
   const { push } = useHistory();
 
@@ -30,6 +32,7 @@ const Documents = ({ allDocs, activeDocId, userId }) => {
         allDocs.map(([id, doc]) => {
           const ownedByUser = userId ? userId === doc.createdBy : false;
           const gradient = getRandomGradient();
+          const updatedAt = Moment(doc.updatedAt);
           return (
             <DocumentInformation
               key={id}
@@ -45,9 +48,9 @@ const Documents = ({ allDocs, activeDocId, userId }) => {
                   : `${ownedByUser ? "Yours - " : ""}Public 🥳`}
               </P>
               <P>
-                {Moment(doc.updatedAt)
-                  .startOf("day")
-                  .fromNow()}
+                {updatedAt.isSame(TODAY, "day")
+                  ? updatedAt.fromNow()
+                  : updatedAt.startOf("day").fromNow()}
               </P>
             </DocumentInformation>
           );
