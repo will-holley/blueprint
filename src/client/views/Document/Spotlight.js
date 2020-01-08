@@ -10,7 +10,8 @@ import Toggle from "client/components/Toggle";
 import {
   changeSpotlightVisibility,
   updateDocumentPrivacy,
-  deleteDocument
+  deleteDocument,
+  duplicateDocument
 } from "client/data/services/document/actions";
 import { push } from "connected-react-router";
 
@@ -87,12 +88,21 @@ const Spotlight = ({
   closeSpotlight,
   handleUpdateDocumentPrivate,
   handleDeleteDocument,
-  navigateToDashboard
+  navigateToDashboard,
+  handleDuplicateDocument,
+  navigateToDuplicate
 }) => {
   const handleDelete = async event => {
     await handleDeleteDocument();
     navigateToDashboard();
   };
+
+  const createDuplicate = async event => {
+    const id = await handleDuplicateDocument();
+    closeSpotlight();
+    navigateToDuplicate(id);
+  };
+
   return (
     <Container>
       <CloseButton onClick={closeSpotlight}>🔴</CloseButton>
@@ -127,7 +137,7 @@ const Spotlight = ({
             </p>
           </div>
           <div>
-            <Button>🍴 Duplicate</Button>
+            <Button onClick={createDuplicate}>🍴 Duplicate</Button>
             <p>
               Duplicating this Blueprint creates an identical private copy of
               it.
@@ -224,7 +234,9 @@ Spotlight.propTypes = {
   closeSpotlight: PropTypes.func.isRequired,
   handleUpdateDocumentPrivate: PropTypes.func.isRequired,
   handleDeleteDocument: PropTypes.func.isRequired,
-  navigateToDashboard: PropTypes.func.isRequired
+  navigateToDashboard: PropTypes.func.isRequired,
+  handleDuplicateDocument: PropTypes.func.isRequired,
+  navigateToDuplicate: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ documents: { active, all } }, ownProps) => ({
@@ -235,7 +247,9 @@ const mapDispatchToProps = dispatch => ({
   closeSpotlight: () => dispatch(changeSpotlightVisibility()),
   handleUpdateDocumentPrivate: () => dispatch(updateDocumentPrivacy()),
   handleDeleteDocument: async () => dispatch(deleteDocument()),
-  navigateToDashboard: () => dispatch(push("/"))
+  navigateToDashboard: () => dispatch(push("/")),
+  handleDuplicateDocument: async () => dispatch(duplicateDocument()),
+  navigateToDuplicate: humanId => dispatch(push(`/d/${humanId}`))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Spotlight);

@@ -15,7 +15,8 @@ import {
   DELETE_NODE,
   CHANGE_SPOTLIGHT_VISIBILITY,
   UPDATE_DOCUMENT_PRIVACY,
-  DELETE_DOCUMENT
+  DELETE_DOCUMENT,
+  DUPLICATE_DOCUMENT
 } from "./constants";
 
 const initialState = {
@@ -65,6 +66,13 @@ const reducer = (state = initialState, action) => {
       return update(state, {
         all: {
           [action.document.id]: { $set: action.document }
+        }
+      });
+    }
+    case DUPLICATE_DOCUMENT: {
+      return update(state, {
+        all: {
+          [action.duplicate.id]: { $set: action.duplicate }
         }
       });
     }

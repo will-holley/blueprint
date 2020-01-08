@@ -19,7 +19,8 @@ import {
   ZOOM_OUT,
   CHANGE_SPOTLIGHT_VISIBILITY,
   UPDATE_DOCUMENT_PRIVACY,
-  DELETE_DOCUMENT
+  DELETE_DOCUMENT,
+  DUPLICATE_DOCUMENT
 } from "./constants";
 
 export const updateDocumentName = name => async (dispatch, getState) => {
@@ -222,8 +223,7 @@ export const updateDocumentPrivacy = () => async (dispatch, getState) => {
 export const deleteDocument = () => async (dispatch, getState) => {
   const {
     documents: {
-      active: { id: docId },
-      all
+      active: { id: docId }
     }
   } = getState();
 
@@ -231,6 +231,23 @@ export const deleteDocument = () => async (dispatch, getState) => {
     //? If the user deletes the full text, do not save to the database
     await API.request(`document/${docId}`, "DELETE");
     return dispatch({ type: DELETE_DOCUMENT, docId });
+  } catch (error) {
+    return requestFailed(error);
+  }
+};
+
+export const duplicateDocument = () => async (dispatch, getState) => {
+  const {
+    documents: {
+      active: { id: docId }
+    }
+  } = getState();
+
+  try {
+    //? If the user deletes the full text, do not save to the database
+    const document = await API.request(`document/${docId}/duplicate`, "POST");
+    dispatch({ type: DUPLICATE_DOCUMENT, duplicate: document });
+    return document.humanId;
   } catch (error) {
     return requestFailed(error);
   }

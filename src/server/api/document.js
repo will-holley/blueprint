@@ -1,5 +1,6 @@
 import express from "express";
 import { hri } from "human-readable-ids";
+import uuid from "uuid/v4";
 // Database Utility
 import db from "../data/db";
 // Models
@@ -224,6 +225,75 @@ router.delete(
     } catch (error) {
       res.send(error.message);
     }
+  }
+);
+
+/**
+ * Duplicate this document (record + nodes + edges)
+ * Duplicate essentially mimics the logic of create.
+ */
+router.post(
+  "/:id/duplicate",
+  [requiresAuthentication, lookupDocument, creatorOnly],
+  async function duplicateDocument(
+    { doc: { id, private: _private, name, human_id }, user },
+    res
+  ) {
+    //? Duplicate document
+    const [duplicateDocument] = await db(Document.table)
+      .insert({
+        //! Until there is table joining document records as having been duplicated,
+        //! append with `-duplicate`.
+        human_id: `${human_id}-duplicate-${hri.random()}`,
+        created_by: user._id,
+        private: _private,
+        name: name ? `${name}-duplicate-${hri.random()}` : null
+      })
+      .returning(fields);
+
+    //? Duplicate Nodes
+    const nodes = await db(Node.table)
+      .select("*")
+      .where({ document: id, deleted_at: null });
+    const duplicateNodes = []; // for sql insertion
+    const duplicateNodeMap = {}; // for mapping edge nodes
+    nodes.forEach(node => {
+      //? Create the duplicate node id rather than relying on the
+      //? sql function because it is necessary to map the edges from
+      //? their old to new nodes.
+      const duplicateNodeId = uuid();
+      duplicateNodeMap[node.id] = duplicateNodeId;
+      duplicateNodes.push({
+        id: duplicateNodeId,
+        human_id: `${node.human_id}-duplicate-${hri.random()}`,
+        document: duplicateDocument.id,
+        content: node.content,
+        content_type: node.content_type
+      });
+    });
+    await db(Node.table).insert(duplicateNodes);
+
+    //? Gather the unique node ids
+    const nodeIds = [...new Set(Object.keys(duplicateNodeMap))];
+
+    //? Duplicate Edges
+    const edges = await db(Edge.table)
+      .select("*")
+      .where({ deleted_at: null })
+      .whereIn("node_a", nodeIds)
+      .orWhereIn("node_b", nodeIds);
+
+    const duplicateEdges = edges.map(edge => ({
+      human_id: `${edge.human_id}-duplicate-${hri.random()}`,
+      has_parent: edge.has_parent,
+      node_a: duplicateNodeMap[edge.node_a],
+      node_b: duplicateNodeMap[edge.node_b]
+    }));
+    await db(Edge.table).insert(duplicateEdges);
+
+    //? Send document to client
+    res.status(201);
+    res.send(duplicateDocument);
   }
 );
 
