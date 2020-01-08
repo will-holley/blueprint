@@ -26,23 +26,39 @@ const fields = [
 //! == Middleware ==
 //! ================
 
+const lookupDocument = async (req, res, next) => {
+  // Otherwise, lookup this document
+  const [doc] = await db(Document.table)
+    .select("*")
+    .where("id", req.params.id)
+    .returning(1);
+  // Check that the doc exists
+  if (!doc) return res.sendStatus(400);
+  // Add doc to request scope
+  req.doc = doc;
+  next();
+};
+
 /**
- * If this is a private document and the user does not match,
- * reject this request.
+ * If this document is private, do not allow unauthorized users
+ * from accessing it.
  */
-const requiresDocumentOwnership = async (
-  { params: { id }, user },
-  res,
-  next
-) => {
+const requiresAuthorizedAccess = async ({ user, doc }, res, next) => {
   try {
-    const [doc] = await db(Document.table)
-      .select(["private", "created_by as createdBy"])
-      .where("id", id)
-      .returning(1);
-    return !doc || (doc.private && doc.createdBy !== user._id)
+    return doc.private && doc.created_by !== user._id
       ? res.sendStatus(400)
       : next();
+  } catch (error) {
+    return res.send({ error: error.message });
+  }
+};
+
+/**
+ * If `req.user` does not match the owner of this document, reject this request.
+ */
+const creatorOnly = async ({ doc, user }, res, next) => {
+  try {
+    return doc.created_by !== user._id ? res.sendStatus(400) : next();
   } catch (error) {
     return res.send({ error: error.message });
   }
@@ -115,8 +131,8 @@ router.post("/", requiresAuthentication, async function createDocument(
  */
 router.get(
   "/:id",
-  requiresDocumentOwnership,
-  async function fetchDocumentDetails({ params: { id } }, res) {
+  [lookupDocument, requiresAuthorizedAccess],
+  async function fetchDocumentDetails({ doc: { id } }, res) {
     //? Client expects nodes and edges as id value maps.
     const details = {
       nodes: {},
@@ -173,11 +189,8 @@ router.get(
 
 router.put(
   "/:id",
-  [requiresAuthentication, requiresDocumentOwnership],
-  async function updateDocumentDetails(
-    { params: { id }, body: { name } },
-    res
-  ) {
+  [requiresAuthentication, lookupDocument, creatorOnly],
+  async function updateDocumentDetails({ doc: { id }, body: { name } }, res) {
     //? Compose update object with allowable fields
     const fields = {};
     if (name) fields["name"] = name;
@@ -195,8 +208,8 @@ router.put(
 
 router.delete(
   "/:id",
-  [requiresAuthentication, requiresDocumentOwnership],
-  async function deleteDocument({ params: { id } }, res) {
+  [requiresAuthentication, lookupDocument, creatorOnly],
+  async function deleteDocument({ doc: { id } }, res) {
     try {
       const updatedCount = await db(Document.table)
         .where("id", id)
