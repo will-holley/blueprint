@@ -55,6 +55,7 @@ const Button = styled.button`
   color: ${({ theme }) => theme.colors.action};
   background: transparent;
   border: 0;
+  cursor: pointer;
 `;
 
 export { H1, H2, H3, H4, P, A, Input, Button };
