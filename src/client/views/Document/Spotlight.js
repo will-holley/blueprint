@@ -6,6 +6,8 @@ import { connect } from "react-redux";
 import { H1, H2, H4, Button } from "client/components/tags";
 import GradientText from "client/components/GradientText";
 import Toggle from "client/components/Toggle";
+//* Actions
+import { changeSpotlightVisibility } from "client/data/services/document/actions";
 
 const Container = styled.div`
   // Position
@@ -19,7 +21,7 @@ const Container = styled.div`
   // Colors
   background: ${({ theme }) => theme.altBackground};
   color: ${({ theme }) => theme.text.alt};
-  opacity: 0.85;
+  opacity: 0.95;
 
   // Interior
   padding: 10rem;
@@ -28,6 +30,15 @@ const Container = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   column-gap: 10rem;
+`;
+
+const CloseButton = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 1rem;
+  margin: 1rem;
+  cursor: pointer;
 `;
 
 const Left = styled.div`
@@ -66,8 +77,9 @@ const Shortcuts = styled(Section)`
   }
 `;
 
-const Spotlight = ({ visibilityIsPrivate }) => (
+const Spotlight = ({ visibilityIsPrivate, closeSpotlight }) => (
   <Container>
+    <CloseButton onClick={closeSpotlight}>🔴</CloseButton>
     <Left>
       <Section>
         <H1>Spotlight</H1>
@@ -189,11 +201,16 @@ const Spotlight = ({ visibilityIsPrivate }) => (
 );
 
 Spotlight.propTypes = {
-  visibilityIsPrivate: PropTypes.bool.isRequired
+  visibilityIsPrivate: PropTypes.bool.isRequired,
+  closeSpotlight: PropTypes.func.isRequired
 };
 
 const mapStateToProps = ({ documents: { active, all } }, ownProps) => ({
   visibilityIsPrivate: all[active.id].private
 });
 
-export default connect(mapStateToProps)(Spotlight);
+const mapDispatchToProps = dispatch => ({
+  closeSpotlight: () => dispatch(changeSpotlightVisibility())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Spotlight);
