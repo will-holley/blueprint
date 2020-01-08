@@ -43,14 +43,14 @@ const useArrowNavigation = () => {
    * @param {function} computeNextIndex : child index computer
    */
   const handleHorizontalNavigation = computeNextIndex => {
-    if (!activeNodeId) return;
+    if (!activeNodeId) return false;
     // Find sibling nodes
     const parentId = findParentNodeId(activeNodeId, edges);
     const siblingIds = Object.values(edges)
       .filter(({ nodeA }) => parentId === nodeA)
       .map(({ nodeB }) => nodeB);
     // If there are no siblings, exit.
-    if (!siblingIds.length) return;
+    if (!siblingIds.length) return false;
     // Otherwise, find the sibling id
     const index = siblingIds.indexOf(activeNodeId);
     const nextIndex = computeNextIndex(index, siblingIds);
@@ -68,7 +68,7 @@ const useArrowNavigation = () => {
     return index - 1 >= 0 ? index - 1 : levelIds.length - 1;
   }
   function left(event) {
-    handleHorizontalNavigation(computeLeft);
+    return handleHorizontalNavigation(computeLeft);
   }
   /**
    * Navigate to the active node's right sibling,
@@ -79,7 +79,7 @@ const useArrowNavigation = () => {
     return index + 1 <= levelIds.length - 1 ? index + 1 : 0;
   }
   function right(event) {
-    handleHorizontalNavigation(computeRight);
+    return handleHorizontalNavigation(computeRight);
   }
   useHotkeys("cmd+up", up, [activeNodeId]);
   useHotkeys("cmd+down", down, [activeNodeId]);
