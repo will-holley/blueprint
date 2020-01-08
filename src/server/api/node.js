@@ -112,7 +112,7 @@ router.delete("/:id", requiresAuthentication, async function deleteNode(
         .orWhere("node_b", id)
         // Return deleted edge ids
         .update({ deleted_at: new Date() }, ["id"]);
-      ////.select("*");
+      //.select("*"); //! dev
 
       //? Update edge ids to include parent edge id
       edgeIds = deletedEdges.map(({ id }) => id);
@@ -120,9 +120,9 @@ router.delete("/:id", requiresAuthentication, async function deleteNode(
 
     //? Mark the nodes as deleted
     const nodeIdArray = [...nodeIds];
-    // await db(Node.table)
-    //   .whereIn("id", nodeIdArray)
-    //   .update({ deleted_at: new Date() });
+    await db(Node.table)
+      .whereIn("id", nodeIdArray)
+      .update({ deleted_at: new Date() });
 
     // Return an object containing the deleted node and edge ids
     res.status(200);
