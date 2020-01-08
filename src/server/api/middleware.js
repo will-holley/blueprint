@@ -33,4 +33,18 @@ const requiresAuthentication = (req, res, next) => {
   next();
 };
 
-export { requiresAuthentication, handleInvalidJWT, useJWT };
+/**
+ * TODO!
+ * Does this work?
+ * https://expressjs.com/en/guide/error-handling.html
+ */
+const catchErrors = (req, res, next) => {
+  try {
+    return next();
+  } catch (error) {
+    console.info("ERROR:", error);
+    res.send(error.message);
+  }
+};
+
+export { requiresAuthentication, handleInvalidJWT, useJWT, catchErrors };

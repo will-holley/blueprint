@@ -5,7 +5,7 @@ import nodeRouter from "./node";
 import documentRouter from "./document";
 import userRouter from "./user";
 // Middleware
-import { useJWT, handleInvalidJWT } from "./middleware";
+import { useJWT, handleInvalidJWT, catchErrors } from "./middleware";
 
 //$ Router Setup
 const router = express({
@@ -29,6 +29,9 @@ router.get("/", (req, res) => res.sendStatus(200));
 router.use("/node", nodeRouter);
 router.use("/document", documentRouter);
 router.use("/user", userRouter);
+
+// TODO: not sure if this works.
+router.use(catchErrors);
 
 // Export
 export default router;
