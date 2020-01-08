@@ -1,13 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
-// Content Container Action Containers
+import { DebounceInput } from "react-debounce-input";
+//* Content Container Action Containers
 import { LeftActions, RightActions } from "client/layout/Actions";
-// Local UI Elements
-import { Title } from "./ui";
+//* Local UI Elements
+import { DocumentName } from "./ui";
 import Spotlight from "./Spotlight";
-// Global UI Elements
+//* Global UI Elements
 import { EmojiButton } from "client/components/Buttons";
-// Redux
+//* Redux
 import {
   activeDocumentSelector,
   documentPermissionsSelector
@@ -21,7 +22,7 @@ import {
   resetZoom,
   changeSpotlightVisibility
 } from "client/data/services/document/actions";
-// Hooks
+//* Hooks
 import { useHistory } from "react-router-dom";
 import { useHotkeys } from "client/utils/hooks";
 import useZoom from "./hotkeys/zoom";
@@ -70,10 +71,12 @@ const Actions = ({
         {permissions.addNodes && (
           <EmojiButton onClick={newBaseNode}>🌀</EmojiButton>
         )}
-        <Title
-          disabled={!permissions.editTitle}
+        <DebounceInput
+          element={DocumentName}
+          disabled={!permissions.editName}
           value={name !== null ? name : humanId}
           onChange={({ target: { value } }) => updateName(value)}
+          debounceTimeout={600}
         />
       </LeftActions>
       <RightActions>

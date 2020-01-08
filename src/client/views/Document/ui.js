@@ -6,7 +6,7 @@ import { Actions } from "client/layout/Actions";
  * Memoize so pixels is not being recomputed every time an updated
  * is made to the parent document.
  */
-const Title = React.memo(styled.input`
+const DocumentName = React.memo(styled.input`
   display: inline-block;
   font-weight: 800;
   font-size: 2rem;
@@ -56,4 +56,4 @@ const HotkeyShortcutsContainer = styled(ActionInfo)`
   }
 `;
 
-export { Title, HotkeyShortcutsContainer };
+export { DocumentName, HotkeyShortcutsContainer };

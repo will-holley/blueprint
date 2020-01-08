@@ -14,7 +14,7 @@ const documentPermissionsSelector = state => {
   //? Set default permissions
   const permissions = {
     readOnly: true,
-    editTitle: false,
+    editName: false,
     editTags: false,
     addNodes: false
   };
@@ -31,8 +31,8 @@ const documentPermissionsSelector = state => {
   //? Check if the document is public
   const docIsPublic = !doc.private;
 
-  //$ Only creator can edit title and tags
-  permissions.editTitle = isCreator;
+  //$ Only creator can edit doc name and tags
+  permissions.editName = isCreator;
   permissions.editTags = isCreator;
 
   //$ Any logged in user can add nodes to a public document.
