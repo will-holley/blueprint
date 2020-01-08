@@ -158,7 +158,7 @@ const Node = ({
             contentEditable={!permissions.readOnly}
             suppressContentEditableWarning={true}
             onInput={handleTextInput}
-            placeholder={"💭"}
+            placeholder={isActive && permissions.readOnly ? "🔵" : "💭"}
           >
             {content}
           </Text>
@@ -191,7 +191,7 @@ Node.propTypes = {
 };
 
 Node.defaultProps = {
-  dev: false,
+  dev: true,
   showButtons: false
 };
 
