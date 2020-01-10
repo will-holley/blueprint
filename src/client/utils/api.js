@@ -1,4 +1,5 @@
 import axios from "axios";
+import jwtDecode from "jwt-decode";
 
 class APISingleton {
   //! Statics
@@ -10,6 +11,15 @@ class APISingleton {
       Authorization: `Bearer ${this.token}`
     }
   });
+
+  constructor() {
+    // Check if there is a JWT and if it is valid.  If it's expired,
+    // delete it.
+    const token = this.token;
+    if (!token) return;
+    const { exp } = jwtDecode(token);
+    if (Date.now() >= exp * 1000) this.deAuthenticate();
+  }
 
   get token() {
     const token = window.localStorage.getItem(this.tokenName);
