@@ -80,7 +80,8 @@ const reducer = (state = initialState, action) => {
       return update(state, {
         all: {
           [action.docId]: {
-            name: { $set: action.name }
+            name: { $set: action.name },
+            updatedAt: { $set: new Date() }
           }
         }
       });
@@ -89,7 +90,8 @@ const reducer = (state = initialState, action) => {
       return update(state, {
         all: {
           [action.docId]: {
-            private: { $set: action.private }
+            private: { $set: action.private },
+            updatedAt: { $set: new Date() }
           }
         }
       });
