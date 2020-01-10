@@ -1,13 +1,13 @@
-import Documents from "client/views/Documents";
+import Dashboard from "client/views/Dashboard";
 import Document from "client/views/Document";
 import Join from "client/views/Authentication/Join";
 import Login from "client/views/Authentication/Login";
 
 const routes = {
-  //$ Documents
+  //$ Dashboard
   "/": {
     exact: true,
-    Component: Documents,
+    Component: Dashboard,
     authenticated: false,
     label: "Dashboard"
   },
