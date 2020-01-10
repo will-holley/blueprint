@@ -2,59 +2,91 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
 // Redux
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { logout } from "client/data/services/user/actions";
 import { createDocument } from "client/data/services/document/actions";
+import { toggleDashboardVisibilityFilter } from "client/data/services/ui/actions";
 // Components
-import { RightActions, ActionLink, ActionDivider } from "client/layout/Actions";
+import {
+  LeftActions,
+  RightActions,
+  ActionLink,
+  ActionDivider
+} from "client/layout/Actions";
 import { EmojiButton } from "client/components/Buttons";
+import Toggle from "client/components/Toggle";
 
-const Actions = ({ isLoggedIn, ...props }) => {
+const Actions = ({ isLoggedIn, showDeletedDocuments, filterDocuments }) => {
   const [disabled, setDisabled] = useState(false);
   const { push } = useHistory();
+  const dispatch = useDispatch();
 
-  const handleDocumentCreationButtonClick = async () => {
+  const handleDocumentCreationButtonClick = async event => {
     setDisabled(true);
-    const humanId = await props.createDocument();
+    const humanId = await dispatch(createDocument());
     push(`d/${humanId}`);
   };
 
+  const handleLogout = event => dispatch(logout());
+
+  const handleVisibilityFilterToggle = event =>
+    dispatch(toggleDashboardVisibilityFilter());
+
   return (
-    <RightActions>
-      {isLoggedIn ? (
-        <>
-          <EmojiButton
-            onClick={handleDocumentCreationButtonClick}
-            disabled={disabled}
-          >
-            ➕
-          </EmojiButton>
-          <ActionLink onClick={props.logout}>Logout</ActionLink>
-        </>
-      ) : (
-        <>
-          <ActionLink to="/join">Join</ActionLink>
-          <ActionDivider>or</ActionDivider>
-          <ActionLink to="/login">Login</ActionLink>
-        </>
+    <>
+      {isLoggedIn && (
+        <LeftActions>
+          <Toggle
+            a="All Blueprints"
+            b="Your Blueprints"
+            active={filterDocuments === "public" ? "a" : "b"}
+            handleClick={handleVisibilityFilterToggle}
+          />
+        </LeftActions>
       )}
-    </RightActions>
+      <RightActions>
+        {isLoggedIn ? (
+          <>
+            <EmojiButton>{showDeletedDocuments ? "✅" : "❌"}🗑</EmojiButton>
+            <EmojiButton
+              onClick={handleDocumentCreationButtonClick}
+              disabled={disabled}
+            >
+              ➕
+            </EmojiButton>
+            <ActionLink onClick={handleLogout}>Logout</ActionLink>
+          </>
+        ) : (
+          <>
+            <ActionLink to="/join">Join</ActionLink>
+            <ActionDivider>or</ActionDivider>
+            <ActionLink to="/login">Login</ActionLink>
+          </>
+        )}
+      </RightActions>
+    </>
   );
 };
 
 Actions.propTypes = {
   isLoggedIn: PropTypes.bool.isRequired,
-  createDocument: PropTypes.func.isRequired,
-  logout: PropTypes.func.isRequired
+  showDeletedDocuments: PropTypes.bool.isRequired,
+  filterDocuments: PropTypes.string.isRequired
 };
 Actions.defaultProps = {};
 
-const mapStateToProps = ({ user: { id } }, ownProps) => ({
-  isLoggedIn: Boolean(id)
-});
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  logout: () => dispatch(logout()),
-  createDocument: async () => dispatch(createDocument())
+const mapStateToProps = (
+  {
+    user: { id },
+    ui: {
+      dashboard: { showDeleted, filter }
+    }
+  },
+  ownProps
+) => ({
+  isLoggedIn: Boolean(id),
+  showDeletedDocuments: showDeleted,
+  filterDocuments: filter
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Actions);
+export default connect(mapStateToProps)(Actions);

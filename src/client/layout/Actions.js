@@ -8,6 +8,7 @@ const Actions = styled.div`
   top: 0;
   z-index: 10;
   padding: 1rem;
+  background-color: ${({ theme }) => theme.background};
 `;
 
 const LeftActions = styled(Actions)`

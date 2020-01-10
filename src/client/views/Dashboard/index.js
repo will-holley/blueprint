@@ -17,7 +17,7 @@ import { getRandomGradient } from "client/styles/gradients";
 
 const TODAY = new Date();
 
-const Documents = ({ allDocs, activeDocId, userId }) => {
+const Documents = ({ allDocs, activeDocId, userId, showDeleted, filter }) => {
   const { push } = useHistory();
 
   useEffect(() => {
@@ -25,11 +25,16 @@ const Documents = ({ allDocs, activeDocId, userId }) => {
     if (activeDocId) setActiveDocument(null);
   }, [activeDocId]);
 
+  let docs = allDocs;
+  if (filter === "private" && docs.length) {
+    docs = docs.filter(([id, doc]) => doc.private);
+  }
+
   return (
     <Container>
       <Actions />
-      {allDocs.length ? (
-        allDocs.map(([id, doc]) => {
+      {docs.length ? (
+        docs.map(([id, doc]) => {
           const ownedByUser = userId ? userId === doc.createdBy : false;
           const gradient = getRandomGradient();
           const updatedAt = Moment(doc.updatedAt);
@@ -69,14 +74,27 @@ const Documents = ({ allDocs, activeDocId, userId }) => {
 Documents.propTypes = {
   allDocs: PropTypes.array.isRequired,
   activeDocId: PropTypes.string,
-  userId: PropTypes.string
+  userId: PropTypes.string,
+  showDeleted: PropTypes.bool.isRequired,
+  filter: PropTypes.string.isRequired
 };
 Documents.defaultProps = {};
 
-const mapStateToProps = ({ documents, user }, ownProps) => ({
+const mapStateToProps = (
+  {
+    documents,
+    user,
+    ui: {
+      dashboard: { showDeleted, filter }
+    }
+  },
+  ownProps
+) => ({
   allDocs: Object.entries(documents.all),
   activeDocId: documents.active.id,
-  userId: user.id
+  userId: user.id,
+  showDeleted,
+  filter
 });
 
 export default connect(mapStateToProps)(Documents);

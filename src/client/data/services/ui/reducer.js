@@ -1,10 +1,15 @@
 import update from "immutability-helper";
 
-import { SET_LOADING } from "./constants";
+import { SET_LOADING, TOGGLE_DASHBOARD_VISIBILITY_FILTER } from "./constants";
 
 const initialState = {
   // application starts loading by default
-  loading: true
+  loading: true,
+  dashboard: {
+    showDeleted: false,
+    // Show all by default
+    filter: "public"
+  }
 };
 
 const reducer = (state = initialState, action) => {
@@ -12,6 +17,17 @@ const reducer = (state = initialState, action) => {
     case SET_LOADING: {
       return update(state, {
         loading: { $set: action.loading }
+      });
+    }
+    case TOGGLE_DASHBOARD_VISIBILITY_FILTER: {
+      const updatedFilter =
+        state.dashboard.filter === "private" ? "public" : "private";
+      return update(state, {
+        dashboard: {
+          filter: {
+            $set: updatedFilter
+          }
+        }
       });
     }
     default:
