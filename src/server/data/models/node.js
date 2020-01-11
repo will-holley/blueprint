@@ -5,6 +5,11 @@ class Node extends Model {
   static get table() {
     return "node";
   }
+
+  static get schema() {
+    return "document";
+  }
+
   static _addFields(table) {
     //? Content Type
     table
@@ -15,7 +20,10 @@ class Node extends Model {
     table.string("content").nullable();
     //? Document Foreign Key
     table.uuid("document").notNullable();
-    table.foreign("document").references(`${Document.table}.id`);
+    table
+      .foreign("document")
+      .references("id")
+      .inTable(Document.ref);
   }
 }
 

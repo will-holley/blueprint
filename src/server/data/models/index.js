@@ -4,10 +4,10 @@ import Edge from "./edge";
 import User from "./user";
 
 const models = {
+  user: User,
   document: Document,
   node: Node,
-  edge: Edge,
-  user: User
+  edge: Edge
 };
 
 export default models;

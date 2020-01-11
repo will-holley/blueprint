@@ -16,6 +16,12 @@ class Model {
     return "public";
   }
 
+  static get ref() {
+    return this.schema !== "public"
+      ? `${this.schema}.${this.table}`
+      : this.table;
+  }
+
   /**
    * Should this table include a human id field?
    */
@@ -47,7 +53,7 @@ class Model {
     if (exists) return;
 
     // Set up schema
-    logger.info(`Creating ${this.table} table`);
+    logger.info(`Creating ${this.ref} table`);
     await db.schema.withSchema(this.schema).createTable(this.table, table => {
       //? Primary Key
       table
@@ -72,10 +78,9 @@ class Model {
     //$ Set up updated at trigger
     await db.raw(`
         CREATE TRIGGER ${this.table}_updated_at
-        BEFORE UPDATE ON ${this.table}
+        BEFORE UPDATE ON ${this.ref}
         FOR EACH ROW
-        EXECUTE PROCEDURE on_update_timestamp();
-      `);
+        EXECUTE PROCEDURE on_update_timestamp();`);
   }
 }
 

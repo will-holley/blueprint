@@ -2,6 +2,9 @@ import Model from "./_model";
 import Node from "./node";
 
 class Edge extends Model {
+  static get schema() {
+    return "document";
+  }
   static get table() {
     return "edge";
   }
@@ -11,11 +14,13 @@ class Edge extends Model {
     table.uuid("node_b").notNullable();
     table
       .foreign("node_a")
-      .references(`${Node.table}.id`)
+      .references("id")
+      .inTable(Node.ref)
       .onDelete("CASCADE");
     table
       .foreign("node_b")
-      .references(`${Node.table}.id`)
+      .references("id")
+      .inTable(Node.ref)
       .onDelete("CASCADE");
     table.unique(["node_a", "node_b"]);
     //? Has Parent?
