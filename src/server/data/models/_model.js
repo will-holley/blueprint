@@ -36,6 +36,10 @@ class Model {
     throw new Error("Model.addFields Not Implemented");
   }
 
+  static _addComments(table) {
+    return;
+  }
+
   //! ====================
   //! == Public Methods ==
   //! ====================
@@ -73,6 +77,8 @@ class Model {
       table.timestamp("deleted_at");
       //? Model specific fields
       _this._addFields(table);
+      //? Model specific comments
+      _this._addComments(table);
     });
 
     //$ Set up updated at trigger

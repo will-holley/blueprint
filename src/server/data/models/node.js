@@ -26,6 +26,11 @@ class Node extends Model {
       .inTable(Document.ref);
     table.index("document");
   }
+
+  static _addComments(table) {
+    // Avoid naming conflicts with Relay `Node`.
+    table.comment("@name _node");
+  }
 }
 
 export default Node;

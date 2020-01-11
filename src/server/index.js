@@ -4,10 +4,12 @@ import cors from "cors";
 import express from "express";
 //* Database
 import db from "./data/db";
+import { createExtensionsAndFunctions, createTables } from "./data/db/setup";
 //* Utils
 import logger, { httpLogger } from "./utils/logger";
 //* API
 import router from "./api/routes";
+import postgraphile from "./graphql/postgraphile";
 //* Environment Variables
 const { SERVER_PORT } = process.env;
 
@@ -21,6 +23,9 @@ app.use(express.json());
 
 //? Attach API Router
 app.use("/api/1", router);
+
+// //? Attach GraphQL Router
+app.use(postgraphile);
 
 /**
  * Checks that the database is connected.
@@ -52,6 +57,8 @@ async function startServer() {
 
 (async () => {
   await validateDatabaseConnection();
+  // await createExtensionsAndFunctions();
+  // await createTables(true);
   await startServer();
 })();
 

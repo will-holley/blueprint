@@ -22,6 +22,7 @@
     "build": "rm -rf dist && webpack --config webpack/webpack.prod.js"
   },
   "dependencies": {
+    "@graphile-contrib/pg-simplify-inflector": "^5.0.0-beta.1",
     "@hapi/joi": "^16.1.8",
     "cors": "^2.8.5",
     "dotenv": "^7.0.0",
@@ -36,6 +37,7 @@
     "morgan": "^1.9.1",
     "pg": "^7.15.1",
     "pg-hstore": "^2.3.3",
+    "postgraphile": "^4.5.5",
     "uuid": "^3.3.3",
     "winston": "^3.2.1"
   },

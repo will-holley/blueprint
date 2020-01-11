@@ -27,3 +27,4 @@ const db = knex({
 });
 
 export default db;
+export { connection as connectionString };
