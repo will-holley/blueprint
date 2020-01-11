@@ -15,6 +15,7 @@ const functions = [
   $$ language 'plpgsql';
 `
 ];
+const schemas = ["document"];
 
 async function createExtensionsAndFunctions() {
   try {
@@ -35,8 +36,19 @@ async function dropTables() {
   await db.raw(commands.join(""));
 }
 
+async function createSchemas() {
+  try {
+    const queryString =
+      schemas.map(s => `CREATE SCHEMA IF NOT EXISTS ${s}`).join("\n") + ";";
+    await db.raw(queryString);
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
 async function createTables(force = false) {
   if (force) await dropTables();
+  await createSchemas();
   // Create tables if they don't exist
   Object.entries(models).forEach(async ([name, api]) => {
     await api.createTable();
