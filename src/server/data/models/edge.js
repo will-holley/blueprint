@@ -23,6 +23,7 @@ class Edge extends Model {
       .inTable(Node.ref)
       .onDelete("CASCADE");
     table.unique(["node_a", "node_b"]);
+    table.index(["node_a", "node_b"]);
     //? Has Parent?
     table
       .boolean("has_parent")

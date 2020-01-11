@@ -19,6 +19,7 @@ class Document extends Model {
       .foreign("created_by")
       .references("id")
       .inTable(User.ref);
+    table.index("created_by");
     //? Visibility
     table
       .boolean("private")

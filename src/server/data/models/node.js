@@ -24,6 +24,7 @@ class Node extends Model {
       .foreign("document")
       .references("id")
       .inTable(Document.ref);
+    table.index("document");
   }
 }
 
