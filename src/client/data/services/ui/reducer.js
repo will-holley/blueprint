@@ -1,6 +1,10 @@
 import update from "immutability-helper";
 
-import { SET_LOADING, TOGGLE_DASHBOARD_VISIBILITY_FILTER } from "./constants";
+import {
+  SET_LOADING,
+  TOGGLE_DASHBOARD_VISIBILITY_FILTER,
+  TOGGLE_DELETED_VISIBILITY
+} from "./constants";
 
 const initialState = {
   // application starts loading by default
@@ -27,6 +31,13 @@ const reducer = (state = initialState, action) => {
           filter: {
             $set: updatedFilter
           }
+        }
+      });
+    }
+    case TOGGLE_DELETED_VISIBILITY: {
+      return update(state, {
+        dashboard: {
+          showDeleted: { $set: !state.dashboard.showDeleted }
         }
       });
     }

@@ -30,6 +30,10 @@ const Documents = ({ allDocs, activeDocId, userId, showDeleted, filter }) => {
     docs = docs.filter(([id, doc]) => doc.private);
   }
 
+  if (!showDeleted && docs.length) {
+    docs = docs.filter(([id, doc]) => doc.deletedAt === null);
+  }
+
   return (
     <Container>
       <Actions />
@@ -38,6 +42,9 @@ const Documents = ({ allDocs, activeDocId, userId, showDeleted, filter }) => {
           const ownedByUser = userId ? userId === doc.createdBy : false;
           const gradient = getRandomGradient();
           const updatedAt = Moment(doc.updatedAt);
+          const deletedAt = doc.deletedAt ? Moment(doc.deletedAt) : null;
+          // If this document was deleted, show that instead of updated at.
+          const interactionTimestamp = deletedAt ? deletedAt : updatedAt;
           return (
             <DocumentInformation
               key={id}
@@ -53,9 +60,10 @@ const Documents = ({ allDocs, activeDocId, userId, showDeleted, filter }) => {
                   : `${ownedByUser ? "Yours - " : ""}Public 🥳`}
               </P>
               <P>
-                {updatedAt.isSame(TODAY, "day")
-                  ? updatedAt.fromNow()
-                  : updatedAt.startOf("day").fromNow()}
+                {deletedAt ? "Deleted " : ""}
+                {interactionTimestamp.isSame(TODAY, "day")
+                  ? interactionTimestamp.fromNow()
+                  : interactionTimestamp.startOf("day").fromNow()}
               </P>
             </DocumentInformation>
           );

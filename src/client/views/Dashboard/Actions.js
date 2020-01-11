@@ -5,7 +5,10 @@ import { useHistory } from "react-router-dom";
 import { connect, useDispatch } from "react-redux";
 import { logout } from "client/data/services/user/actions";
 import { createDocument } from "client/data/services/document/actions";
-import { toggleDashboardVisibilityFilter } from "client/data/services/ui/actions";
+import {
+  toggleDashboardVisibilityFilter,
+  toggleDeletedVisibility
+} from "client/data/services/ui/actions";
 // Components
 import {
   LeftActions,
@@ -32,6 +35,8 @@ const Actions = ({ isLoggedIn, showDeletedDocuments, filterDocuments }) => {
   const handleVisibilityFilterToggle = event =>
     dispatch(toggleDashboardVisibilityFilter());
 
+  const handleDeletedVisibility = event => dispatch(toggleDeletedVisibility());
+
   return (
     <>
       {isLoggedIn && (
@@ -47,7 +52,9 @@ const Actions = ({ isLoggedIn, showDeletedDocuments, filterDocuments }) => {
       <RightActions>
         {isLoggedIn ? (
           <>
-            <EmojiButton>{showDeletedDocuments ? "✅" : "❌"}🗑</EmojiButton>
+            <EmojiButton onClick={handleDeletedVisibility}>
+              {showDeletedDocuments ? "✅" : "❌"}🗑
+            </EmojiButton>
             <EmojiButton
               onClick={handleDocumentCreationButtonClick}
               disabled={disabled}
