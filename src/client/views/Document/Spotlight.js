@@ -90,7 +90,8 @@ const Spotlight = ({
   handleDeleteDocument,
   navigateToDashboard,
   handleDuplicateDocument,
-  navigateToDuplicate
+  navigateToDuplicate,
+  isDeleted
 }) => {
   const handleDelete = async event => {
     await handleDeleteDocument();
@@ -144,12 +145,16 @@ const Spotlight = ({
             </p>
           </div>
           <div>
-            <Button onClick={handleDelete}>🗑 Add to Trash</Button>
-            <p>
-              Adding this Blueprint to the trash will hide it from your
-              Dashboard. Don't worry, you can always get it back by clicking the
-              🗑 on your dashboard.
-            </p>
+            <Button onClick={handleDelete}>
+              🗑 {isDeleted ? "Remove from" : "Add to"} Trash
+            </Button>
+            {!isDeleted && (
+              <p>
+                Adding this Blueprint to the trash will hide it from your
+                Dashboard. Don't worry, you can always get it back by clicking
+                the 🗑 on your dashboard.
+              </p>
+            )}
           </div>
         </Actions>
         <Section>
@@ -236,11 +241,13 @@ Spotlight.propTypes = {
   handleDeleteDocument: PropTypes.func.isRequired,
   navigateToDashboard: PropTypes.func.isRequired,
   handleDuplicateDocument: PropTypes.func.isRequired,
-  navigateToDuplicate: PropTypes.func.isRequired
+  navigateToDuplicate: PropTypes.func.isRequired,
+  isDeleted: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = ({ documents: { active, all } }, ownProps) => ({
-  visibilityIsPrivate: all[active.id].private
+  visibilityIsPrivate: all[active.id].private,
+  isDeleted: Boolean(all[active.id].deletedAt)
 });
 
 const mapDispatchToProps = dispatch => ({
