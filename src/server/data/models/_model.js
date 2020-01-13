@@ -63,6 +63,7 @@ class Model {
       table
         .uuid("id")
         .primary()
+        .unique()
         .defaultTo(db.raw("gen_random_uuid()"));
       //? Human Readable ID
       if (_this._hasHumanId) {
