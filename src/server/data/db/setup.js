@@ -1,6 +1,13 @@
 import db from "./index";
 import { models, modelsByName } from "./../models";
+
+//* Constants
 const gqlUser = process.env.GRAPHQL_USER;
+
+const USER_REF = modelsByName.user.ref;
+const DOCUMENT_REF = modelsByName.document.ref;
+const NODE_REF = modelsByName.node.ref;
+const EDGE_REF = modelsByName.edge.ref;
 
 const types = [
   // Json Web Token type
@@ -53,7 +60,7 @@ const functions = [
     password text
   ) RETURNS public.jwt_token AS $$
   DECLARE
-    account ${modelsByName.user.ref};
+    account ${USER_REF};
     salt text;
     hashed_password text;
   BEGIN
@@ -62,7 +69,7 @@ const functions = [
     -- Hash Password
     hashed_password := (SELECT crypt(password, salt));
     -- Insert record
-    INSERT INTO ${modelsByName.user.ref} (email, password, salt)
+    INSERT INTO ${USER_REF} (email, password, salt)
     VALUES (email, hashed_password, salt)
     RETURNING * INTO account;
     -- Return JWT token
@@ -78,11 +85,11 @@ const functions = [
     password text
   ) RETURNS public.jwt_token AS $$
   DECLARE
-    account ${modelsByName.user.ref};
+    account ${USER_REF};
   BEGIN
     -- Find user account
     SELECT a.* INTO account
-      FROM ${modelsByName.user.ref} AS a
+      FROM ${USER_REF} AS a
       WHERE a.email = login_user.email;
     -- Check that passwords match
     IF account.password = crypt(password, account.salt) THEN
@@ -125,7 +132,7 @@ const roles = [
 ];
 
 /**
- * Public Permissions
+ * Public (including app_user) Permissions
  * - execute public.register_user
  * - execute public.login_user
  * - select public documents
@@ -141,10 +148,10 @@ const permissions = [
   /**
    * Enable row level security
    */
-  `ALTER TABLE ${modelsByName.user.ref} ENABLE ROW LEVEL SECURITY;`,
-  `ALTER TABLE ${modelsByName.document.ref} ENABLE ROW LEVEL SECURITY;`,
-  `ALTER TABLE ${modelsByName.node.ref} ENABLE ROW LEVEL SECURITY;`,
-  `ALTER TABLE ${modelsByName.edge.ref} ENABLE ROW LEVEL SECURITY;`,
+  `ALTER TABLE ${USER_REF} ENABLE ROW LEVEL SECURITY;`,
+  `ALTER TABLE ${DOCUMENT_REF} ENABLE ROW LEVEL SECURITY;`,
+  `ALTER TABLE ${NODE_REF} ENABLE ROW LEVEL SECURITY;`,
+  `ALTER TABLE ${EDGE_REF} ENABLE ROW LEVEL SECURITY;`,
   /**
    * Public Permissions
    */
@@ -153,25 +160,42 @@ const permissions = [
   // Don't expose a mutation for `public.generate_jwt_token`
   `COMMENT ON FUNCTION public.generate_jwt_token IS '@omit';`,
   // Select must be granted prior to policy creation
-  `GRANT USAGE ON SCHEMA document TO ${gqlUser};`,
-  `GRANT SELECT ON TABLE ${modelsByName.document.ref} TO ${gqlUser};`,
-  `GRANT SELECT ON TABLE ${modelsByName.node.ref} TO ${gqlUser};`,
-  `GRANT SELECT ON TABLE ${modelsByName.edge.ref} TO ${gqlUser};`,
+  `GRANT USAGE ON SCHEMA document TO ${gqlUser}, app_user;`,
+  `GRANT SELECT ON TABLE ${DOCUMENT_REF} TO ${gqlUser}, app_user;`,
+  `GRANT SELECT ON TABLE ${NODE_REF} TO ${gqlUser}, app_user;`,
+  `GRANT SELECT ON TABLE ${EDGE_REF} TO ${gqlUser}, app_user;`,
   // Create policies
-  `CREATE POLICY public_visibility ON ${modelsByName.document.ref}
-  AS PERMISSIVE FOR SELECT TO ${gqlUser}
+  `CREATE POLICY public_visibility ON ${DOCUMENT_REF}
+  AS PERMISSIVE FOR SELECT TO ${gqlUser}, app_user
   USING (private = False);
   `,
-  // `CREATE POLICY public_visibility ON ${modelsByName.node.ref}
-  // AS PERMISSIVE FOR SELECT TO ${gqlUser}
-  // USING (
-
-  // )
-  // `,
+  `CREATE POLICY public_visibility ON ${NODE_REF}
+  AS PERMISSIVE FOR SELECT TO ${gqlUser}, app_user
+  USING (
+    EXISTS (
+      SELECT private
+      FROM ${DOCUMENT_REF}
+      WHERE id = document and ${DOCUMENT_REF}.private = False
+    )
+  );`,
+  `CREATE POLICY public_visibility ON ${EDGE_REF}
+  AS PERMISSIVE FOR SELECT TO ${gqlUser}, app_user
+  USING (
+    EXISTS (
+      SELECT ${DOCUMENT_REF}.id
+      FROM ${NODE_REF}
+      JOIN ${DOCUMENT_REF} ON ${DOCUMENT_REF}.id = ${NODE_REF}.document
+      WHERE 
+        ${DOCUMENT_REF}.private = False AND (
+          ${NODE_REF}.id = node_a OR
+          ${NODE_REF}.id = node_b
+        )
+    )
+  );`,
   /**
-   * User Permissions
+   * TODO: User Permissions
    */
-  `CREATE POLICY user_can_select_self ON ${modelsByName.user.ref}
+  `CREATE POLICY user_can_select_self ON ${USER_REF}
   FOR SELECT
   USING ("id" = current_user_id());
   `
@@ -216,7 +240,7 @@ const createSchemas = async () =>
 
 /**
  * Create types, functions, extensions, and roles.
- * TODO: wrap this entire block in a single transaction.
+ * TODO: wrap this entire block in a single transaction within a single sql transaction
  */
 async function setupDatabase(forceCreateTables = false) {
   // Pre-table creation
