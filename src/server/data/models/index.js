@@ -3,11 +3,14 @@ import Node from "./node";
 import Edge from "./edge";
 import User from "./user";
 
-const models = {
+const modelsByName = {
   user: User,
   document: Document,
   node: Node,
   edge: Edge
 };
 
-export default models;
+// Ordered
+const models = [User, Document, Node, Edge];
+
+export { models, modelsByName };
