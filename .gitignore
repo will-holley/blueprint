@@ -1,4 +1,7 @@
-# Asserts
+# Relay (will be built)
+**/__generated__/**
+
+# Assets
 src/client/static/fonts/**/*.woff
 src/client/static/fonts/**/*.woff2
 src/client/static/fonts/**/*.css
