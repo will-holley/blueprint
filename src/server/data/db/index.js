@@ -8,11 +8,15 @@ const host = process.env[`${env}_DATABASE_HOST`];
 const name = process.env[`${env}_DATABASE_NAME`];
 const password = process.env[`${env}_DATABASE_PASSWORD`];
 const user = process.env[`${env}_DATABASE_USER`];
-const connection = `postgres://${user}:${password}@${host}:5432/${name}`;
+
+const ownerConnection = `postgres://${user}:${password}@${host}:5432/${name}`;
+
+const graphqlUser = process.env["GRAPHQL_USER"];
+const postgraphileConnection = `postgres://${graphqlUser}:${password}@${host}:5432/${name}`;
 
 const db = knex({
   client: "pg",
-  connection,
+  connection: ownerConnection,
   // the default settings:
   pool: {
     min: 2,
@@ -27,4 +31,4 @@ const db = knex({
 });
 
 export default db;
-export { connection as connectionString };
+export { ownerConnection, postgraphileConnection };
