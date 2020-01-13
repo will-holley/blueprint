@@ -1,5 +1,6 @@
-# Relay (will be built)
+# GraphQL
 **/__generated__/**
+schema.graphql
 
 # Assets
 src/client/static/fonts/**/*.woff
