@@ -143,12 +143,13 @@ const roles = [
 ];
 
 /**
- * Public (including app_user) Permissions
+ ** Public Permissions
  * - [x] execute public.register_user
  * - [x] execute public.login_user
  * - [x] select public documents
  * - [x] select nodes/edges within public documents
- * User permissions
+ ** User permissions (user inherits all public)
+ * TODO: explicit inheritance rather than dual grants/assignments
  * - [x] app_user can select any public document/node/edge
  * - document/node/edge tables
  * -- [x] app_user can insert on document table
@@ -160,14 +161,14 @@ const roles = [
  */
 const permissions = [
   /**
-   * Enable row level security
+   *? Enable row level security
    */
   `ALTER TABLE ${USER_REF} ENABLE ROW LEVEL SECURITY;`,
   `ALTER TABLE ${DOCUMENT_REF} ENABLE ROW LEVEL SECURITY;`,
   `ALTER TABLE ${NODE_REF} ENABLE ROW LEVEL SECURITY;`,
   `ALTER TABLE ${EDGE_REF} ENABLE ROW LEVEL SECURITY;`,
   /**
-   * Public Permissions
+   *? Public Permissions
    */
   `GRANT EXECUTE ON FUNCTION public.register_user TO ${gqlUser};`,
   `GRANT EXECUTE ON FUNCTION public.login_user TO ${gqlUser};`,
@@ -210,7 +211,7 @@ const permissions = [
   // See "How it works" -- https://www.graphile.org/postgraphile/security/
   `GRANT app_user TO ${gqlUser};`,
   /**
-   * User Permissions
+   *? User Permissions
    */
   // User can select their own record
   // TODO: users can select email + name of other users.
@@ -221,19 +222,52 @@ const permissions = [
   USING ("id" = current_user_id());
   `,
   // user can select
+  // document
   `CREATE POLICY creator_select ON ${DOCUMENT_REF}
   AS PERMISSIVE FOR SELECT TO app_user
   USING ("created_by" = current_user_id());`,
-  // user can update/insert documents
+  // select node
+  `CREATE POLICY private_visibility ON ${DOCUMENT_REF}
+  AS PERMISSIVE FOR SELECT TO app_user
+  USING (
+    EXISTS (
+      SELECT private
+      FROM ${DOCUMENT_REF}
+      WHERE id = document AND document.created_by = current_user_id()
+    )
+  );
+  `,
+  // select edge
+  `CREATE POLICY private_visibility ON ${EDGE_REF}
+  AS PERMISSIVE FOR SELECT TO app_user
+  USING (
+    EXISTS (
+      SELECT ${DOCUMENT_REF}.id
+      FROM ${NODE_REF}
+      JOIN ${DOCUMENT_REF} ON ${DOCUMENT_REF}.id = ${NODE_REF}.document
+      WHERE 
+        ${DOCUMENT_REF}.created_by = current_user_id() AND (
+          ${NODE_REF}.id = node_a OR
+          ${NODE_REF}.id = node_b
+        )
+    )
+  );`,
+  // user can update/insert
   `GRANT UPDATE, INSERT ON TABLE ${DOCUMENT_REF} TO app_user;`,
-  // user can update documents they've authored
+  `GRANT UPDATE, INSERT ON TABLE ${NODE_REF} TO app_user;`,
+  `GRANT UPDATE, INSERT ON TABLE ${EDGE_REF} TO app_user;`,
+  // row level policies
+  // document update/insert
   `CREATE POLICY creator_update ON ${DOCUMENT_REF}
   AS PERMISSIVE FOR UPDATE TO app_user
   USING ("created_by" = current_user_id());`,
-  // insertion policy
   `CREATE POLICY app_user_insert ON ${DOCUMENT_REF}
   AS PERMISSIVE FOR INSERT TO app_user
   WITH CHECK (TRUE);`
+  // TODO: add a trigger to automatically set createdBy on document,
+  // TODO and do not allow it to be set otherwise
+  // TODO node update/insert
+  // TODO edge update/insert
 ];
 
 const schemas = ["document"];
@@ -278,6 +312,8 @@ const createSchemas = async () =>
  * TODO: wrap this entire block in a single transaction within a single sql transaction
  * TODO: consider strengthening the authentication using stored sessions:
  * https://postgresconf.org/system/events/document/000/000/996/pgconf_us_2019.pdf -- pg27+
+ * TODO: don't consider the above... DO IT B/C THE AUTHORS ADMIT THE DOCS SUCK
+ * https://github.com/graphile/postgraphile/issues/1049
  */
 async function setupDatabase(forceCreateTables = false) {
   // Pre-table creation
