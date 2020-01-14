@@ -8,9 +8,12 @@ const extendedSchemas = makeExtendSchemaPlugin(buid => ({
   `,
   resolvers: {
     Document: {
-      createdByUser: async (parent, args, context, resolveInfo) => {
-        return true;
-      }
+      createdByUser: async (
+        { createdBy },
+        args,
+        { jwtClaims: { user_id: userId } },
+        resolveInfo
+      ) => createdBy === userId
     }
   }
 }));
