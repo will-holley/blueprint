@@ -127,7 +127,18 @@ const roles = [
   ALTER ROLE ${gqlUser} WITH LOGIN;
   `,
   // Session user
-  `DROP ROLE IF EXISTS app_user;
+  `
+  DO $$
+  DECLARE
+    count int;
+  BEGIN
+    SELECT 1 INTO count FROM pg_roles WHERE rolname = 'app_user';
+  IF count > 0 THEN
+    REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public FROM app_user;
+    REVOKE ALL ON SCHEMA document FROM app_user;
+    DROP ROLE app_user;
+  END IF;
+  END$$;
   CREATE ROLE app_user;`
 ];
 
