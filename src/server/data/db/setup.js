@@ -144,16 +144,19 @@ const roles = [
 
 /**
  * Public (including app_user) Permissions
- * - execute public.register_user
- * - execute public.login_user
- * - select public documents
- * - select nodes/edges within public documents
+ * - [x] execute public.register_user
+ * - [x] execute public.login_user
+ * - [x] select public documents
+ * - [x] select nodes/edges within public documents
  * User permissions
- * - app_user can select any public document/node/edge
- * - app_user can write to document/node/edge tables
- * - app_user has full access to any document/node/edge they've authored
- * - app_user can query their own user record
- * - set current user id when bearer token is present
+ * - [x] app_user can select any public document/node/edge
+ * - document/node/edge tables
+ * -- [x] app_user can insert on document table
+ * -- [x] app_user can read select/update documents they've authored
+ * -- [] app_user can select/insert/update nodes on documents they've authored
+ * -- [] app_user can select/insert/update edges on documents they've authored
+ * - [x] app_user can query their own user record
+ * - [x] set current user id when bearer token is present
  */
 const permissions = [
   /**
@@ -203,13 +206,34 @@ const permissions = [
         )
     )
   );`,
+  // Important: Needs permission to set `app_user` in transactions
+  // See "How it works" -- https://www.graphile.org/postgraphile/security/
+  `GRANT app_user TO ${gqlUser};`,
   /**
-   * TODO: User Permissions
+   * User Permissions
    */
+  // User can select their own record
+  // TODO: users can select email + name of other users.
+  // TODO: see the postgresconf presentation...
+  `GRANT SELECT ON TABLE ${USER_REF} TO app_user;`,
   `CREATE POLICY user_can_select_self ON ${USER_REF}
-  FOR SELECT
+  FOR SELECT TO app_user
   USING ("id" = current_user_id());
-  `
+  `,
+  // user can select
+  `CREATE POLICY creator_select ON ${DOCUMENT_REF}
+  AS PERMISSIVE FOR SELECT TO app_user
+  USING ("created_by" = current_user_id());`,
+  // user can update/insert documents
+  `GRANT UPDATE, INSERT ON TABLE ${DOCUMENT_REF} TO app_user;`,
+  // user can update documents they've authored
+  `CREATE POLICY creator_update ON ${DOCUMENT_REF}
+  AS PERMISSIVE FOR UPDATE TO app_user
+  USING ("created_by" = current_user_id());`,
+  // insertion policy
+  `CREATE POLICY app_user_insert ON ${DOCUMENT_REF}
+  AS PERMISSIVE FOR INSERT TO app_user
+  WITH CHECK (TRUE);`
 ];
 
 const schemas = ["document"];
@@ -252,6 +276,8 @@ const createSchemas = async () =>
 /**
  * Create types, functions, extensions, and roles.
  * TODO: wrap this entire block in a single transaction within a single sql transaction
+ * TODO: consider strengthening the authentication using stored sessions:
+ * https://postgresconf.org/system/events/document/000/000/996/pgconf_us_2019.pdf -- pg27+
  */
 async function setupDatabase(forceCreateTables = false) {
   // Pre-table creation
