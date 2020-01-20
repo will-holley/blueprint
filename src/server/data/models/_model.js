@@ -64,17 +64,27 @@ class Model {
         .uuid("id")
         .primary()
         .unique()
-        .defaultTo(db.raw("gen_random_uuid()"));
+        .defaultTo(db.raw("gen_random_uuid()"))
+        // only allow selecting
+        .comment("@omit create,update,delete");
       //? Human Readable ID
       if (_this._hasHumanId) {
         table
           .string("human_id")
           .unique()
-          .notNullable();
+          .notNullable()
+          // allow setting and selecting
+          .comment("@omit update,delete");
       }
       //? Timestamps
-      table.timestamp("created_at").defaultTo(db.fn.now());
-      table.timestamp("updated_at").defaultTo(db.fn.now());
+      table
+        .timestamp("created_at")
+        .defaultTo(db.fn.now())
+        .comment("@omit create,update");
+      table
+        .timestamp("updated_at")
+        .defaultTo(db.fn.now())
+        .comment("@omit create,update");
       table.timestamp("deleted_at");
       //? Model specific fields
       _this._addFields(table);
