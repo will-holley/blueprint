@@ -1,7 +1,6 @@
 const path = require("path");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const { EnvironmentPlugin } = require("webpack");
-const RelayCompilerWebpackPlugin = require("relay-compiler-webpack-plugin");
 
 module.exports = {
   // Client Entrypoint
@@ -56,10 +55,6 @@ module.exports = {
         viewport:
           "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no"
       }
-    }),
-    new RelayCompilerWebpackPlugin({
-      schema: path.resolve(__dirname, "./../schema.graphql"), // or schema.json
-      src: path.resolve(__dirname, "./../src/client")
     })
   ],
   output: {
