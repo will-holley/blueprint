@@ -1,4 +1,4 @@
-import API from "client/utils/api";
+import API from "../../../graphql/api";
 
 import { requestFailed } from "client/data/services/api/actions";
 
