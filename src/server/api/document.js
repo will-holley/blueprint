@@ -20,6 +20,7 @@ const fields = [
   "name",
   "updated_at as updatedAt",
   "created_by as createdBy",
+  "deleted_at as deletedAt",
   "private"
 ];
 
@@ -74,9 +75,9 @@ router.get("/", async function fetchAllDocuments(req, res) {
     //? Check if there is a logged in user
     const user = req.user && req.user._id ? req.user : null;
     //? Query all documents
-    const rows = await db(Document.table)
+    const rows = await db(Document.ref)
       .select(fields)
-      .where("deleted_at", null)
+      //.where("deleted_at", null)
       .andWhere(function() {
         //? Select public documents
         this.where("private", false);
@@ -105,7 +106,7 @@ router.post("/", requiresAuthentication, async function createDocument(
 ) {
   try {
     //? Insert the document record
-    const [document] = await db(Document.table)
+    const [document] = await db(Document.ref)
       .insert({
         human_id: hri.random(),
         created_by: user._id
@@ -115,7 +116,7 @@ router.post("/", requiresAuthentication, async function createDocument(
     document.edges = {};
     document.nodes = {};
     //? Create a base node record
-    await db(Node.table).insert({
+    await db(Node.ref).insert({
       human_id: hri.random(),
       document: document.id
     });
