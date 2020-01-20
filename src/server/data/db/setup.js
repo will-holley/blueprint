@@ -112,12 +112,9 @@ const functions = [
   DROP FUNCTION IF EXISTS document.on_insert_document CASCADE;
   CREATE FUNCTION document.on_insert_document() RETURNS trigger AS $$
   BEGIN
-    -- Validate that a user id is present
-    IF current_user_id() IS NULL THEN
-      RAISE EXCEPTION 'current_user_id is null!';
+    IF current_user_id() IS NOT NULL THEN
+      NEW.created_by := current_user_id();
     END IF;
-    -- Update
-    NEW.created_by := current_user_id();
     RETURN NEW;
   END;
   $$ LANGUAGE 'plpgsql';
