@@ -14,7 +14,10 @@ class Document extends Model {
     //? Name
     table.string("name").nullable();
     //? Owner Foreign key
-    table.uuid("created_by").notNullable();
+    table
+      .uuid("created_by")
+      .notNullable() // automatically set by a SQL trigger + immutable
+      .comment("@omit create,update,delete");
     table
       .foreign("created_by")
       .references("id")
