@@ -13,7 +13,8 @@ import {
   deleteDocument,
   duplicateDocument
 } from "client/data/services/document/actions";
-import { push } from "connected-react-router";
+//* Hooks
+import { useHistory } from "react-router-dom";
 
 const Container = styled.div`
   // Position
@@ -93,6 +94,8 @@ const Spotlight = ({
   navigateToDuplicate,
   isDeleted
 }) => {
+  const { push } = useHistory();
+
   const handleDelete = async event => {
     await handleDeleteDocument();
     navigateToDashboard();
@@ -144,7 +147,7 @@ const Spotlight = ({
               it.
             </p>
           </div>
-          <div>
+          {/* <div>
             <Button onClick={handleDelete}>
               🗑 {isDeleted ? "Remove from" : "Add to"} Trash
             </Button>
@@ -155,7 +158,7 @@ const Spotlight = ({
                 the 🗑 on your dashboard.
               </p>
             )}
-          </div>
+          </div> */}
         </Actions>
         <Section>
           <GradientText>
