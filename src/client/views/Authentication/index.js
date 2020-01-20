@@ -1,6 +1,7 @@
+//* React Core
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-// Components
+//* Components
 import GradientText from "client/components/GradientText";
 import { H1, H2, H3, P } from "client/components/tags";
 import {
@@ -10,15 +11,14 @@ import {
 } from "client/components/Actions";
 import Password from "./components/Password";
 import { Container, Input, Button } from "./components/ui";
-// Hooks
+//* Hooks
 import { useTransition, animated, Transition } from "react-spring";
 import { useHistory } from "react-router-dom";
 //* Graphql
-import { environment } from "client/graphql";
-import { commitMutation, graphql } from "react-relay";
-import jwtAPI from "../../graphql/api";
+import { useMutation, gql } from "@apollo/client";
+import { DashboardQuery } from "client/views/Dashboard";
 
-const registrationMutation = graphql`
+const RegistrationMutation = gql`
   mutation AuthenticationRegistrationMutation(
     $email: String!
     $password: String!
@@ -29,7 +29,7 @@ const registrationMutation = graphql`
   }
 `;
 
-const loginMutation = graphql`
+const LoginMutation = gql`
   mutation AuthenticationLoginMutation($email: String!, $password: String!) {
     loginUser(input: { email: $email, password: $password }) {
       jwtToken
@@ -43,15 +43,34 @@ const Authentication = () => {
     location: { pathname }
   } = useHistory();
 
-  //? Determine if this is login or join
-  const isLogin = pathname === "/login";
-
   //? Set up state variables
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  //? Determine if this is login or join
+  const isLogin = pathname === "/login";
+
+  //? Register mutation hooks
+  const mutationFunction = isLogin ? "loginUser" : "registerUser";
+  const [authenticate] = useMutation(
+    isLogin ? LoginMutation : RegistrationMutation,
+    {
+      variables: { email, password },
+      refetchQueries: ({
+        data: {
+          [mutationFunction]: { jwtToken }
+        }
+      }) => {
+        window.localStorage.setItem("jwt", jwtToken);
+        return [{ query: DashboardQuery }];
+      },
+      awaitRefetchQueries: true,
+      onCompleted: () => push("/")
+    }
+  );
 
   //! Change Handlers
   const handleEmailChange = ({ target: { value } }) => setEmail(value);
@@ -61,22 +80,7 @@ const Authentication = () => {
   const submit = async event => {
     setError(null);
     setLoading(true);
-    commitMutation(environment, {
-      mutation: isLogin ? loginMutation : registrationMutation,
-      variables: { email, password },
-      onCompleted: (response, errors) => {
-        // The object could either be `loginUser` or `registerUser`
-        const keys = Object.keys(response);
-        const { jwtToken } = response[keys[0]];
-        jwtAPI.authenticate(jwtToken);
-        // Navigate to dashboard
-        push("/");
-      },
-      onError: error => {
-        setError(error);
-        setLoading(false);
-      }
-    });
+    authenticate();
   };
 
   const canSubmit = email && password && !loading;
@@ -138,7 +142,7 @@ const Authentication = () => {
               <animated.div style={props}>
                 <GradientText>
                   <H2 onClick={submit} style={{ cursor: "pointer" }}>
-                    Join
+                    Go
                   </H2>
                 </GradientText>
               </animated.div>
