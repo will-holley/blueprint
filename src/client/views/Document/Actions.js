@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { DebounceInput } from "react-debounce-input";
 //* Content Container Action Containers
-import { LeftActions, RightActions } from "client/layout/Actions";
+import { LeftActions, RightActions } from "client/components/Actions";
 //* Local UI Elements
 import { DocumentName } from "./ui";
 import Spotlight from "./Spotlight";

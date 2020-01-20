@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Actions } from "client/layout/Actions";
+import { Actions } from "client/components/Actions";
 
 /**
  * Memoize so pixels is not being recomputed every time an updated
