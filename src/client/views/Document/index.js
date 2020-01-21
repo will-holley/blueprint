@@ -35,7 +35,10 @@ const Document = () => {
 
   const [createNode] = useMutation(CREATE_NODE_MUTATION, {
     // Reload the view
-    onCompleted: result => refetch()
+    onCompleted: async ({ createNode: { _node } }) => {
+      await refetch();
+      setActiveNodeId(_node.id);
+    }
   });
   const addNode = parentNodeId => {
     createNode({

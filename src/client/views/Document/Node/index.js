@@ -12,7 +12,7 @@ import { P } from "client/components/tags";
 
 const UPDATE_TEXT = gql`
   mutation UpdateText($id: UUID!, $text: String!) {
-    updateNodeById(input: { patch: { content: $text }, id: $id }) {
+    updateNode(input: { patch: { content: $text }, id: $id }) {
       clientMutationId
       _node {
         id

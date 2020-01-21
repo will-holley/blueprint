@@ -12,22 +12,24 @@ import { useHistory } from "react-router-dom";
 import { useHotkeys } from "client/utils/hooks";
 import useZoom from "./hotkeys/zoom";
 // import useArrowNavigation from "./hotkeys/arrows";
-// import useEscape from "./hotkeys/escape";
+import useEscape from "./hotkeys/escape";
 // import useBackspace from "./hotkeys/backspace";
-// import useEnter from "./hotkeys/enter";
-// import useDisableHotkeys from "./hotkeys/disable";
+import useEnter from "./hotkeys/enter";
+import useDisableHotkeys from "./hotkeys/disable";
 
 const Actions = ({
-  newBaseNode,
+  addNode,
   handleZoomIn,
   handleZoomOut,
   handleResetZoom,
   currentZoom,
   editable,
+  activeNodeId,
   setActiveNodeId,
   isPrivate,
   documentId,
-  displayName
+  displayName,
+  edges
 }) => {
   // ===========
   // == State ==
@@ -41,18 +43,25 @@ const Actions = ({
   // ====================
   // == Attach Hotkeys ==
   // ====================
+
   useZoom(handleZoomIn, handleZoomOut, handleResetZoom, currentZoom);
   // useArrowNavigation(setActiveNodeId);
-  // useEscape(setActiveNodeId);
+  useEscape(setActiveNodeId);
   // useBackspace();
-  // useEnter(newBaseNode);
-  // useDisableHotkeys();
+  useEnter(addNode, activeNodeId, edges);
+  useDisableHotkeys();
 
   //* Auditing
   //useHotkeys("*", event => console.info(event));
 
   // Hotkey Menu
   useHotkeys("cmd+k", handleSpotlightTrigger, [spotlightVisible]);
+
+  // ====================
+  // == Event Handlers ==
+  // ====================
+
+  const newBaseNode = event => addNode(null);
 
   // ============
   // == Render ==
@@ -85,26 +94,16 @@ const Actions = ({
 Actions.propTypes = {
   displayName: PropTypes.string.isRequired,
   documentId: PropTypes.string.isRequired,
-  newBaseNode: PropTypes.func.isRequired,
+  addNode: PropTypes.func.isRequired,
   handleZoomIn: PropTypes.func.isRequired,
   handleZoomOut: PropTypes.func.isRequired,
   handleResetZoom: PropTypes.func.isRequired,
   currentZoom: PropTypes.number.isRequired,
   editable: PropTypes.bool.isRequired,
+  activeNodeId: PropTypes.string,
   setActiveNodeId: PropTypes.func.isRequired,
-  isPrivate: PropTypes.bool.isRequired
+  isPrivate: PropTypes.bool.isRequired,
+  edges: PropTypes.array.isRequired
 };
-
-// const mapDispatchToProps = (dispatch, ownProps) => ({
-//   newBaseNode: () => dispatch(addNode(null)),
-//   updateName: name => dispatch(updateDocumentName(name)),
-//   handleSpotlightTrigger: () => dispatch(changeSpotlightVisibility())
-// });
-
-// const mapStateToProps = ({
-//   documents: {
-//     active: { spotlightVisible }
-//   }
-// }) => ({ spotlightVisible });
 
 export default Actions;

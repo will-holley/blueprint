@@ -41,7 +41,7 @@ const DocumentName = React.memo(styled.input`
 const UPDATE_NAME_MUTATION = gql`
   mutation UpdateDocumentPrivacy($id: UUID!, $name: String!) {
     __typename
-    updateDocumentById(input: { patch: { name: $name }, id: $id }) {
+    updateDocument(input: { patch: { name: $name }, id: $id }) {
       document {
         id
         name

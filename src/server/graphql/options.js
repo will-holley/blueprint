@@ -31,7 +31,7 @@ const commonOptions = {
   ],
   exportGqlSchemaPath: "schema.graphql",
   graphileBuildOptions: {
-    nestedMutationsOldUniqueFields: true
+    nestedMutationsSimpleFieldNames: false
   },
   // Security
   ownerConnectionString: ownerConnection,

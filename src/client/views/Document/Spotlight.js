@@ -87,7 +87,7 @@ const Shortcuts = styled(Section)`
 const UPDATE_PRIVATE_MUTATION = gql`
   mutation UpdateDocumentPrivacy($id: UUID!, $private: Boolean!) {
     __typename
-    updateDocumentById(input: { patch: { private: $private }, id: $id }) {
+    updateDocument(input: { patch: { private: $private }, id: $id }) {
       document {
         id
         private
