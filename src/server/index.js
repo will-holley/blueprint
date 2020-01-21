@@ -17,7 +17,7 @@ app.use(express.json());
 
 (async () => {
   // Setup the database
-  await setupDatabase(true);
+  //await setupDatabase(true);
 
   // Attach the graphql client only after database
   // setup is complete

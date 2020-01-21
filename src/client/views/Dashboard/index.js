@@ -17,7 +17,7 @@ import CreateDocumentButton from "./components/CreateDocumentButton";
 
 const DashboardQuery = gql`
   query DashboardQuery {
-    documents {
+    documents(orderBy: UPDATED_AT_DESC) {
       nodes {
         id
         name

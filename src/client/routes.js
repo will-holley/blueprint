@@ -1,5 +1,5 @@
 import Dashboard from "client/views/Dashboard";
-//import Document from "client/views/Document";
+import Document from "client/views/Document";
 import Authentication from "client/views/Authentication";
 
 export default {
@@ -9,12 +9,12 @@ export default {
     requiresAuth: false,
     label: "Dashboard"
   },
-  // "/d/:humanId": {
-  //   exact: true,
-  //   Component: Document,
-  //   requiresAuth: false,
-  //   label: "Document"
-  // },
+  "/d/:humanId": {
+    exact: true,
+    Component: Document,
+    requiresAuth: false,
+    label: "Document"
+  },
   "/join": {
     exact: true,
     Component: Authentication,

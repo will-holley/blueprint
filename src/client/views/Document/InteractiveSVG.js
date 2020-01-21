@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useSpring, animated } from "react-spring";
 import styled from "styled-components";
-import { connect } from "react-redux";
+
 //* Hooks
 import { useWindowSize, useWhyDidYouUpdate } from "client/utils/hooks";
 
@@ -87,8 +87,7 @@ const InteractiveSVG = ({ children, opacity, activeNodeId, zoom }) => {
 
   //! Activating a node centers it.
   useEffect(() => {
-    // By default there is no active node until the user creates
-    // a base node.
+    // By default there is no active node until the user creates a base node.
     if (!activeNodeId) return;
     // Get active node position
     const {
@@ -181,13 +180,4 @@ InteractiveSVG.propTypes = {
   zoom: PropTypes.number.isRequired
 };
 
-const mapStateToProps = ({
-  documents: {
-    active: { activeNodeId, zoom }
-  }
-}) => ({
-  activeNodeId,
-  zoom
-});
-
-export default connect(mapStateToProps)(InteractiveSVG);
+export default InteractiveSVG;

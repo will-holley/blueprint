@@ -63,7 +63,6 @@ class Model {
       table
         .uuid("id")
         .primary()
-        .unique()
         .defaultTo(db.raw("gen_random_uuid()"))
         // only allow selecting
         .comment("@omit create,update,delete");
@@ -74,7 +73,7 @@ class Model {
           .unique()
           .notNullable()
           // allow setting and selecting
-          .comment("@omit update,delete");
+          .comment("@omit create,update,delete");
       }
       //? Timestamps
       table

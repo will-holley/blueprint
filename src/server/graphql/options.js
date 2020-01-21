@@ -7,7 +7,10 @@ import { ownerConnection } from "./../data/db";
 //* Postgraphile Plugins
 import PgSimplifyInflectorPlugin from "@graphile-contrib/pg-simplify-inflector";
 import ConnectionFilterPlugin from "postgraphile-plugin-connection-filter";
+import PostGraphileNestedMutations from "postgraphile-plugin-nested-mutations";
 import extendedSchemas from "./schema";
+import resolvers from "./resolvers";
+import nullability from "./nullability";
 
 const commonOptions = {
   subscriptions: true,
@@ -19,15 +22,25 @@ const commonOptions = {
   enableQueryBatching: true,
   legacyRelations: "omit",
   appendPlugins: [
+    PostGraphileNestedMutations,
     PgSimplifyInflectorPlugin,
     ConnectionFilterPlugin,
-    extendedSchemas
+    nullability, // before resolvers
+    extendedSchemas,
+    resolvers
   ],
   exportGqlSchemaPath: "schema.graphql",
+  graphileBuildOptions: {
+    nestedMutationsOldUniqueFields: true
+  },
   // Security
   ownerConnectionString: ownerConnection,
   jwtSecret: process.env.JWT_SIGNATURE,
-  jwtPgTypeIdentifier: "public.jwt_token"
+  jwtPgTypeIdentifier: "public.jwt_token",
+  pgSettings: {
+    // After 3s runtime the database will timeout the call.
+    statement_timeout: "3000"
+  }
 };
 
 const devOptions = {

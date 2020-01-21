@@ -1,7 +1,7 @@
 import dagre from "dagre";
 import { calculateNodeHeight } from "./utils";
 
-function dagger(nodes, edges) {
+function dagger(nodes) {
   // Create a new directed graph
   const g = new dagre.graphlib.Graph();
 
@@ -17,20 +17,44 @@ function dagger(nodes, edges) {
     return {};
   });
 
-  //? Insert each node
-  Object.keys(nodes).forEach(id => {
+  // Create flat records of each edge, making a record of the node-edge b/c dagre doesn't support edge ids.
+  const edgesByNodes = {};
+  const edges = {};
+
+  // Insert each node
+  const nodesById = {};
+  nodes.forEach(node => {
+    const { id, edgesByNodeA, edgesByNodeB } = node;
+    nodesById[id] = Object.assign({}, node);
+
+    // Add to graph
     g.setNode(id, {
       width: 300, // always 300
       height: calculateNodeHeight(id)
     });
-  });
 
-  //? Insert each edge, making a record of the edge b/c dagre doesn't support
-  //? edge ids.
-  const edgesByNodes = {};
-  Object.values(edges).forEach(({ id, nodeA, nodeB }) => {
-    g.setEdge(nodeA, nodeB);
-    edgesByNodes[`${nodeA}-${nodeB}`] = id;
+    // Insert edges
+    edgesByNodeA.nodes.forEach(({ nodeB, id: edgeId, ...edge }) => {
+      g.setEdge(id, nodeB);
+      edges[edgeId] = {
+        id: edgeId,
+        nodeA: id,
+        nodeB,
+        ...edge
+      };
+      edgesByNodes[`${id}-${nodeB}`] = edgeId;
+    });
+
+    edgesByNodeB.nodes.forEach(({ nodeA, id: edgeId, ...edge }) => {
+      g.setEdge(nodeA, id);
+      edges[edgeId] = {
+        id: edgeId,
+        nodeA,
+        nodeB: id,
+        ...edge
+      };
+      edgesByNodes[`${nodeA}-${id}`] = edgeId;
+    });
   });
 
   //? Compute the layout
@@ -39,8 +63,8 @@ function dagger(nodes, edges) {
   //? Add position back to nodes and edges
   g.nodes().forEach(id => {
     const { x, y, height } = g.node(id);
-    nodes[id].position = { x, y };
-    nodes[id].height = height;
+    nodesById[id].position = { x, y };
+    nodesById[id].height = height;
   });
 
   //? Map edges w/ offsets
@@ -51,7 +75,7 @@ function dagger(nodes, edges) {
     // offset by 1/2 of the height of the source node.  add 5
     // because edges are represented with dashed lines and we want
     // the edge to appear vertically balanced.
-    const heightOffset = nodes[v].height / 2 + 5;
+    const heightOffset = nodesById[v].height / 2 + 5;
     edges[edgeId].position = g.edge(e).points.map(({ x, y }) => ({
       // Align to the middle of each node
       x: x + widthOffset,
@@ -59,7 +83,7 @@ function dagger(nodes, edges) {
     }));
   });
 
-  return [nodes, edges];
+  return [nodesById, edges];
 }
 
 export default dagger;

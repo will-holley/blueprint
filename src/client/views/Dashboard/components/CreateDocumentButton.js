@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { EmojiButton } from "client/components/Buttons";
-import { hri } from "human-readable-ids";
 //* Graphql
 import { useMutation, gql } from "@apollo/client";
 
 const CreateDocumentMutation = gql`
-  mutation createDocument($humanId: String!) {
-    createDocument(input: { document: { humanId: $humanId } }) {
+  mutation createDocument {
+    createDocument(input: {}) {
       document {
         humanId
       }
@@ -18,8 +17,6 @@ const CreateDocumentMutation = gql`
 const CreateDocumentButton = () => {
   const { push } = useHistory();
   const [create] = useMutation(CreateDocumentMutation, {
-    //TODO: The human id assignment should occur in GraphQL middleware.
-    variables: { humanId: hri.random() },
     onCompleted: ({
       createDocument: {
         document: { humanId }

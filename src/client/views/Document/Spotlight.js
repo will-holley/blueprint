@@ -1,20 +1,16 @@
 import React from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
-import { connect } from "react-redux";
+//* Graphql
+import { gql, useMutation } from "@apollo/client";
 //* Components
 import { H1, H2, H4, Button } from "client/components/tags";
 import GradientText from "client/components/GradientText";
 import Toggle from "client/components/Toggle";
-//* Actions
-import {
-  changeSpotlightVisibility,
-  updateDocumentPrivacy,
-  deleteDocument,
-  duplicateDocument
-} from "client/data/services/document/actions";
-//* Hooks
-import { useHistory } from "react-router-dom";
+
+// ===============================
+// == Presentational Components ==
+// ===============================
 
 const Container = styled.div`
   // Position
@@ -84,28 +80,39 @@ const Shortcuts = styled(Section)`
   }
 `;
 
+// ===============
+// == Mutations ==
+// ===============
+
+const UPDATE_PRIVATE_MUTATION = gql`
+  mutation UpdateDocumentPrivacy($id: UUID!, $private: Boolean!) {
+    __typename
+    updateDocumentById(input: { patch: { private: $private }, id: $id }) {
+      document {
+        id
+        private
+      }
+    }
+  }
+`;
+
+// ===============
+// == Component ==
+// ===============
+
 const Spotlight = ({
+  documentId,
   visibilityIsPrivate,
   closeSpotlight,
-  handleUpdateDocumentPrivate,
-  handleDeleteDocument,
-  navigateToDashboard,
-  handleDuplicateDocument,
-  navigateToDuplicate,
-  isDeleted
+  editable
 }) => {
-  const { push } = useHistory();
-
-  const handleDelete = async event => {
-    await handleDeleteDocument();
-    navigateToDashboard();
-  };
-
-  const createDuplicate = async event => {
-    const id = await handleDuplicateDocument();
-    closeSpotlight();
-    navigateToDuplicate(id);
-  };
+  const [updatePrivacy] = useMutation(UPDATE_PRIVATE_MUTATION, {
+    variables: {
+      id: documentId,
+      private: !visibilityIsPrivate
+    }
+  });
+  const handlePrivacyChange = event => updatePrivacy();
 
   return (
     <Container>
@@ -123,31 +130,32 @@ const Spotlight = ({
           <Tag>Dog</Tag>
         </div>
       </Tags> */}
-        <Actions>
-          <GradientText>
-            <H2>Actions</H2>
-          </GradientText>
-          <div>
-            <Toggle
-              a={"👀 Public"}
-              b="Private"
-              active={visibilityIsPrivate ? "b" : "a"}
-              handleClick={handleUpdateDocumentPrivate}
-            />
-            <p>
-              Update the visibility of this Blueprint. A private Blueprint is
-              only visible and editable by you. Public Blueprints are visible to
-              all and can be edited by member of the Blueprint community.
-            </p>
-          </div>
-          <div>
+        {editable && (
+          <Actions>
+            <GradientText>
+              <H2>Actions</H2>
+            </GradientText>
+            <div>
+              <Toggle
+                a={"👀 Public"}
+                b="Private"
+                active={visibilityIsPrivate ? "b" : "a"}
+                handleClick={handlePrivacyChange}
+              />
+              <p>
+                Update the visibility of this Blueprint. A private Blueprint is
+                only visible and editable by you. Public Blueprints are visible
+                to all and can be edited by member of the Blueprint community.
+              </p>
+            </div>
+            {/* <div>
             <Button onClick={createDuplicate}>🍴 Duplicate</Button>
             <p>
               Duplicating this Blueprint creates an identical private copy of
               it.
             </p>
-          </div>
-          {/* <div>
+          </div> */}
+            {/* <div>
             <Button onClick={handleDelete}>
               🗑 {isDeleted ? "Remove from" : "Add to"} Trash
             </Button>
@@ -159,11 +167,24 @@ const Spotlight = ({
               </p>
             )}
           </div> */}
-        </Actions>
+          </Actions>
+        )}
         <Section>
           <GradientText>
             <H2>Tips</H2>
           </GradientText>
+          <div>
+            <H4>Never take your hands off the keyboard</H4>
+            <p>
+              Removing your hands from the keyboard to use your mouse breaks
+              cognitive flow. You can navigate through your Blueprint using the
+              shortcuts in the right column.{" "}
+              <strong>
+                They may take a bit of practice if you're not used to using
+                keyboard shortcuts, but are worth the 10x speed improvements.
+              </strong>
+            </p>
+          </div>
           <div>
             <H4>Fullscreen is awesome</H4>
             <p>
@@ -238,28 +259,10 @@ const Spotlight = ({
 };
 
 Spotlight.propTypes = {
+  documentId: PropTypes.string.isRequired,
   visibilityIsPrivate: PropTypes.bool.isRequired,
   closeSpotlight: PropTypes.func.isRequired,
-  handleUpdateDocumentPrivate: PropTypes.func.isRequired,
-  handleDeleteDocument: PropTypes.func.isRequired,
-  navigateToDashboard: PropTypes.func.isRequired,
-  handleDuplicateDocument: PropTypes.func.isRequired,
-  navigateToDuplicate: PropTypes.func.isRequired,
-  isDeleted: PropTypes.bool.isRequired
+  editable: PropTypes.bool.isRequired
 };
 
-const mapStateToProps = ({ documents: { active, all } }, ownProps) => ({
-  visibilityIsPrivate: all[active.id].private,
-  isDeleted: Boolean(all[active.id].deletedAt)
-});
-
-const mapDispatchToProps = dispatch => ({
-  closeSpotlight: () => dispatch(changeSpotlightVisibility()),
-  handleUpdateDocumentPrivate: () => dispatch(updateDocumentPrivacy()),
-  handleDeleteDocument: async () => dispatch(deleteDocument()),
-  navigateToDashboard: () => dispatch(push("/")),
-  handleDuplicateDocument: async () => dispatch(duplicateDocument()),
-  navigateToDuplicate: humanId => dispatch(push(`/d/${humanId}`))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Spotlight);
+export default Spotlight;
