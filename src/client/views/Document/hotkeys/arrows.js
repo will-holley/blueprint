@@ -1,23 +1,13 @@
-//* libraries
-import { useSelector, useDispatch } from "react-redux";
-//* selectors
-import { activeDocumentSelector } from "client/data/selectors/document";
-//* actions
-import { setActiveNode, addNode } from "client/data/services/document/actions";
-//* everything else
 import { useHotkeys } from "client/utils/hooks";
 import { findParentNodeId } from "./utils";
 
-const useArrowNavigation = () => {
-  const { activeNodeId, edges, nodes } = useSelector(activeDocumentSelector);
-  const dispatch = useDispatch();
-
+const useArrowNavigation = (setActiveNodeId, activeNodeId, edges, addNode) => {
   function up(event) {
     if (!activeNodeId) return false;
     //? Determine if there is an edge where this node is the target
     const parentId = findParentNodeId(activeNodeId, edges);
     // If active node is not a base node, navigate to its parent.
-    if (parentId) dispatch(setActiveNode(parentId));
+    if (parentId) setActiveNodeId(parentId);
     // Prevent default behavior (shifting cursor the beginning of text)
     return false;
   }
@@ -27,13 +17,13 @@ const useArrowNavigation = () => {
    */
   function down(event) {
     if (!activeNodeId) return false;
-    const childIds = Object.values(edges)
+    const childIds = edges
       .filter(({ nodeA }) => {
         return nodeA === activeNodeId;
       })
       .map(({ nodeB }) => nodeB);
-    if (!childIds.length) dispatch(addNode(activeNodeId));
-    else dispatch(setActiveNode(childIds[0]));
+    if (!childIds.length) addNode(activeNodeId);
+    else setActiveNodeId(childIds[0]);
     // Prevent default behavior
     return false;
   }
@@ -46,7 +36,7 @@ const useArrowNavigation = () => {
     if (!activeNodeId) return false;
     // Find sibling nodes
     const parentId = findParentNodeId(activeNodeId, edges);
-    const siblingIds = Object.values(edges)
+    const siblingIds = edges
       .filter(({ nodeA }) => parentId === nodeA)
       .map(({ nodeB }) => nodeB);
     // If there are no siblings, exit.
@@ -55,7 +45,7 @@ const useArrowNavigation = () => {
     const index = siblingIds.indexOf(activeNodeId);
     const nextIndex = computeNextIndex(index, siblingIds);
     const id = siblingIds[nextIndex];
-    dispatch(setActiveNode(id));
+    setActiveNodeId(id);
     // Prevent default behavior
     return false;
   };
@@ -83,8 +73,8 @@ const useArrowNavigation = () => {
   }
   useHotkeys("cmd+up", up, [activeNodeId]);
   useHotkeys("cmd+down", down, [activeNodeId]);
-  useHotkeys("cmd+left", left, [activeNodeId, nodes]);
-  useHotkeys("cmd+right", right, [activeNodeId, nodes]);
+  useHotkeys("cmd+left", left, [activeNodeId]);
+  useHotkeys("cmd+right", right, [activeNodeId]);
 };
 
 export default useArrowNavigation;

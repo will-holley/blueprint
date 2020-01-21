@@ -11,7 +11,7 @@ import { EmojiButton } from "client/components/Buttons";
 import { useHistory } from "react-router-dom";
 import { useHotkeys } from "client/utils/hooks";
 import useZoom from "./hotkeys/zoom";
-// import useArrowNavigation from "./hotkeys/arrows";
+import useArrowNavigation from "./hotkeys/arrows";
 import useEscape from "./hotkeys/escape";
 // import useBackspace from "./hotkeys/backspace";
 import useEnter from "./hotkeys/enter";
@@ -45,7 +45,7 @@ const Actions = ({
   // ====================
 
   useZoom(handleZoomIn, handleZoomOut, handleResetZoom, currentZoom);
-  // useArrowNavigation(setActiveNodeId);
+  useArrowNavigation(setActiveNodeId, activeNodeId, edges, addNode);
   useEscape(setActiveNodeId);
   // useBackspace();
   useEnter(addNode, activeNodeId, edges);

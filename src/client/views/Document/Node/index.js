@@ -194,7 +194,7 @@ Node.propTypes = {
 
 Node.defaultProps = {
   dev: false,
-  showButtons: true
+  showButtons: false
 };
 
 export default Node;
