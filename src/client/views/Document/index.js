@@ -4,7 +4,11 @@ import { useParams } from "react-router-dom";
 import { hri } from "human-readable-ids";
 // Data
 import { useQuery, gql, useMutation } from "@apollo/client";
-import { DocumentQuery, CREATE_NODE_MUTATION } from "./gql";
+import {
+  DocumentQuery,
+  CREATE_NODE_MUTATION,
+  CREATE_BASE_NODE_MUTATION
+} from "./gql";
 // Components
 import { Helmet } from "react-helmet";
 import { Redirect } from "react-router-dom";
@@ -32,23 +36,33 @@ const Document = () => {
   // ======================
   // == Document Actions ==
   // ======================
-
-  const [createNode] = useMutation(CREATE_NODE_MUTATION, {
+  const createNodeConfig = {
     // Reload the view
     onCompleted: async ({ createNode: { _node } }) => {
       await refetch();
       setActiveNodeId(_node.id);
     }
-  });
+  };
+  const [createBaseNode] = useMutation(
+    CREATE_BASE_NODE_MUTATION,
+    createNodeConfig
+  );
+  const [createNode] = useMutation(CREATE_NODE_MUTATION, createNodeConfig);
   const addNode = parentNodeId => {
-    createNode({
-      variables: {
-        parentNodeId,
-        documentId: data.documentByHumanId.id,
-        nodeHumanId: hri.random(),
-        edgeHumanId: hri.random()
-      }
-    });
+    if (parentNodeId) {
+      createNode({
+        variables: {
+          parentNodeId,
+          documentId: data.documentByHumanId.id
+        }
+      });
+    } else {
+      createBaseNode({
+        variables: {
+          documentId: data.documentByHumanId.id
+        }
+      });
+    }
   };
 
   // ============

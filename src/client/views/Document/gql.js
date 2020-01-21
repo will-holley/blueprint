@@ -66,4 +66,16 @@ const CREATE_NODE_MUTATION = gql`
   ${NodeFragment}
 `;
 
-export { DocumentQuery, CREATE_NODE_MUTATION };
+const CREATE_BASE_NODE_MUTATION = gql`
+  mutation CreateNode($documentId: UUID!) {
+    createNode(input: { _node: { document: $documentId } }) {
+      _node {
+        ...NodeFragment
+      }
+      __typename
+    }
+  }
+  ${NodeFragment}
+`;
+
+export { DocumentQuery, CREATE_NODE_MUTATION, CREATE_BASE_NODE_MUTATION };
