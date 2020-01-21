@@ -6,6 +6,7 @@ import { hri } from "human-readable-ids";
 import { useQuery, gql, useMutation } from "@apollo/client";
 import { DocumentQuery, CREATE_NODE_MUTATION } from "./gql";
 // Components
+import { Helmet } from "react-helmet";
 import { Redirect } from "react-router-dom";
 import Node from "./Node";
 import Edge from "./Edge";
@@ -84,6 +85,7 @@ const Document = () => {
     if (!document) return <Redirect to="/" />;
     const { id, name, createdByUser, _nodes, private: _private } = document;
     const editable = Boolean(createdByUser);
+    const displayName = name !== null ? name : humanId;
 
     const result = dagger(_nodes);
     const positionedNodes = Object.values(result[0]);
@@ -91,17 +93,22 @@ const Document = () => {
 
     return (
       <>
+        <Helmet>
+          <title>{displayName}</title>
+        </Helmet>
         <Actions
           documentId={id}
-          displayName={name !== null ? name : humanId}
+          displayName={displayName}
           isPrivate={_private}
           editable={editable}
           handleZoomIn={event => setZoom(zoom + 0.1)}
           handleZoomOut={event => setZoom(zoom - 0.1)}
           handleResetZoom={event => setZoom(1)}
           currentZoom={zoom}
+          activeNodeId={activeNodeId}
           setActiveNodeId={setActiveNodeId}
-          newBaseNode={event => addNode(null)}
+          addNode={addNode}
+          edges={positionedEdges}
         />
         <InteractiveSVG
           opacity={nodesRendered ? 1 : 0}
