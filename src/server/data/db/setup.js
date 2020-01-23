@@ -159,6 +159,11 @@ const functions = [
     UPDATE ${NODE_REF}
     SET deleted_at = now()
     WHERE ${NODE_REF}.id = node_id;	
+
+    -- Delete the parent edge if one exists
+    UPDATE ${EDGE_REF}
+    SET deleted_at = now()
+    WHERE ${EDGE_REF}.node_b = node_id;
   END;
   $$ LANGUAGE 'plpgsql' VOLATILE STRICT SECURITY INVOKER;
   `
