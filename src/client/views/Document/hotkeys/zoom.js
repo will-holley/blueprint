@@ -1,45 +1,27 @@
-//* libraries
-import { useSelector, useDispatch } from "react-redux";
-//* actions
-import {
-  zoomIn,
-  zoomOut,
-  resetZoom
-} from "client/data/services/document/actions";
-//* everything else
 import { useHotkeys } from "client/utils/hooks";
 
-const useZoom = () => {
-  const dispatch = useDispatch();
-  const { zoom } = useSelector(
-    ({
-      documents: {
-        active: { zoom }
-      }
-    }) => zoom
-  );
-
+const useZoom = (zoomIn, zoomOut, resetZoom, currentZoom) => {
   const handleZoomIn = event => {
     event.preventDefault();
-    dispatch(zoomIn());
+    zoomIn();
     return false;
   };
 
   const handleZoomOut = event => {
     event.preventDefault();
-    dispatch(zoomOut());
+    zoomOut();
     return false;
   };
 
   const handleZoomReset = event => {
     event.preventDefault();
-    dispatch(resetZoom());
+    resetZoom();
     return false;
   };
 
-  useHotkeys("cmd+=", handleZoomIn, [zoom]);
-  useHotkeys("cmd+-", handleZoomOut, [zoom]);
-  useHotkeys("cmd+0", handleZoomReset, [zoom]);
+  useHotkeys("cmd+=", handleZoomIn, [currentZoom]);
+  useHotkeys("cmd+-", handleZoomOut, [currentZoom]);
+  useHotkeys("cmd+0", handleZoomReset, [currentZoom]);
 
   // Block browser zoom.  This gets trigged if cmd is held while switching from
   // plus to minus or visa versa.  Also blocks zoom reset.

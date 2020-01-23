@@ -2,20 +2,25 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Spring } from "react-spring";
-import { useSelector, connect } from "react-redux";
+//* GraphQL
+import { gql, useMutation } from "@apollo/client";
 //* Hooks
 import { useOnClickOutside, useHotkeys } from "client/utils/hooks";
-//* Selectors
-import { documentPermissionsSelector } from "client/data/selectors/document";
 //* Components
 import { Container, Text, NewChildButton } from "./ui";
 import { P } from "client/components/tags";
-//* Actions
-import {
-  addNode,
-  setActiveNode,
-  updateNodeText
-} from "client/data/services/document/actions";
+
+const UPDATE_TEXT = gql`
+  mutation UpdateText($id: UUID!, $text: String!) {
+    updateNode(input: { patch: { content: $text }, id: $id }) {
+      clientMutationId
+      _node {
+        id
+        content
+      }
+    }
+  }
+`;
 
 const Node = ({
   id,
@@ -23,20 +28,18 @@ const Node = ({
   position: { x, y },
   contentType,
   content,
-  dev,
-  showButtons,
-  // Redux
+  editable,
   isActive,
-  addChildNode,
   handleClickOutside,
   setAsActive,
-  updateText
+  addChildNode,
+  //
+  dev,
+  showButtons
 }) => {
   //! ============
   //! == CONFIG ==
   //! ============
-
-  const permissions = useSelector(documentPermissionsSelector);
 
   //* Ref used for tracking container height.
   const el = useRef(null);
@@ -85,7 +88,7 @@ const Node = ({
       //? Focus
       _el.focus();
       //? If this node cannot be edited, do not move cursor.
-      if (permissions.readOnly) return;
+      if (!editable) return;
       //? Set cursor to end of content
       if (_el.innerHTML.length) cursorToEnd();
     } else if (window.document.activeElement === _el) {
@@ -104,9 +107,9 @@ const Node = ({
    * Also updates node height in state if number of text lines has changed.
    * @param {Object} event
    */
+  const [updateText] = useMutation(UPDATE_TEXT);
   const handleTextInput = async ({ target: { innerText } }) => {
-    //* Track text area size.
-    await updateText(innerText);
+    await updateText({ variables: { id, text: innerText } });
     //* Ensure the cursor remains at the end of the value
     cursorToEnd();
   };
@@ -154,15 +157,15 @@ const Node = ({
             active={isActive}
             ref={textInput}
             onClick={setAsActive}
-            readOnly={permissions.readOnly}
-            contentEditable={!permissions.readOnly}
+            readOnly={!editable}
+            contentEditable={editable}
             suppressContentEditableWarning={true}
             onInput={handleTextInput}
-            placeholder={isActive && permissions.readOnly ? "🔵" : "💭"}
+            placeholder={isActive && !editable ? "🔵" : "💭"}
           >
             {content}
           </Text>
-          {showButtons && !permissions.readOnly && (
+          {showButtons && editable && (
             <NewChildButton onClick={addChildNode}>➕</NewChildButton>
           )}
         </Container>
@@ -180,36 +183,18 @@ Node.propTypes = {
   }).isRequired,
   contentType: PropTypes.string.isRequired,
   content: PropTypes.string,
-  dev: PropTypes.bool.isRequired,
-  showButtons: PropTypes.bool.isRequired,
-  // Redux
-  isActive: PropTypes.bool.isRequired,
+  editable: PropTypes.bool.isRequired,
   addChildNode: PropTypes.func.isRequired,
   handleClickOutside: PropTypes.func.isRequired,
   setAsActive: PropTypes.func.isRequired,
-  updateText: PropTypes.func.isRequired
+  // Local Dev
+  dev: PropTypes.bool.isRequired,
+  showButtons: PropTypes.bool.isRequired
 };
 
 Node.defaultProps = {
-  dev: true,
+  dev: false,
   showButtons: false
 };
 
-const mapStateToProps = (
-  {
-    documents: {
-      active: { activeNodeId }
-    }
-  },
-  { id }
-) => ({
-  isActive: activeNodeId === id
-});
-const mapDispatchToProps = (dispatch, { id }) => ({
-  addChildNode: () => dispatch(addNode(id)),
-  handleClickOutside: () => dispatch(setActiveNode(null)),
-  setAsActive: () => dispatch(setActiveNode(id)),
-  updateText: async text => dispatch(updateNodeText(id, text))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Node);
+export default Node;

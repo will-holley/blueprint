@@ -1,35 +1,30 @@
 import Dashboard from "client/views/Dashboard";
 import Document from "client/views/Document";
-import Join from "client/views/Authentication/Join";
-import Login from "client/views/Authentication/Login";
+import Authentication from "client/views/Authentication";
 
-const routes = {
-  //$ Dashboard
+export default {
   "/": {
     exact: true,
     Component: Dashboard,
-    authenticated: false,
+    requiresAuth: false,
     label: "Dashboard"
   },
-  //$ Document
   "/d/:humanId": {
     exact: true,
     Component: Document,
-    authenticated: false,
+    requiresAuth: false,
     label: "Document"
   },
   "/join": {
     exact: true,
-    Component: Join,
-    authenticated: false,
+    Component: Authentication,
+    requiresAuth: false,
     label: "Join"
   },
   "/login": {
     exact: true,
-    Component: Login,
-    authenticated: false,
+    Component: Authentication,
+    requiresAuth: false,
     label: "Login"
   }
 };
-
-export default routes;

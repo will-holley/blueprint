@@ -1,108 +1,75 @@
-import React, { useEffect } from "react";
-import PropTypes from "prop-types";
-import styled from "styled-components";
-import { useHistory } from "react-router-dom";
-import Moment from "moment";
-import { connect } from "react-redux";
-//* Redux Actions
-import { setActiveDocument } from "client/data/services/document/actions";
-// Components
-import { Container, DocumentInformation } from "./ui";
+import React from "react";
+//* GraphQL
+import { useQuery, gql } from "@apollo/client";
+//* Components
 import GradientText from "client/components/GradientText";
-import { H1, H3, P } from "client/components/tags";
-import Actions from "./Actions";
+import { H1 } from "client/components/tags";
+import Container from "client/components/PaddedContainer";
+import AuthenticationButtons from "client/components/AuthenticationButtons";
+import { RightActions } from "client/components/Actions";
+//* Local Components
+import DocumentListItem from "./components/DocumentListItem";
+import CreateDocumentButton from "./components/CreateDocumentButton";
 
-// Styles
-import { getRandomGradient } from "client/styles/gradients";
+//* ================
+//* == Root Query ==
+//* ================
 
-const TODAY = new Date();
-
-const Documents = ({ allDocs, activeDocId, userId, showDeleted, filter }) => {
-  const { push } = useHistory();
-
-  useEffect(() => {
-    // Clear any active document
-    if (activeDocId) setActiveDocument(null);
-  }, [activeDocId]);
-
-  let docs = allDocs;
-  if (filter === "private" && docs.length) {
-    docs = docs.filter(([id, doc]) => doc.private);
+const DashboardQuery = gql`
+  query DashboardQuery {
+    documents(orderBy: UPDATED_AT_DESC) {
+      nodes {
+        id
+        name
+        humanId
+        createdBy
+        updatedAt
+        private
+        createdByUser
+      }
+    }
+    currentUserId
   }
+`;
 
-  if (!showDeleted && docs.length) {
-    docs = docs.filter(([id, doc]) => doc.deletedAt === null);
-  }
+//* =====================
+//* == React Component ==
+//* =====================
+
+const Dashboard = () => {
+  const { loading, error, data, refetch } = useQuery(DashboardQuery);
+  const isAuthenticated = Boolean(data && data.currentUserId);
+  const documents = data && data.documents.nodes;
 
   return (
     <Container>
-      <Actions />
-      {docs.length ? (
-        docs.map(([id, doc]) => {
-          const ownedByUser = userId ? userId === doc.createdBy : false;
-          const gradient = getRandomGradient();
-          const updatedAt = Moment(doc.updatedAt);
-          const deletedAt = doc.deletedAt ? Moment(doc.deletedAt) : null;
-          // If this document was deleted, show that instead of updated at.
-          const interactionTimestamp = deletedAt ? deletedAt : updatedAt;
-          return (
-            <DocumentInformation
-              key={id}
-              onClick={() => push(`d/${doc.humanId}`)}
-            >
-              <GradientText interactive>
-                <H1>{doc.name ? doc.name : doc.humanId}</H1>
-              </GradientText>
-              {/* <H3>tag1, tag2, tag3</H3> */}
-              <P>
-                {doc.private
-                  ? "For your eyes only 😎"
-                  : `${ownedByUser ? "Yours - " : ""}Public 🥳`}
-              </P>
-              <P>
-                {deletedAt ? "Deleted " : ""}
-                {interactionTimestamp.isSame(TODAY, "day")
-                  ? interactionTimestamp.fromNow()
-                  : interactionTimestamp.startOf("day").fromNow()}
-              </P>
-            </DocumentInformation>
-          );
-        })
-      ) : userId ? (
+      {loading ? (
         <GradientText>
-          <H1>Click ➕ to start</H1>
+          <H1>Loading</H1>
         </GradientText>
       ) : (
-        <H1>👀 ➡️</H1>
+        <>
+          <RightActions>
+            <AuthenticationButtons
+              isAuthenticated={isAuthenticated}
+              refetchDashboardData={refetch}
+            />
+            {isAuthenticated && <CreateDocumentButton />}
+          </RightActions>
+          {documents.length ? (
+            documents.map(item => <DocumentListItem key={item.id} {...item} />)
+          ) : isAuthenticated ? (
+            <GradientText>
+              <H1>Click ➕ to start</H1>
+            </GradientText>
+          ) : (
+            <H1>👀 ➡️</H1>
+          )}
+        </>
       )}
     </Container>
   );
 };
 
-Documents.propTypes = {
-  allDocs: PropTypes.array.isRequired,
-  activeDocId: PropTypes.string,
-  userId: PropTypes.string,
-  showDeleted: PropTypes.bool.isRequired,
-  filter: PropTypes.string.isRequired
-};
-Documents.defaultProps = {};
-
-const mapStateToProps = (
-  {
-    documents,
-    user,
-    ui: {
-      dashboard: { showDeleted, filter }
-    }
-  },
-  ownProps
-) => ({
-  allDocs: Object.entries(documents.all),
-  activeDocId: documents.active.id,
-  userId: user.id,
-  showDeleted,
-  filter
-});
-
-export default connect(mapStateToProps)(Documents);
+export default Dashboard;
+export { DashboardQuery };

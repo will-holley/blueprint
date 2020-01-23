@@ -11,6 +11,7 @@
     "@babel/preset-react"
   ],
   "plugins": [
+    "relay",
     [
       "babel-plugin-styled-components",
       {

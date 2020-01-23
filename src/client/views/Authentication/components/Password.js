@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Input, Checkbox } from "./../ui";
+import { Input, Checkbox } from "./ui";
 
 const Password = ({ onChange, placeholder }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +13,7 @@ const Password = ({ onChange, placeholder }) => {
         type={showPassword ? "text" : "password"}
         placeholder={placeholder}
         onChange={onChange}
+        autocomplete="NoAutocomplete"
       />
       <label>
         <Checkbox onChange={updateVisibility} />

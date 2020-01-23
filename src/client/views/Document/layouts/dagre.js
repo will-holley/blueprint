@@ -18,17 +18,22 @@ function dagger(nodes, edges) {
   });
 
   //? Insert each node
-  Object.keys(nodes).forEach(id => {
-    g.setNode(id, {
+  const nodesById = {};
+  nodes.forEach(node => {
+    nodesById[node.id] = Object.assign({}, node);
+    g.setNode(node.id, {
       width: 300, // always 300
-      height: calculateNodeHeight(id)
+      height: calculateNodeHeight(node.id)
     });
   });
 
   //? Insert each edge, making a record of the edge b/c dagre doesn't support
   //? edge ids.
   const edgesByNodes = {};
-  Object.values(edges).forEach(({ id, nodeA, nodeB }) => {
+  const edgesById = {};
+  edges.forEach(edge => {
+    const { id, nodeA, nodeB } = edge;
+    edgesById[id] = Object.assign({}, edge);
     g.setEdge(nodeA, nodeB);
     edgesByNodes[`${nodeA}-${nodeB}`] = id;
   });
@@ -39,8 +44,8 @@ function dagger(nodes, edges) {
   //? Add position back to nodes and edges
   g.nodes().forEach(id => {
     const { x, y, height } = g.node(id);
-    nodes[id].position = { x, y };
-    nodes[id].height = height;
+    nodesById[id].position = { x, y };
+    nodesById[id].height = height;
   });
 
   //? Map edges w/ offsets
@@ -51,15 +56,15 @@ function dagger(nodes, edges) {
     // offset by 1/2 of the height of the source node.  add 5
     // because edges are represented with dashed lines and we want
     // the edge to appear vertically balanced.
-    const heightOffset = nodes[v].height / 2 + 5;
-    edges[edgeId].position = g.edge(e).points.map(({ x, y }) => ({
+    const heightOffset = nodesById[v].height / 2 + 5;
+    edgesById[edgeId].position = g.edge(e).points.map(({ x, y }) => ({
       // Align to the middle of each node
       x: x + widthOffset,
       y: y + heightOffset
     }));
   });
 
-  return [nodes, edges];
+  return [nodesById, edgesById];
 }
 
 export default dagger;

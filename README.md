@@ -19,3 +19,11 @@ Inspire yourself
 4. Create a build
 
 `npm run build`
+
+5. Create PostgreSQL users
+
+```bash
+psql
+CREATE USER super;
+ALTER USER super WITH SUPERUSER;
+```

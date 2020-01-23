@@ -1,4 +1,8 @@
-# Asserts
+# GraphQL
+**/__generated__/**
+schema.graphql
+
+# Assets
 src/client/static/fonts/**/*.woff
 src/client/static/fonts/**/*.woff2
 src/client/static/fonts/**/*.css

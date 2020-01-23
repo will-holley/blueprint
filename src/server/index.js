@@ -3,56 +3,29 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 //* Database
-import db from "./data/db";
+import setupDatabase from "./data/db/setup";
+import createPGQLClient from "./graphql/postgraphile";
 //* Utils
 import logger, { httpLogger } from "./utils/logger";
-//* API
-import router from "./api/routes";
 //* Environment Variables
 const { SERVER_PORT } = process.env;
 
-//? Create server instance
 const app = express();
-
-//? Attach Middleware
 app.use(cors());
 app.use(httpLogger);
 app.use(express.json());
 
-//? Attach API Router
-app.use("/api/1", router);
-
-/**
- * Checks that the database is connected.
- */
-async function validateDatabaseConnection() {
-  try {
-    const {
-      rows: [{ result }],
-      ...response
-    } = await db.raw("select 1+1 as result");
-    if (result === 2) {
-      logger.info("Database connection initialized");
-    } else {
-      throw new Error(response.toString());
-    }
-  } catch (error) {
-    logger.error(error);
-    throw error;
-  }
-}
-
-/**
- * Starts Express server.
- */
-async function startServer() {
-  await app.listen(SERVER_PORT);
-  logger.info(`Server live on localhost:${SERVER_PORT}`);
-}
-
 (async () => {
-  await validateDatabaseConnection();
-  await startServer();
+  // Setup the database
+  //await setupDatabase(true);
+
+  // Attach the graphql client only after database
+  // setup is complete
+  app.use(createPGQLClient());
+
+  // Start the express server
+  app.listen(SERVER_PORT);
+  logger.info(`Server live on localhost:${SERVER_PORT}`);
 })();
 
 //? Export for testing

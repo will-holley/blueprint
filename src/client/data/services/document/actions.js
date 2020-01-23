@@ -1,8 +1,7 @@
 //* Libraries
-import { push } from "connected-react-router";
 //* API
 import { requestFailed } from "client/data/services/api/actions";
-import API from "client/utils/api";
+import API from "../../../graphql/api";
 //* Constants
 import {
   ADD_NODE,

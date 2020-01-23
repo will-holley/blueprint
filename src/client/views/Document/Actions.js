@@ -1,27 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { DebounceInput } from "react-debounce-input";
 //* Content Container Action Containers
-import { LeftActions, RightActions } from "client/layout/Actions";
+import { LeftActions, RightActions } from "client/components/Actions";
 //* Local UI Elements
-import { DocumentName } from "./ui";
 import Spotlight from "./Spotlight";
+import Name from "./Components/Name";
 //* Global UI Elements
 import { EmojiButton } from "client/components/Buttons";
-//* Redux
-import {
-  activeDocumentSelector,
-  documentPermissionsSelector
-} from "client/data/selectors/document";
-import { connect, useSelector } from "react-redux";
-import {
-  addNode,
-  updateDocumentName,
-  zoomIn,
-  zoomOut,
-  resetZoom,
-  changeSpotlightVisibility
-} from "client/data/services/document/actions";
 //* Hooks
 import { useHistory } from "react-router-dom";
 import { useHotkeys } from "client/utils/hooks";
@@ -33,51 +18,61 @@ import useEnter from "./hotkeys/enter";
 import useDisableHotkeys from "./hotkeys/disable";
 
 const Actions = ({
-  newBaseNode,
-  updateName,
+  addNode,
   handleZoomIn,
   handleZoomOut,
   handleResetZoom,
-  spotlightVisible,
-  handleSpotlightTrigger
+  currentZoom,
+  editable,
+  activeNodeId,
+  setActiveNodeId,
+  isPrivate,
+  documentId,
+  displayName,
+  edges,
+  refetch
 }) => {
-  const { push } = useHistory();
-  const { name, humanId, activeNodeId, id: docId } = useSelector(
-    activeDocumentSelector
-  );
-  const permissions = useSelector(documentPermissionsSelector);
+  // ===========
+  // == State ==
+  // ===========
+  const [spotlightVisible, setSpotlightVisible] = useState(false);
+  const handleSpotlightTrigger = event =>
+    setSpotlightVisible(!spotlightVisible);
 
-  //! ====================
-  //! == Attach Hotkeys ==
-  //! ====================
-  useZoom();
-  useArrowNavigation();
-  useEscape();
-  useBackspace();
-  useEnter();
+  const { push } = useHistory();
+
+  // ====================
+  // == Attach Hotkeys ==
+  // ====================
+
+  useZoom(handleZoomIn, handleZoomOut, handleResetZoom, currentZoom);
+  useArrowNavigation(setActiveNodeId, activeNodeId, edges, addNode);
+  useEscape(setActiveNodeId);
+  useBackspace(activeNodeId, refetch);
+  useEnter(addNode, activeNodeId, edges);
   useDisableHotkeys();
 
   //* Auditing
   //useHotkeys("*", event => console.info(event));
 
-  //! Hotkey Menu
+  // Hotkey Menu
   useHotkeys("cmd+k", handleSpotlightTrigger, [spotlightVisible]);
 
-  //! Render
+  // ====================
+  // == Event Handlers ==
+  // ====================
+
+  const newBaseNode = event => addNode(null);
+
+  // ============
+  // == Render ==
+  // ============
   return (
     <>
       <LeftActions>
         <EmojiButton onClick={() => push("/")}>🎨</EmojiButton>
-        {permissions.addNodes && (
-          <EmojiButton onClick={newBaseNode}>🌀</EmojiButton>
-        )}
-        <DebounceInput
-          element={DocumentName}
-          disabled={!permissions.editName}
-          value={name !== null ? name : humanId}
-          onChange={({ target: { value } }) => updateName(value)}
-          debounceTimeout={600}
-        />
+        {editable && <EmojiButton onClick={newBaseNode}>🌀</EmojiButton>}
+        <Name text={displayName} editable={editable} documentId={documentId} />
       </LeftActions>
       <RightActions>
         <EmojiButton onClick={handleSpotlightTrigger}>💡</EmojiButton>
@@ -85,34 +80,32 @@ const Actions = ({
         <EmojiButton onClick={handleResetZoom}>🔍</EmojiButton>
         <EmojiButton onClick={handleZoomOut}>➖</EmojiButton>
       </RightActions>
-      {spotlightVisible && <Spotlight />}
+      {spotlightVisible && (
+        <Spotlight
+          documentId={documentId}
+          editable={editable}
+          closeSpotlight={handleSpotlightTrigger}
+          visibilityIsPrivate={isPrivate}
+        />
+      )}
     </>
   );
 };
 
 Actions.propTypes = {
-  newBaseNode: PropTypes.func.isRequired,
-  updateName: PropTypes.func.isRequired,
+  displayName: PropTypes.string.isRequired,
+  documentId: PropTypes.string.isRequired,
+  addNode: PropTypes.func.isRequired,
   handleZoomIn: PropTypes.func.isRequired,
   handleZoomOut: PropTypes.func.isRequired,
   handleResetZoom: PropTypes.func.isRequired,
-  spotlightVisible: PropTypes.bool.isRequired,
-  handleSpotlightTrigger: PropTypes.func.isRequired
+  currentZoom: PropTypes.number.isRequired,
+  editable: PropTypes.bool.isRequired,
+  activeNodeId: PropTypes.string,
+  setActiveNodeId: PropTypes.func.isRequired,
+  isPrivate: PropTypes.bool.isRequired,
+  edges: PropTypes.array.isRequired,
+  refetch: PropTypes.func.isRequired
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  newBaseNode: () => dispatch(addNode(null)),
-  updateName: name => dispatch(updateDocumentName(name)),
-  handleZoomIn: () => dispatch(zoomIn()),
-  handleZoomOut: () => dispatch(zoomOut()),
-  handleResetZoom: () => dispatch(resetZoom()),
-  handleSpotlightTrigger: () => dispatch(changeSpotlightVisibility())
-});
-
-const mapStateToProps = ({
-  documents: {
-    active: { spotlightVisible }
-  }
-}) => ({ spotlightVisible });
-
-export default connect(mapStateToProps, mapDispatchToProps)(Actions);
+export default Actions;

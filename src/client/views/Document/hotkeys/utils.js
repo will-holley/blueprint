@@ -3,7 +3,7 @@
  */
 const findParentNodeId = (activeNodeId, edges) => {
   //? Find the parent id
-  const edge = Object.values(edges).find(({ nodeB }) => nodeB === activeNodeId);
+  const edge = edges.find(({ nodeB }) => nodeB === activeNodeId);
   return edge ? edge.nodeA : null;
 };
 
