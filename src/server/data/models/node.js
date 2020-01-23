@@ -17,7 +17,7 @@ class Node extends Model {
       .notNullable()
       .defaultTo("text");
     //? Content
-    table.string("content").nullable();
+    table.text("content").nullable();
     //? Document Foreign Key
     table.uuid("document").notNullable();
     table
