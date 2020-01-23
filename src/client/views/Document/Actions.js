@@ -13,7 +13,7 @@ import { useHotkeys } from "client/utils/hooks";
 import useZoom from "./hotkeys/zoom";
 import useArrowNavigation from "./hotkeys/arrows";
 import useEscape from "./hotkeys/escape";
-// import useBackspace from "./hotkeys/backspace";
+import useBackspace from "./hotkeys/backspace";
 import useEnter from "./hotkeys/enter";
 import useDisableHotkeys from "./hotkeys/disable";
 
@@ -47,7 +47,7 @@ const Actions = ({
   useZoom(handleZoomIn, handleZoomOut, handleResetZoom, currentZoom);
   useArrowNavigation(setActiveNodeId, activeNodeId, edges, addNode);
   useEscape(setActiveNodeId);
-  // useBackspace();
+  useBackspace(activeNodeId);
   useEnter(addNode, activeNodeId, edges);
   useDisableHotkeys();
 
