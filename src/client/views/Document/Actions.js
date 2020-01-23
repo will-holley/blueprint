@@ -29,7 +29,8 @@ const Actions = ({
   isPrivate,
   documentId,
   displayName,
-  edges
+  edges,
+  refetch
 }) => {
   // ===========
   // == State ==
@@ -47,7 +48,7 @@ const Actions = ({
   useZoom(handleZoomIn, handleZoomOut, handleResetZoom, currentZoom);
   useArrowNavigation(setActiveNodeId, activeNodeId, edges, addNode);
   useEscape(setActiveNodeId);
-  useBackspace(activeNodeId);
+  useBackspace(activeNodeId, refetch);
   useEnter(addNode, activeNodeId, edges);
   useDisableHotkeys();
 
@@ -103,7 +104,8 @@ Actions.propTypes = {
   activeNodeId: PropTypes.string,
   setActiveNodeId: PropTypes.func.isRequired,
   isPrivate: PropTypes.bool.isRequired,
-  edges: PropTypes.array.isRequired
+  edges: PropTypes.array.isRequired,
+  refetch: PropTypes.func.isRequired
 };
 
 export default Actions;

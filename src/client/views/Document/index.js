@@ -133,6 +133,7 @@ const Document = () => {
           setActiveNodeId={setActiveNodeId}
           addNode={addNode}
           edges={positionedEdges}
+          refetch={refetch}
         />
         <InteractiveSVG
           opacity={nodesRendered ? 1 : 0}
