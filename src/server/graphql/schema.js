@@ -9,6 +9,9 @@ export default makeExtendSchemaPlugin(({ pgSql: sql, inflection }) => ({
         source: ${embed(sql.fragment`document.node`)}
         withQueryBuilder: ${embed((queryBuilder, args) => {
           queryBuilder.where(
+            sql.fragment`${queryBuilder.getTableAlias()}.deleted_at IS NULL`
+          );
+          queryBuilder.where(
             sql.fragment`${queryBuilder.getTableAlias()}.document = ${queryBuilder.parentQueryBuilder.getTableAlias()}.id`
           );
         })}
@@ -29,7 +32,7 @@ export default makeExtendSchemaPlugin(({ pgSql: sql, inflection }) => ({
       edges: async ({ id }, args, { pgClient }, { graphile }) => {
         // Is this a hack?  Is now the time for caring... no.
         const { rows } = await pgClient.query(`
-          SELECT * FROM document.edge WHERE id IN (
+          SELECT * FROM document.edge WHERE document.edge.deleted_at IS NULL AND id IN (
             SELECT DISTINCT(document.edge.id)
             FROM document.edge
             JOIN document.node ON document.node.id = document.edge.node_a OR document.node.id = document.edge.node_b
