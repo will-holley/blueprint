@@ -118,6 +118,49 @@ const functions = [
     RETURN NEW;
   END;
   $$ LANGUAGE 'plpgsql';
+  `,
+  // Node Branch deletion
+  `
+  DROP FUNCTION IF EXISTS document.delete_node CASCADE;
+  CREATE FUNCTION document.delete_node(node_id uuid)
+  RETURNS void AS $$
+  BEGIN
+    WITH RECURSIVE edge_tree AS (
+      SELECT id, node_a, node_b, deleted_at, 1 AS relative_depth
+      FROM ${EDGE_REF}
+      WHERE node_a = node_id
+      UNION ALL
+      SELECT e.id, e.node_a, e.node_b, e.deleted_at, st.relative_depth + 1
+      FROM ${EDGE_REF} e, edge_tree st
+      WHERE e.node_a = st.node_b AND e.deleted_at IS NULL
+    ),
+    node_ids AS (
+      UPDATE ${EDGE_REF}
+      SET deleted_at = now()
+      FROM edge_tree
+      WHERE edge_tree.id = ${EDGE_REF}.id
+      RETURNING edge_tree.node_a AS a, edge_tree.node_b AS b
+    ),
+    distinct_node_ids AS (
+      SELECT DISTINCT(id)
+      FROM ${NODE_REF}, node_ids
+      WHERE
+        ${NODE_REF}.id = node_ids.a OR
+        ${NODE_REF}.id = node_ids.b
+      GROUP BY ${NODE_REF}.id, node_ids.a, node_ids.b
+    )
+    UPDATE ${NODE_REF}
+    SET deleted_at = now()
+    FROM distinct_node_ids
+    WHERE distinct_node_ids.id = ${NODE_REF}.id;
+    
+    -- If this is a node with no child edges, edge_tree
+    -- will be empty and this node will not have been deleted.
+    UPDATE ${NODE_REF}
+    SET deleted_at = now()
+    WHERE ${NODE_REF}.id = node_id;	
+  END;
+  $$ LANGUAGE 'plpgsql' VOLATILE STRICT SECURITY INVOKER;
   `
 ];
 
