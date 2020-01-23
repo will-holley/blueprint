@@ -100,11 +100,18 @@ const Document = () => {
   if (!loading) {
     // Handle bad ids + errors + expired JWT
     if (!document) return <Redirect to="/" />;
-    const { id, name, createdByUser, _nodes, private: _private } = document;
+    const {
+      id,
+      name,
+      createdByUser,
+      _nodes,
+      edges,
+      private: _private
+    } = document;
     const editable = Boolean(createdByUser);
     const displayName = name !== null ? name : humanId;
 
-    const result = dagger(_nodes);
+    const result = dagger(_nodes, edges);
     const positionedNodes = Object.values(result[0]);
     const positionedEdges = Object.values(result[1]);
 

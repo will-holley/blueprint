@@ -6,6 +6,7 @@ const EdgeFragment = gql`
     nodeA
     nodeB
     hasParent
+    deletedAt
   }
 `;
 
@@ -16,18 +17,13 @@ const NodeFragment = gql`
     content
     contentType
     createdAt
-    edgesByNodeA {
-      nodes {
-        ...EdgeFragment
-      }
-    }
+    deletedAt
     edgesByNodeB {
       nodes {
-        ...EdgeFragment
+        id
       }
     }
   }
-  ${EdgeFragment}
 `;
 
 const DocumentQuery = gql`
@@ -40,9 +36,13 @@ const DocumentQuery = gql`
       _nodes {
         ...NodeFragment
       }
+      edges {
+        ...EdgeFragment
+      }
     }
   }
   ${NodeFragment}
+  ${EdgeFragment}
 `;
 
 const CREATE_NODE_MUTATION = gql`
