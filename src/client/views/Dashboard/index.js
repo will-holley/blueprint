@@ -10,6 +10,8 @@ import { RightActions } from "client/components/Actions";
 //* Local Components
 import DocumentListItem from "./components/DocumentListItem";
 import CreateDocumentButton from "./components/CreateDocumentButton";
+//* Graphql
+import { DocumentFragment } from "./gql";
 
 //* ================
 //* == Root Query ==
@@ -19,17 +21,12 @@ const DashboardQuery = gql`
   query DashboardQuery {
     documents(orderBy: UPDATED_AT_DESC) {
       nodes {
-        id
-        name
-        humanId
-        createdBy
-        updatedAt
-        private
-        createdByUser
+        ...DocumentFragment
       }
     }
     currentUserId
   }
+  ${DocumentFragment}
 `;
 
 //* =====================
@@ -37,9 +34,14 @@ const DashboardQuery = gql`
 //* =====================
 
 const Dashboard = () => {
-  const { loading, error, data, refetch } = useQuery(DashboardQuery);
+  const { loading, error, data, refetch } = useQuery(DashboardQuery, {
+    // Load new documents from server when navigating to Dashboard.
+    fetchPolicy: "cache-and-network"
+  });
   const isAuthenticated = Boolean(data && data.currentUserId);
   const documents = data && data.documents.nodes;
+
+  console.log(data, error);
 
   return (
     <Container>

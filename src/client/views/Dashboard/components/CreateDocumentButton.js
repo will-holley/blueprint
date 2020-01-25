@@ -3,15 +3,17 @@ import { useHistory } from "react-router-dom";
 import { EmojiButton } from "client/components/Buttons";
 //* Graphql
 import { useMutation, gql } from "@apollo/client";
+import { DocumentFragment } from "./../gql";
 
 const CreateDocumentMutation = gql`
   mutation createDocument {
     createDocument(input: {}) {
       document {
-        humanId
+        ...DocumentFragment
       }
     }
   }
+  ${DocumentFragment}
 `;
 
 const CreateDocumentButton = () => {
