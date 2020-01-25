@@ -9,4 +9,12 @@ const calculateNodeHeight = id => {
   return height;
 };
 
-export { calculateNodeHeight };
+const arrayToIdMap = array => {
+  const map = {};
+  array.forEach(item => {
+    map[item.id] = Object.assign({}, item);
+  });
+  return map;
+};
+
+export { calculateNodeHeight, arrayToIdMap };
