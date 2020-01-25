@@ -59,6 +59,9 @@ const InteractiveSVG = ({ children, opacity, activeNodeId, zoom }) => {
 
   //! Pan Event Handlers
   const handlePointerDown = event => {
+    // Only allow panning when user pans on empty canvas
+    if (event.target !== svg.current) return;
+
     setIsPointerDown(true);
     // We get the pointer position on click/touchdown so we can get the value
     // once the user starts to drag
