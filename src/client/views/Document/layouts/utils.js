@@ -1,10 +1,11 @@
 const calculateNodeHeight = id => {
   const el = document.getElementById(id);
-  const height = el
-    ? Array.from(el.children)
-        .map(({ offsetHeight }) => offsetHeight)
-        .reduce((acc, height) => (acc += height), 0)
-    : 0;
+  let height = 0;
+  if (el) {
+    Array.from(el.children).forEach(child => {
+      height += child.offsetHeight;
+    });
+  }
   return height;
 };
 
