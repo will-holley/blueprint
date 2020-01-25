@@ -72,9 +72,10 @@ const Node = ({
    */
   useEffect(() => {
     //* Calculate height
-    const height = Array.from(el.current.children)
-      .map(({ offsetHeight }) => offsetHeight)
-      .reduce((acc, height) => (acc += height), 0);
+    let height = 0;
+    Array.from(el.current.children).forEach(child => {
+      height += child.offsetHeight;
+    });
     setHeight(height);
   });
 
@@ -193,7 +194,7 @@ Node.propTypes = {
 };
 
 Node.defaultProps = {
-  dev: false,
+  dev: true,
   showButtons: false
 };
 
