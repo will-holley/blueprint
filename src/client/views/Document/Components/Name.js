@@ -20,10 +20,7 @@ const DocumentName = React.memo(styled.input`
   padding-left: 0.5rem;
   border: 0;
   background: transparent;
-  width: ${({ value }) => {
-    const pixels = value.length * 10;
-    return `${pixels}px`;
-  }};
+  width: 50vw;
   &:focus {
     outline: none;
   }
