@@ -9,6 +9,8 @@ import { useOnClickOutside, useHotkeys } from "client/utils/hooks";
 //* Components
 import { Container, Text, NewChildButton } from "./ui";
 import { P } from "client/components/tags";
+//* Constants
+import { VERTEX_WIDTH } from "./../constants";
 
 const UPDATE_TEXT = gql`
   mutation UpdateText($id: UUID!, $text: String!) {
@@ -143,7 +145,7 @@ const Node = ({
           style={props}
           ref={el}
           id={id}
-          width={300}
+          width={VERTEX_WIDTH}
           height={height}
           y={y}
           x={x}
@@ -194,7 +196,7 @@ Node.propTypes = {
 };
 
 Node.defaultProps = {
-  dev: true,
+  dev: false,
   showButtons: false
 };
 
