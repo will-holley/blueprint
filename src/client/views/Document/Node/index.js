@@ -1,5 +1,6 @@
 //* Libraries
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
+import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import { Spring } from "react-spring";
 //* GraphQL
@@ -44,9 +45,8 @@ const Node = ({
   //! ============
 
   //* Ref used for tracking container height.
-  const el = useRef(null);
+  const containerRef = useRef(null);
   const textInput = useRef(null);
-  const [height, setHeight] = useState(0);
 
   //! ===============
   //! == UTILITIES ==
@@ -70,30 +70,19 @@ const Node = ({
   //! ===============
 
   /**
-   * When node renders, calculate its height.
-   */
-  useEffect(() => {
-    //* Calculate height
-    let height = 0;
-    Array.from(el.current.children).forEach(child => {
-      height += child.offsetHeight;
-    });
-    setHeight(height);
-  });
-
-  /**
    * When `isActive` changes, check if this node should
    * be focused.
    */
   useEffect(() => {
     const _el = textInput.current;
     if (isActive) {
-      //? Focus
+      // Focus
       _el.focus();
-      //? If this node cannot be edited, do not move cursor.
+      // If this node cannot be edited, do not set cursor.
       if (!editable) return;
-      //? Set cursor to end of content
-      if (_el.innerHTML.length) cursorToEnd();
+      // Set cursor to end of content
+      const caretPos = _el.value.length;
+      _el.setSelectionRange(caretPos, caretPos);
     } else if (window.document.activeElement === _el) {
       // Programmatically de-focus if this element is not active
       // but was.  This occurs when `escape` key is pressed.
@@ -106,24 +95,31 @@ const Node = ({
   //! ====================
 
   /**
-   * Controlled input logic that updates the Node's text as the user changes it.
-   * Also updates node height in state if number of text lines has changed.
-   * @param {Object} event
+   * Syncs vertex text with the server.
+   * @param {Event}
    */
   const [updateText] = useMutation(UPDATE_TEXT);
-  const handleTextInput = async ({ target: { innerText } }) => {
-    await updateText({ variables: { id, text: innerText } });
-    //* Ensure the cursor remains at the end of the value
-    cursorToEnd();
+  const handleTextInput = async ({ target: { value } }) => {
+    await updateText({ variables: { id, text: value } });
   };
 
   /**
    * If this node is current active, set it as inactive
    */
-  useOnClickOutside(el, event => {
+  useOnClickOutside(containerRef, event => {
     if (!isActive) return;
     handleClickOutside();
   });
+
+  /**
+   * Set height outside of the react dom in order to avoid a re-render.
+   * @param {Number} newHeight - Textarea height in pixels.
+   */
+  const handleHeightChange = newHeight => {
+    const _el = ReactDOM.findDOMNode(containerRef.current);
+    _el.setAttribute("height", newHeight);
+    _el.style.height = newHeight;
+  };
 
   //! =============
   //! == HOTKEYS ==
@@ -138,15 +134,17 @@ const Node = ({
   //! == RENDER ==
   //! ============
 
+  console.log("Re-rendering");
+
   return (
     <Spring from={{ opacity: 0 }} to={{ opacity: 1 }}>
       {props => (
         <Container
           style={props}
-          ref={el}
+          ref={containerRef}
           id={id}
+          // Height is set by `handleHeightChange`
           width={VERTEX_WIDTH}
-          height={height}
           y={y}
           x={x}
           dev={dev}
@@ -158,16 +156,14 @@ const Node = ({
           )}
           <Text
             active={isActive}
-            ref={textInput}
-            onClick={setAsActive}
+            inputRef={textInput}
             readOnly={!editable}
-            contentEditable={editable}
-            suppressContentEditableWarning={true}
-            onInput={handleTextInput}
+            onChange={handleTextInput}
             placeholder={isActive && !editable ? "🔵" : "💭"}
-          >
-            {content}
-          </Text>
+            value={content}
+            onHeightChange={handleHeightChange}
+            onClick={setAsActive}
+          />
           {showButtons && editable && (
             <NewChildButton onClick={addChildNode}>➕</NewChildButton>
           )}
