@@ -4,6 +4,7 @@ import { EmojiButton } from "client/components/Buttons";
 //* Graphql
 import { useMutation, gql } from "@apollo/client";
 import { DocumentFragment } from "./../gql";
+import { CREATE_BASE_NODE_MUTATION } from "client/views/Document/gql";
 
 const CreateDocumentMutation = gql`
   mutation createDocument {
@@ -18,18 +19,20 @@ const CreateDocumentMutation = gql`
 
 const CreateDocumentButton = () => {
   const { push } = useHistory();
-  const [create] = useMutation(CreateDocumentMutation, {
-    onCompleted: ({
-      createDocument: {
-        document: { humanId }
-      }
-    }) => push(`d/${humanId}`)
-  });
+  const [createDocument] = useMutation(CreateDocumentMutation);
+  const [createBaseNode] = useMutation(CREATE_BASE_NODE_MUTATION);
   const [disabled, setDisabled] = useState(false);
 
   const handleClick = async event => {
     setDisabled(true);
-    create();
+    const result = await createDocument();
+    const { id, humanId } = result.data.createDocument.document;
+    await createBaseNode({
+      variables: {
+        documentId: id
+      }
+    });
+    push(`d/${humanId}`);
   };
 
   return (

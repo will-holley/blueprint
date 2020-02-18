@@ -7,6 +7,10 @@ import styled from "styled-components";
 //* Hooks
 import { useWindowSize, useWhyDidYouUpdate } from "client/utils/hooks";
 
+const SVG = styled(animated.svg)`
+  cursor: move;
+`;
+
 const Group = styled(animated.g)`
   opacity: ${({ opacity }) => opacity && opacity};
 `;
@@ -153,7 +157,7 @@ const InteractiveSVG = ({ children, opacity, activeNodeId, zoom }) => {
   }, [zoom]);
 
   return (
-    <animated.svg
+    <SVG
       ref={svg}
       viewBox={isPointerDown ? viewBoxString : viewBoxTransition.viewBox}
       style={{ width }}
@@ -172,7 +176,7 @@ const InteractiveSVG = ({ children, opacity, activeNodeId, zoom }) => {
       <Group style={animatedZoom} ref={group} opacity={opacity}>
         {children}
       </Group>
-    </animated.svg>
+    </SVG>
   );
 };
 

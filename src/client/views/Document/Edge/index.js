@@ -6,17 +6,9 @@ import { Path } from "./ui";
 //* Hooks
 import { useWindowSize } from "client/utils/hooks";
 
-const Edge = ({
-  position: [{ x: x1, y: y1 }, { x: x2, y: y2 }, { x, y }],
-  elbow,
-  id
-}) => {
-  //? Create a bezier curve.
-  const bezier = `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x} ${y}`;
-  //? Create a straight line.
-  const straight = `M ${x1} ${y1} L ${x} ${y}`;
-  return <Path d={elbow ? bezier : straight} id={id} />;
-};
+const Edge = ({ position: [{ x: x1, y: y1 }, { x: x2, y: y2 }], id }) => (
+  <Path d={`M ${x1} ${y1} L ${x2} ${y2}`} id={id} />
+);
 
 Edge.propTypes = {
   position: PropTypes.arrayOf(
@@ -25,11 +17,7 @@ Edge.propTypes = {
       y: PropTypes.number.isRequired
     })
   ).isRequired,
-  elbow: PropTypes.bool.isRequired,
   id: PropTypes.string.isRequired
-};
-Edge.defaultProps = {
-  elbow: true
 };
 
 export default Edge;

@@ -17,8 +17,8 @@ import Edge from "./Edge";
 import InteractiveSVG from "./InteractiveSVG";
 import Actions from "./Actions";
 // Rendering Engines
-import renderTree from "./layouts/tree";
 import dagger from "./layouts/dagre";
+import D3Force from "./layouts/force";
 
 const Document = () => {
   const { humanId } = useParams();
@@ -111,9 +111,10 @@ const Document = () => {
     const editable = Boolean(createdByUser);
     const displayName = name !== null ? name : humanId;
 
-    const result = dagger(_nodes, edges);
-    const positionedNodes = Object.values(result[0]);
-    const positionedEdges = Object.values(result[1]);
+    // const result = dagger(_nodes, edges);
+    // const positionedNodes = Object.values(result[0]);
+    // const positionedEdges = Object.values(result[1]);
+    const [positionedNodes, positionedEdges] = D3Force(_nodes, edges);
 
     return (
       <>
@@ -140,26 +141,34 @@ const Document = () => {
           zoom={zoom}
           activeNodeId={activeNodeId}
         >
-          {positionedNodes.map(
-            ({ id: nodeId, humanId, position, contentType, content }) => (
-              <Node
-                key={nodeId}
-                humanId={humanId}
-                id={nodeId}
-                position={position}
-                contentType={contentType}
-                content={content}
-                editable={editable}
-                isActive={activeNodeId === nodeId}
-                setAsActive={() => setActiveNodeId(nodeId)}
-                handleClickOutside={() => setActiveNodeId(null)}
-                addChildNode={() => addNode(nodeId)}
-              />
-            )
-          )}
-          {positionedEdges.map(({ id, position }) => (
-            <Edge key={id} position={position} id={id} />
-          ))}
+          {/**
+           * It is necessary to render the edges first and then the nodes as SVG layer order
+           * is a stack i.e. first-rendered, bottom-most displayed.
+           */}
+          <g>
+            {positionedEdges.map(({ id, position }) => (
+              <Edge key={id} position={position} id={id} />
+            ))}
+          </g>
+          <g>
+            {positionedNodes.map(
+              ({ id: nodeId, humanId, position, contentType, content }) => (
+                <Node
+                  key={nodeId}
+                  humanId={humanId}
+                  id={nodeId}
+                  position={position}
+                  contentType={contentType}
+                  content={content}
+                  editable={editable}
+                  isActive={activeNodeId === nodeId}
+                  setAsActive={() => setActiveNodeId(nodeId)}
+                  handleClickOutside={() => setActiveNodeId(null)}
+                  addChildNode={() => addNode(nodeId)}
+                />
+              )
+            )}
+          </g>
         </InteractiveSVG>
       </>
     );

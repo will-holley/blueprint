@@ -19,12 +19,8 @@ const DocumentName = React.memo(styled.input`
   letter-spacing: -0.03em;
   padding-left: 0.5rem;
   border: 0;
-  border-bottom: 1px dashed #e2e2e2;
   background: transparent;
-  width: ${({ value }) => {
-    const pixels = value.length * 15;
-    return `${pixels}px`;
-  }};
+  width: 50vw;
   &:focus {
     outline: none;
   }

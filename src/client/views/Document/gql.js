@@ -18,7 +18,12 @@ const NodeFragment = gql`
     contentType
     createdAt
     deletedAt
-    edgesByNodeB {
+    edgesByNodeA(filter: { deletedAt: { isNull: true } }) {
+      nodes {
+        id
+      }
+    }
+    edgesByNodeB(filter: { deletedAt: { isNull: true } }) {
       nodes {
         id
       }
