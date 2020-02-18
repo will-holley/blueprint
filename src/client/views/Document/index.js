@@ -18,7 +18,7 @@ import InteractiveSVG from "./InteractiveSVG";
 import Actions from "./Actions";
 // Rendering Engines
 import dagger from "./layouts/dagre";
-import FDS from "./layouts/fds";
+import D3Force from "./layouts/force";
 
 const Document = () => {
   const { humanId } = useParams();
@@ -111,10 +111,10 @@ const Document = () => {
     const editable = Boolean(createdByUser);
     const displayName = name !== null ? name : humanId;
 
-    const result = dagger(_nodes, edges);
-    const positionedNodes = Object.values(result[0]);
-    const positionedEdges = Object.values(result[1]);
-    //const [positionedNodes, positionedEdges] = FDS(_nodes, edges);
+    // const result = dagger(_nodes, edges);
+    // const positionedNodes = Object.values(result[0]);
+    // const positionedEdges = Object.values(result[1]);
+    const [positionedNodes, positionedEdges] = D3Force(_nodes, edges);
 
     return (
       <>
